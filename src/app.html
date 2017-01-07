@@ -4,7 +4,7 @@
 
   <div style="margin:25px">
     <div class="row">
-      <div class="col-md-6">
+      <div class="col-md-5">
         <v-grid v-multi-select="true" v-grid-connector.bind="gridConnector" v-row-height="25" v-header-height="50" v-panel-height="25"
           v-footer-height="25" style="height:400px;width:100%">
           <v-grid-col col-filter-menu="filter:country" col-label-menu="sort:country;groupby:country" col-width="100" col-drag-drop="title:Country;field:country"
@@ -47,15 +47,15 @@
         </div>
       </div>
     </div>
-    <div class="row col-md-6">
+    <div class="row col-md-5">
       <form>
         <div class="form-group">
           <label for="exampleInputEmail1">name</label>
-          <input value.bind="ds.entity.name" disabled.bind="!ds.entity" class="form-control" id="exampleInputEmail1">
+          <input value.bind="ds.entity.name" disabled.bind="!ds.entity.name" class="form-control" id="exampleInputEmail1">
         </div>
         <div class="checkbox">
           <label>
-      <input type="checkbox" checked.bind="ds.entity.bool" disabled.bind="!ds.entity"> Bool
+      <input type="checkbox" checked.bind="ds.entity.bool" disabled.bind="!ds.entity.bool"> Bool
     </label>
         </div>
       </form>
