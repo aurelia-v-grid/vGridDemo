@@ -28151,4 +28151,2191 @@ define('aurelia-v-grid/grid/columnMarkup',["require", "exports", "aurelia-framew
 
 //# sourceMappingURL=columnMarkup.js.map
 
-function _aureliaConfigureModuleLoader(){requirejs.config({"baseUrl":"src/","paths":{"aurelia-bootstrapper":"..\\node_modules\\aurelia-bootstrapper\\dist\\amd\\aurelia-bootstrapper","aurelia-binding":"..\\node_modules\\aurelia-binding\\dist\\amd\\aurelia-binding","aurelia-dependency-injection":"..\\node_modules\\aurelia-dependency-injection\\dist\\amd\\aurelia-dependency-injection","aurelia-event-aggregator":"..\\node_modules\\aurelia-event-aggregator\\dist\\amd\\aurelia-event-aggregator","aurelia-history":"..\\node_modules\\aurelia-history\\dist\\amd\\aurelia-history","aurelia-history-browser":"..\\node_modules\\aurelia-history-browser\\dist\\amd\\aurelia-history-browser","aurelia-loader":"..\\node_modules\\aurelia-loader\\dist\\amd\\aurelia-loader","aurelia-loader-default":"..\\node_modules\\aurelia-loader-default\\dist\\amd\\aurelia-loader-default","aurelia-logging":"..\\node_modules\\aurelia-logging\\dist\\amd\\aurelia-logging","aurelia-framework":"..\\node_modules\\aurelia-framework\\dist\\amd\\aurelia-framework","aurelia-logging-console":"..\\node_modules\\aurelia-logging-console\\dist\\amd\\aurelia-logging-console","aurelia-metadata":"..\\node_modules\\aurelia-metadata\\dist\\amd\\aurelia-metadata","aurelia-pal-browser":"..\\node_modules\\aurelia-pal-browser\\dist\\amd\\aurelia-pal-browser","aurelia-pal":"..\\node_modules\\aurelia-pal\\dist\\amd\\aurelia-pal","aurelia-path":"..\\node_modules\\aurelia-path\\dist\\amd\\aurelia-path","aurelia-router":"..\\node_modules\\aurelia-router\\dist\\amd\\aurelia-router","aurelia-task-queue":"..\\node_modules\\aurelia-task-queue\\dist\\amd\\aurelia-task-queue","aurelia-polyfills":"..\\node_modules\\aurelia-polyfills\\dist\\amd\\aurelia-polyfills","aurelia-route-recognizer":"..\\node_modules\\aurelia-route-recognizer\\dist\\amd\\aurelia-route-recognizer","aurelia-templating":"..\\node_modules\\aurelia-templating\\dist\\amd\\aurelia-templating","text":"..\\node_modules\\text\\text","aurelia-templating-binding":"..\\node_modules\\aurelia-templating-binding\\dist\\amd\\aurelia-templating-binding","app-bundle":"../scripts/app-bundle"},"packages":[{"name":"aurelia-templating-router","location":"../node_modules/aurelia-templating-router/dist/amd","main":"aurelia-templating-router"},{"name":"aurelia-templating-resources","location":"../node_modules/aurelia-templating-resources/dist/amd","main":"aurelia-templating-resources"},{"name":"aurelia-testing","location":"../node_modules/aurelia-testing/dist/amd","main":"aurelia-testing"},{"name":"aurelia-v-grid","location":"../node_modules/aurelia-v-grid/dist/amd","main":"index"}],"stubModules":[],"shim":{},"bundles":{"app-bundle":["app","environment","main","resources/index","aurelia-v-grid/grid/htmlCache","aurelia-v-grid/grid/controller","aurelia-v-grid/grid/mainMarkup","aurelia-v-grid/grid/mainMarkupHtmlString","aurelia-v-grid/grid/mainScrollEvents","aurelia-v-grid/grid/rowMarkup","aurelia-v-grid/grid/rowScrollEvents","aurelia-v-grid/grid/columnMarkup","aurelia-v-grid/grid/columnMarkupHelper","aurelia-v-grid/grid/htmlHeightWidth","aurelia-v-grid/grid/viewSlots","aurelia-v-grid/grid/columnBindingContext","aurelia-v-grid/grid/rowDataBinder","aurelia-v-grid/grid/rowClickHandler","aurelia-v-grid/grid/groupingElements","aurelia-v-grid/grid/loadingScreen","aurelia-v-grid/grid/contextMenu","aurelia-v-grid/grid/v-grid","aurelia-v-grid/grid/footer","aurelia-v-grid/utils/arrayUtils","aurelia-v-grid/utils/arrayFilter","aurelia-v-grid/utils/arraySort","aurelia-v-grid/utils/arrayGrouping"]}})}
+define('aurelia-v-grid/grid/columnMarkupHelper',["require", "exports"], function (require, exports) {
+    var ColumnMarkupHelper = (function () {
+        function ColumnMarkupHelper() {
+        }
+        ColumnMarkupHelper.prototype.generate = function (colConfig) {
+            var type = null;
+            if (colConfig && colConfig.length > 0) {
+                type = 'typeHtml';
+            }
+            if (!type) {
+                throw new Error('column setup missing');
+            }
+            this.processColumns(colConfig);
+        };
+        ColumnMarkupHelper.prototype.processColumns = function (array) {
+            var _this = this;
+            array.forEach(function (col, index) {
+                if (!col.colField && !col.colRowTemplate) {
+                    if (col.colType !== 'selection') {
+                        throw new Error('colField is not set on column' + index);
+                    }
+                }
+                col.colType = col.colType || 'text';
+                col.colFilterTop = col.colFilterTop || false;
+                col.colHeaderName = col.colHeaderName || _this.getAttribute(col.colField, true);
+                col.colWidth = col.colWidth || 100;
+                col.colCss = col.colCss || '';
+                col.colField = _this.checkAttribute(col.colField);
+                _this.createHeaderTemplate(col);
+                _this.createRowTemplate(col);
+                if (col.colRowTemplate) {
+                    col.__colRowTemplateGenerated = col.colRowTemplate;
+                }
+                if (col.colHeaderTemplate) {
+                    col.__colHeaderTemplateGenerated = col.colHeaderTemplate;
+                }
+            });
+        };
+        ColumnMarkupHelper.prototype.createHeaderTemplate = function (col) {
+            if (!col.colHeaderTemplate) {
+                var inputHeader = void 0;
+                var labelHeader = void 0;
+                switch (col.colType) {
+                    case 'selection':
+                        labelHeader = '';
+                        inputHeader = "<input \n            class=\"avg-row-checkbox-100\" \n            v-selection=\"type:header;selected.bind:selected\" \n            type=\"checkbox\">";
+                        break;
+                    case 'image':
+                        inputHeader = '<p class="avg-label-top"></p>';
+                        if (!col.colFilterTop) {
+                            col.colFilter = 'x';
+                        }
+                        labelHeader = this.createLabelMarkup(col);
+                        break;
+                    default:
+                        inputHeader = this.createInputHeaderMarkup(col);
+                        labelHeader = this.createLabelMarkup(col);
+                        break;
+                }
+                if (col.colFilterTop) {
+                    col.__colHeaderTemplateGenerated = inputHeader + labelHeader;
+                }
+                else {
+                    col.__colHeaderTemplateGenerated = labelHeader + inputHeader;
+                }
+            }
+        };
+        ColumnMarkupHelper.prototype.createRowTemplate = function (col) {
+            if (!col.colRowTemplate) {
+                switch (col.colType) {
+                    case 'selection':
+                        col.colRowTemplate = "<input \n            v-key-move \n            class=\"avg-row-checkbox-100\"  \n            v-selection=\"type:row;selected.bind:selected\" \n            type=\"checkbox\" >";
+                        break;
+                    case 'image':
+                        this.createImageRowMarkup(col);
+                        break;
+                    default:
+                        this.createInputRowMarkup(col);
+                        break;
+                }
+            }
+        };
+        ColumnMarkupHelper.prototype.getAttribute = function (value, capitalize) {
+            var returnValue = value || 'missing!';
+            if (value) {
+                value = value.replace('rowRef.', '');
+                value = value.replace('tempRef.', '');
+                var newValue = '';
+                var done = false;
+                for (var x = 0; x < value.length; x++) {
+                    var letter = value.charAt(x);
+                    if (!done && letter !== ' ' && letter !== '&' && letter !== '|' && letter !== ':') {
+                        newValue = newValue + letter;
+                    }
+                    else {
+                        done = true;
+                    }
+                }
+                if (capitalize) {
+                    returnValue = newValue.charAt(0).toUpperCase() + newValue.slice(1);
+                }
+                else {
+                    returnValue = newValue;
+                }
+            }
+            return returnValue;
+        };
+        ;
+        ColumnMarkupHelper.prototype.checkAttribute = function (attribute) {
+            var value = attribute;
+            if (attribute) {
+                if (attribute.indexOf('rowRef') === -1 && attribute.indexOf('tempRef') === -1) {
+                    value = 'rowRef.' + attribute;
+                }
+            }
+            return value;
+        };
+        ColumnMarkupHelper.prototype.createImageRowMarkup = function (col) {
+            var classNames = 'class="avg-image-round"';
+            var attributeRow = col.colAddRowAttributes ? col.colAddRowAttributes : '';
+            var css = col.colCss ? "css=\"" + col.colCss + "\"" : '';
+            var imageFix = "v-image-fix.bind=\"" + col.colField + "\"";
+            col.__colRowTemplateGenerated = "<image " + css + " " + classNames + " " + imageFix + " " + attributeRow + ">";
+        };
+        ColumnMarkupHelper.prototype.createInputRowMarkup = function (col) {
+            var colClass = "class=\"" + (col.colType === 'checkbox' ? 'avg-row-checkbox-100' : 'avg-row-input') + "\"";
+            var colType = "type=\"" + col.colType + "\"";
+            var colAddRowAttributes = col.colAddRowAttributes ? col.colAddRowAttributes : '';
+            var colRowMenu = col.colRowMenu ? "v-menu=\"" + col.colRowMenu + "\"" : '';
+            var colCss = col.colCss ? "css=\"" + col.colCss + "\"" : '';
+            if (col.colType === 'checkbox') {
+                col.__colRowTemplateGenerated = "<input \n        " + colCss + " \n        " + colClass + " \n        " + colType + " \n        " + colAddRowAttributes + " \n        " + colRowMenu + "  \n        checked.bind=\"" + col.colField + "\">";
+            }
+            else {
+                col.__colRowTemplateGenerated = "<input \n        " + colCss + " \n        " + colClass + " \n        " + colType + " \n        " + colRowMenu + "  \n        " + colAddRowAttributes + "  \n        value.bind=\"" + col.colField + "\">";
+            }
+        };
+        ColumnMarkupHelper.prototype.createInputHeaderMarkup = function (col) {
+            var markup;
+            if (col.colFilter) {
+                var type = "type=\"" + col.colType + "\"";
+                var filter = col.colFilter ? "v-filter=\"" + col.colFilter + "\"" : '';
+                var colAddFilterAttributes = col.colAddFilterAttributes ? col.colAddFilterAttributes : '';
+                var classNames = '';
+                if (col.colType === 'checkbox') {
+                    classNames = "class=\"" + (col.colFilterTop ? 'avg-row-checkbox-50' : 'avg-row-checkbox-50') + "\"";
+                }
+                else {
+                    classNames = "class=\"" + (col.colFilterTop ? 'avg-header-input-top' : 'avg-header-input-bottom') + "\"";
+                }
+                var colRowMenu = col.colFilterMenu ? "v-menu=\"" + col.colFilterMenu + "\"" : '';
+                markup = "<input " + colRowMenu + " " + classNames + " " + colAddFilterAttributes + " " + type + " " + filter + "\">";
+            }
+            else {
+                markup = '';
+            }
+            return markup;
+        };
+        ColumnMarkupHelper.prototype.createLabelMarkup = function (col) {
+            var filterClass = col.colFilter ? "" + (col.colFilterTop ? 'avg-label-bottom' : 'avg-label-top') : 'avg-label-full';
+            var dragDropClass = col.colDragDrop ? 'avg-vGridDragHandle' : '';
+            var classname = "class=\"" + dragDropClass + " " + filterClass + "\"";
+            var colAddLabelAttributes = col.colAddLabelAttributes ? col.colAddLabelAttributes : '';
+            var sort = col.colSort ? "v-sort=\"" + col.colSort + "\"" : '';
+            var colLabelMenu = col.colLabelMenu ? "v-menu=\"" + col.colLabelMenu + "\"" : '';
+            var colDragDrop = col.colDragDrop !== 'false' ? "v-drag-drop-col=\"" + col.colDragDrop + "\"" : '';
+            var colResizeable = col.colResizeable !== 'false' ? "v-resize-col" : '';
+            var extraAttributes = colDragDrop + " " + colResizeable + " " + colLabelMenu;
+            return "<p \n      " + extraAttributes + " \n      " + classname + " \n      " + sort + " \n      " + colAddLabelAttributes + ">\n      " + col.colHeaderName + "\n      </p>";
+        };
+        return ColumnMarkupHelper;
+    }());
+    exports.ColumnMarkupHelper = ColumnMarkupHelper;
+});
+
+//# sourceMappingURL=columnMarkupHelper.js.map
+
+define('aurelia-v-grid/grid/contextMenu',["require", "exports", "aurelia-framework"], function (require, exports, aurelia_framework_1) {
+    var ContextMenu = (function () {
+        function ContextMenu(viewCompiler, container, viewResources, viewSlots) {
+            this.menuStrings = {
+                close: 'Close',
+                pinLeft: 'Pin left',
+                pinRight: 'Pin Right',
+                groupBy: 'Group By',
+                sortAscending: 'Sort Ascending',
+                sortDescending: 'Sort Descending',
+                showAll: 'Show All',
+                clearCurrent: 'Clear Current',
+                clearAll: 'Clear All',
+                chooseOperator: 'Choose Operator',
+                back: 'Back',
+                equals: 'Equals',
+                lessThanOrEqual: 'Less than or equal',
+                greaterThanOrEqual: 'Greater than or equal',
+                lessThan: 'Less than',
+                greaterThan: 'Greater than',
+                contains: 'Contains',
+                notEqualTo: 'Not equal to',
+                doesNotContain: 'Does not contain',
+                beginsWith: 'Begins with',
+                endsWith: 'Ends with'
+            };
+            this.viewCompiler = viewCompiler;
+            this.container = container;
+            this.viewResources = viewResources;
+            this.viewSlots = viewSlots;
+            this.setDefaults();
+        }
+        ContextMenu.prototype.setDefaults = function () {
+            this.top = 0;
+            this.left = 0;
+            this.show = false;
+            this.pinnedMenu = false;
+            this.sortMenu = false;
+            this.filterMainMenu = false;
+            this.filterOptionsMenu = false;
+        };
+        ContextMenu.prototype.init = function (customMenuTemplates, overrideContext) {
+            this.overrideContext = overrideContext;
+            var viewFactory = this.viewCompiler.compile("<template>" + this.menuHtml(customMenuTemplates) + "</template>", this.viewResources);
+            var view = viewFactory.create(this.container);
+            var viewSlot = new aurelia_framework_1.ViewSlot(document.body, true);
+            viewSlot.add(view);
+            this.viewSlots.contextMenu = viewSlot;
+            viewSlot.bind(this, { bindingContext: this, parentOverrideContext: this.overrideContext });
+            viewSlot.attached();
+        };
+        ContextMenu.prototype.openMenu = function (options) {
+            this.left = options.left;
+            this.top = options.top;
+            this.pinnedMenu = options.pinned ? true : false;
+            this.sortMenu = options.sort ? true : false;
+            this.groupbyMenu = options.groupby ? true : false;
+            this.filterMainMenu = options.filter ? true : false;
+            this.show = true;
+            this.callback = options.callback;
+        };
+        ContextMenu.prototype.menuClick = function (type, option, event) {
+            switch (true) {
+                case type === 'filter' && option === 'options':
+                    this.showFilterOptions();
+                    break;
+                case type === 'filterOption' && option === 'Back':
+                    this.hideFilterOptions();
+                    break;
+                case type === 'close' && option === 'true':
+                    this.show = false;
+                    break;
+                default:
+                    var result = this.callback(type, option, event);
+                    if (result) {
+                        this.show = false;
+                        this.pinnedMenu = false;
+                        this.sortMenu = false;
+                        this.filterMainMenu = false;
+                        this.filterOptionsMenu = false;
+                    }
+            }
+        };
+        ContextMenu.prototype.updateMenuStrings = function (key, text) {
+            if (this.menuStrings[key]) {
+                this.menuStrings[key] = text;
+            }
+        };
+        ContextMenu.prototype.showFilterOptions = function () {
+            this.filterOptionsMenu = true;
+        };
+        ContextMenu.prototype.hideFilterOptions = function () {
+            this.filterOptionsMenu = false;
+        };
+        ContextMenu.prototype.menuHtml = function (customMenuTemplates) {
+            var menuTop = "<div css=\"top:$au{top}px;left:$au{left}px\" if.bind=\"show\" class=\"avg-default avg-menu\">".replace(/\$(au{)/g, '${');
+            var menuClose = customMenuTemplates.close ||
+                "<ul if.bind=\"show\" class=\"avg-menu__items\">\n                <li class=\"avg-menu__item\">\n                <p click.delegate=\"menuClick('close','true')\" class=\"avg-menu__link\">\n                    <svg class=\"icon\" xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 16 16\">\n                      <path d=\"M3 4l4.3 4L3 12h1.4L8 8.7l3.5 3.3H13L8.6 8 13 4h-1.5L8 7.3 4.4 4H3z\"/>\n                      </svg> $au{menuStrings.close}\n                </p>\n                </li>\n            </ul>".replace(/\$(au{)/g, '${');
+            var menuPinned = customMenuTemplates.pinned ||
+                "<ul if.bind=\"pinnedMenu && !filterOptionsMenu\" class=\"avg-menu__items\">\n                <li class=\"avg-menu__item\">\n                <p click.delegate=\"menuClick('pinned','left', $event)\" class=\"avg-menu__link\">\n                    <i class=\"avg-fa avg-text\"></i> $au{menuStrings.pinLeft}\n                </p>\n                </li>\n                <li class=\"avg-menu__item\">\n                <p click.delegate=\"menuClick('pinned','right', $event)\" class=\"avg-menu__link\">\n                    <i class=\"avg-fa avg-text\"></i> $au{menuStrings.pinRight}\n                </p>\n                </li>\n            </ul>".replace(/\$(au{)/g, '${');
+            var menuGroupby = customMenuTemplates.groupby ||
+                "<ul if.bind=\"groupbyMenu && !filterOptionsMenu\" class=\"avg-menu__items\">\n                <li class=\"avg-menu__item\">\n                <p click.delegate=\"menuClick('groupby','groupby', $event)\" class=\"avg-menu__link\">\n                    <svg class=\"icon\" xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 16 16\">\n                     <path d=\"M3 4v1h10V4H3zm3.7 2.4v1H13v-1H6.8zm0 2.4v1H13v-1H6.8zm0 2.3v1H13v-1H6.8z\"/>\n                      </svg> $au{menuStrings.groupBy}\n                </p>\n                </li>\n            </ul>".replace(/\$(au{)/g, '${');
+            var menuSort = customMenuTemplates.sort ||
+                "<ul if.bind=\"sortMenu && !filterOptionsMenu\" class=\"avg-menu__items\">\n                <li class=\"avg-menu__item\">\n                <p click.delegate=\"menuClick('sort','asc', $event)\" class=\"avg-menu__link\">\n                       <svg class=\"icon\" xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 16 16\">\n                        <path d=\"M7.4 6L3 10h1.5L8 7l3.4 3H13L8.5 6h-1z\"/>\n                      </svg> $au{menuStrings.sortAscending}\n                </p>\n                </li>\n                <li class=\"avg-menu__item\">\n                <p click.delegate=\"menuClick('sort','desc', $event)\" class=\"avg-menu__link\">\n                    <svg class=\"icon\" xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 16 16\">\n                        <path d=\"M7.4 10L3 6h1.5L8 9.2 11.3 6H13l-4.5 4h-1z\"/>\n                    </svg> $au{menuStrings.sortDescending}\n                </p>\n                </li>\n            </ul>".replace(/\$(au{)/g, '${');
+            var menuFilter = customMenuTemplates.filter ||
+                "<ul if.bind=\"filterMainMenu && !filterOptionsMenu\" class=\"avg-menu__items\">\n                <li class=\"avg-menu__item\">\n                <p click.delegate=\"menuClick('filter','showall', $event)\" class=\"avg-menu__link\">\n                    <svg class=\"icon\" xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 16 16\">\n                        <path d=\"M7.4 4.8v2.7H4.7v1h2.7v3h1v-3h2.8v-1H8.5V4.8h-1z\"/>\n                      </svg> $au{menuStrings.showAll}\n                </p>\n                </li>\n                <li class=\"avg-menu__item\">\n                <p click.delegate=\"menuClick('filter','clear', $event)\" class=\"avg-menu__link\">\n                    <svg class=\"icon\" xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 16 16\">\n                        <path d=\"M4.8 7.5h6.5v1H4.8z\">\n                      </svg> $au{menuStrings.clearCurrent}\n                </p>\n                </li>\n                <li class=\"avg-menu__item\">\n                <p click.delegate=\"menuClick('filter','clearall', $event)\" class=\"avg-menu__link\">\n                    <svg class=\"icon\" xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 16 16\">\n                        <path d=\"M4.8 7.5h6.5v1H4.8z\">\n                      </svg> $au{menuStrings.clearAll}\n                </p>\n                </li>\n                <li class=\"avg-menu__item\">\n                <p click.delegate=\"menuClick('filter','options', $event)\" class=\"avg-menu__link\">\n                    <svg class=\"icon\" xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 16 16\">\n                        <path d=\"M7.3 4v1.2L11 7.5H3v1h8l-3.7 2.2V12L13 8.4v-.8L7.3 4z\"/>\n                      </svg> $au{menuStrings.chooseOperator}\n                </p>\n                </li>\n            </ul>".replace(/\$(au{)/g, '${');
+            var menuFilterOptions = customMenuTemplates.filterOptions ||
+                "<ul if.bind=\"filterOptionsMenu\" class=\"avg-menu__items\">\n                <li class=\"avg-menu__item\">\n                <p click.delegate=\"menuClick('filterOption','Back', $event)\" class=\"avg-menu__link\">\n                    <svg class=\"icon\" xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 16 16\">\n                       <path d=\"M8.7 4v1.2L5 7.5h8v1H5l3.7 2.2V12L3 8.4v-1L8.7 4z\"/>\n                      </svg> $au{menuStrings.back}\n                </p>\n                </li>\n            </ul>\n            <ul if.bind=\"filterOptionsMenu\" class=\"avg-menu__items\">\n                <li class=\"avg-menu__item\">\n                <p click.delegate=\"menuClick('filterOption','=', $event)\" class=\"avg-menu__link\">\n                    <svg class=\"icon\" xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 16 16\">\n                        <path d=\"M13 7H3V6h10v1zm0 3H3V9h10v1z\"/>\n                      </svg> $au{menuStrings.equals}\n                </p>\n                </li>\n                <li class=\"avg-menu__item\">\n                <p click.delegate=\"menuClick('filterOption','<=', $event)\" class=\"avg-menu__link\">\n                    <svg class=\"icon\" xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 16 16\">\n                        <path d=\"M13 10.3L3 7.5v-.7L13 4v1L5.3 7 13 9.3v1zm0 1.7H3v-1h10v1z\"/>\n                      </svg> $au{menuStrings.lessThanOrEqual}\n                </p>\n                </li>\n                <li class=\"avg-menu__item\">\n                <p click.delegate=\"menuClick('filterOption','>=', $event)\" class=\"avg-menu__link\">\n                    <svg class=\"icon\" xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 16 16\">\n                        <path d=\"M13 7.4L3 10.2v-1l7.7-2L3 5V4l10 2.7v.7zm0 4.5H3v-1h10v1z\"/>\n                      </svg> $au{menuStrings.greaterThanOrEqual}\n                </p>\n                </li>\n                <li class=\"avg-menu__item\">\n                <p click.delegate=\"menuClick('filterOption','<', $event)\" class=\"avg-menu__link\">\n                    <svg class=\"icon\" xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 16 16\">\n                       <path d=\"M3 8.5L13 12v-1.2L5 8l8-2.7V4L3 7.7v1z\"/>\n                      </svg> $au{menuStrings.lessThan}\n                </p>\n                </li>\n                <li class=\"avg-menu__item\">\n                <p click.delegate=\"menuClick('filterOption','>', $event)\" class=\"avg-menu__link\">\n                    <svg class=\"icon\" xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 16 16\">\n                      <path d=\"M13 8L3 12v-1.4l8-3-8-3.2V3l10 4v1z\"/>\n                      </svg> $au{menuStrings.greaterThan}\n                </p>\n                </li>\n                <li class=\"avg-menu__item\">\n                <p click.delegate=\"menuClick('filterOption','*', $event)\" class=\"avg-menu__link\">\n                    <svg class=\"icon\" xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 16 16\">\n                        <path d=\"M13 9.7l-.7 1L8.6 9v3H7.4V9l-3.6 1.7-.7-1L7 8 3 6.2l.7-1 3.7 2V4h1.3v3l3.6-1.7.7 1L9 8l4 1.7z\"/>\n                      </svg> $au{menuStrings.contains}\n                </p>\n                </li>\n                <li class=\"avg-menu__item\">\n                <p click.delegate=\"menuClick('filterOption','!=', $event)\" class=\"avg-menu__link\">\n                    <svg class=\"icon\" xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 16 16\">\n                        <path d=\"M13 9.8H7.7l-1 2.2H5.7l1-2.2H2.8v-1h4L7.5 7H3V6h5l1-2H10l-1 2H13v1H9L8 9H13v1z\"/>\n                      </svg> $au{menuStrings.notEqualTo}\n                </p>\n                </li>\n                <li class=\"avg-menu__item\">\n                <p click.delegate=\"menuClick('filterOption','!*', $event)\" class=\"avg-menu__link\">\n                    <svg class=\"icon\" xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 16 16\">\n                       <path d=\"M5 4V10H4V4h1zm5.5 0v3l2-1.7.5 1L10.7 8 13 9.8l-.4 1-2-2V12h-1l.2-3-2.2 1.7-.3-1L9.5 8 7.3 6.3l.3-1L9.8 7V4h.7zM5 11v1H4v-1h1z\"/>\n                      </svg> $au{menuStrings.doesNotContain}\n                </p>\n                </li>\n                <li class=\"avg-menu__item\">\n                <p click.delegate=\"menuClick('filterOption','*=', $event)\" class=\"avg-menu__link\">\n                    <svg class=\"icon\" xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 16 16\">\n                      <path d=\"M5.2 4v3l-2-1.7-.2 1L5 8 3 9.8l.3 1 2-2V12h.6l-.2-3 2 1.8.2-1L6 8l2-1.8-.3-1-2 2L6 4H5zm3 2v1.2H13v-1H8.3zm0 2.8v1H13v-1H8.3z\"/>\n                      </svg> $au{menuStrings.beginsWith}\n                </p>\n                </li>\n                <li class=\"avg-menu__item\">\n                <p click.delegate=\"menuClick('filterOption','=*', $event)\" class=\"avg-menu__link\">\n                    <svg class=\"icon\" xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 16 16\">\n                        <path d=\"M10.8 4v3l2-1.8.2 1L11 8l2 1.7-.3 1-2-2V12h-.6l.2-3.2-2 2-.3-1 2-2-2-1.6.3-1 2 2L10 4h.8zm-3 2v1H3V6h4.7zm0 2.7v1H3v-1h4.7z\"/>\n                      </svg> $au{menuStrings.endsWith}\n                </p>\n                </li>\n            </ul>".replace(/\$(au{)/g, '${');
+            var menuBottom = "</div>";
+            var menuAll = customMenuTemplates.all || [
+                menuTop,
+                menuClose,
+                menuPinned,
+                menuGroupby,
+                menuSort,
+                menuFilter,
+                menuFilterOptions,
+                menuBottom,
+            ].join('');
+            return menuAll;
+        };
+        return ContextMenu;
+    }());
+    exports.ContextMenu = ContextMenu;
+});
+
+//# sourceMappingURL=contextMenu.js.map
+
+define('aurelia-v-grid/grid/controller',["require", "exports"], function (require, exports) {
+    var Controller = (function () {
+        function Controller(vGrid) {
+            this.vGrid = vGrid;
+            this.element = vGrid.element;
+        }
+        Controller.prototype.getContext = function () {
+            var c = this.vGrid;
+            this.colConfig = c.colConfig;
+            this.backupColConfig = c.backupColConfig;
+            this.colRepeater = c.colRepeater;
+            this.colGroupRow = c.colGroupRow;
+            this.colGroupElement = c.colGroupElement;
+            this.colRepeatRowTemplate = c.colRepeatRowTemplate;
+            this.colRepeatRowHeaderTemplate = c.colRepeatRowHeaderTemplate;
+            this.customMenuTemplates = c.customMenuTemplates;
+            this.loadingScreenTemplate = c.loadingScreenTemplate;
+            this.footerTemplate = c.footerTemplate;
+            this.viewCompiler = c.viewCompiler;
+            this.container = c.container;
+            this.viewResources = c.viewResources;
+            this.taskQueue = c.taskQueue;
+            this.htmlCache = c.htmlCache;
+            this.htmlHeightWidth = c.htmlHeightWidth;
+            this.viewSlots = c.viewSlots;
+            this.columnBindingContext = c.columnBindingContext;
+            this.rowDataBinder = c.rowDataBinder;
+            this.mainMarkup = c.mainMarkup;
+            this.mainScrollEvents = c.mainScrollEvents;
+            this.rowMarkup = c.rowMarkup;
+            this.rowScrollEvents = c.rowScrollEvents;
+            this.rowClickHandler = c.rowClickHandler;
+            this.htmlcolumnMarkupCache = c.columnMarkup;
+            this.columnMarkup = c.columnMarkup;
+            this.groupingElements = c.groupingElements;
+            this.loadingScreen = c.loadingScreen;
+            this.contextMenu = c.contextMenu;
+            this.footer = c.footer;
+            this.bindingContext = c.bindingContext;
+            this.overrideContext = c.overrideContext;
+            this.attRowHeight = c.attRowHeight;
+            this.attHeaderHeight = c.attHeaderHeight;
+            this.attFooterHeight = c.attFooterHeight;
+            this.attPanelHeight = c.attPanelHeight;
+            this.attMultiSelect = c.attMultiSelect;
+            this.attManualSelection = c.attManualSelection;
+            this.attGridConnector = c.attGridConnector;
+            this.attOnRowDraw = c.attOnRowDraw;
+            this.attI18N = c.attI18N;
+            this.attDataDelay = c.attDataDelay;
+        };
+        Controller.prototype.triggerI18N = function () {
+            var _this = this;
+            var keys = Object.keys({
+                close: 'Close',
+                pinLeft: 'Pin left',
+                pinRight: 'Pin Right',
+                groupBy: 'Group By',
+                sortAscending: 'Sort Ascending',
+                sortDescending: 'Sort Descending',
+                showAll: 'Show All',
+                clearCurrent: 'Clear Current',
+                clearAll: 'Clear All',
+                chooseOperator: 'Choose Operator',
+                back: 'Back',
+                equals: 'Equals',
+                lessThanOrEqual: 'Less than or equal',
+                greaterThanOrEqual: 'Greater than or equal',
+                lessThan: 'Less than',
+                greaterThan: 'Greater than',
+                contains: 'Contains',
+                notEqualTo: 'Not equal to',
+                doesNotContain: 'Does not contain',
+                beginsWith: 'Begins with',
+                endsWith: 'Ends with',
+                loading: 'loading'
+            });
+            if (this.attI18N) {
+                keys.forEach(function (key) {
+                    if (_this.vGrid.filterOperatorTranslationKeys[key]) {
+                        _this.vGrid.filterOperatorNames[_this.vGrid.filterOperatorTranslationKeys[key]] = _this.attI18N(key);
+                    }
+                    _this.contextMenu.updateMenuStrings(key, _this.attI18N(key));
+                });
+                this.raiseEvent('filterTranslation', {});
+                var loading = this.attI18N('loading') || keys.loading;
+                this.loadingScreen.updateLoadingDefaultLoadingMessage(loading);
+            }
+        };
+        Controller.prototype.createGrid = function () {
+            if (this.attI18N) {
+                this.triggerI18N();
+            }
+            this.htmlHeightWidth.addDefaultsAttributes(this.attHeaderHeight, this.attRowHeight, this.attFooterHeight, this.attPanelHeight);
+            this.mainMarkup.generateMainMarkup();
+            this.htmlCache.updateMainMarkup();
+            this.rowDataBinder.init();
+            this.mainScrollEvents.init();
+            this.rowMarkup.init(this.attRowHeight);
+            this.htmlCache.updateRowsMarkup();
+            this.rowScrollEvents.init(this.attRowHeight, this.attDataDelay);
+            this.columnMarkup.init(this.colConfig, this.overrideContext, this.colRepeater, this.colRepeatRowTemplate, this.colRepeatRowHeaderTemplate, this.colGroupRow);
+            this.htmlHeightWidth.setWidthFromColumnConfig(this.colConfig);
+            this.rowClickHandler.init(this.attMultiSelect, this.attManualSelection, this);
+            this.groupingElements.init(this, this.colGroupElement);
+            this.loadingScreen.init(this.overrideContext, this.loadingScreenTemplate);
+            this.footer.init(this.overrideContext, this.footerTemplate);
+            this.contextMenu.init(this.customMenuTemplates, this.overrideContext);
+        };
+        Controller.prototype.getElement = function (rowNumber, isDownScroll, callbackFN) {
+            var _this = this;
+            this.attGridConnector.getElement({
+                row: rowNumber,
+                isDown: isDownScroll,
+                callback: function (rowContext) {
+                    if (_this.attOnRowDraw) {
+                        _this.attOnRowDraw(rowContext);
+                    }
+                    callbackFN(rowContext);
+                }
+            });
+        };
+        Controller.prototype.expandGroup = function (id) {
+            this.attGridConnector.expandGroup(id);
+        };
+        Controller.prototype.collapseGroup = function (id) {
+            this.attGridConnector.collapseGroup(id);
+        };
+        Controller.prototype.select = function (row) {
+            this.attGridConnector.select(row);
+        };
+        Controller.prototype.addToGrouping = function (attribute) {
+            var currentGrouping = this.attGridConnector.getGrouping();
+            if (currentGrouping.indexOf(attribute) === -1) {
+                currentGrouping.push(attribute);
+                this.attGridConnector.group(currentGrouping, true);
+            }
+        };
+        Controller.prototype.removeFromGrouping = function (attribute) {
+            var currentGrouping = this.attGridConnector.getGrouping();
+            var index = currentGrouping.indexOf(attribute);
+            if (index !== -1) {
+                currentGrouping.splice(index, 1);
+                this.attGridConnector.group(currentGrouping, true);
+            }
+        };
+        Controller.prototype.getSelectionContext = function () {
+            var sel = this.attGridConnector.getSelection();
+            return sel;
+        };
+        Controller.prototype.raiseEvent = function (name, data) {
+            if (data === void 0) { data = {}; }
+            var event = new CustomEvent(name, {
+                detail: data,
+                bubbles: true
+            });
+            this.element.dispatchEvent(event);
+        };
+        Controller.prototype.setLoadingScreen = function (value, msg, collectionLength) {
+            if (value) {
+                return this.loadingScreen.enable(msg, collectionLength);
+            }
+            else {
+                return this.loadingScreen.disable();
+            }
+        };
+        Controller.prototype.updateHeights = function () {
+            var totalRowHeight = this.htmlHeightWidth.getNewHeight(this.attGridConnector.getDatasourceLength());
+            var bodyHeight = this.htmlCache.avg_content_main.clientHeight;
+            if (bodyHeight < totalRowHeight) {
+                this.htmlCache.avg_content_vhandle.style.display = 'block';
+            }
+            else {
+                this.htmlCache.avg_content_vhandle.style.display = 'none';
+            }
+            this.rowScrollEvents.setCollectionLength(this.attGridConnector.getDatasourceLength());
+            this.htmlHeightWidth.setCollectionLength(this.attGridConnector.getDatasourceLength(), bodyHeight < totalRowHeight);
+        };
+        Controller.prototype.udateHorizontalScroller = function () {
+            var bodyWidth = this.htmlCache.avg_content_main.clientWidth;
+            var scrollWidth = this.htmlHeightWidth.avgContentMainScroll_Width;
+            if (bodyWidth < scrollWidth) {
+                this.htmlCache.avg_content_hhandle.style.display = 'block';
+            }
+            else {
+                this.htmlCache.avg_content_hhandle.style.display = 'none';
+            }
+        };
+        Controller.prototype.updateHeaderGrouping = function (groups) {
+            var length = groups.length;
+            this.columnBindingContext.setupgrouping = length;
+            this.htmlHeightWidth.adjustWidthsColumns(this.columnBindingContext, length);
+        };
+        Controller.prototype.collectionLength = function () {
+            return this.attGridConnector.getDatasourceLength();
+        };
+        Controller.prototype.triggerScroll = function (position) {
+            if (position === null || position === undefined) {
+                position = this.htmlCache.avg_content_vhandle.scrollTop;
+            }
+            else {
+                this.htmlCache.avg_content_vhandle.scrollTop = position;
+            }
+            this.raiseEvent('avg-scroll', {
+                isScrollBarScrolling: true,
+                isDown: true,
+                newTopPosition: position
+            });
+        };
+        Controller.prototype.rebindAllRows = function () {
+            this.raiseEvent('avg-rebind-all-rows', {
+                rowCache: this.htmlCache.rowCache,
+                downScroll: true
+            });
+        };
+        Controller.prototype.getColumnConfig = function () {
+            var colContext = this.columnBindingContext;
+            var tempArray = [];
+            for (var i = 0; i < this.colConfig.length; i++) {
+                switch (true) {
+                    case colContext.setupleft[i].show:
+                        tempArray.push({
+                            no: i,
+                            set: 1,
+                            colPinLeft: true,
+                            colPinRight: false,
+                            left: colContext.setupleft[i].left - 10000,
+                            width: colContext.setupleft[i].width
+                        });
+                        break;
+                    case colContext.setupmain[i].show:
+                        tempArray.push({
+                            no: i,
+                            set: 2,
+                            colPinLeft: false,
+                            colPinRight: false,
+                            left: colContext.setupmain[i].left,
+                            width: colContext.setupmain[i].width
+                        });
+                        break;
+                    case colContext.setupright[i].show:
+                        tempArray.push({
+                            no: i,
+                            set: 3,
+                            colPinLeft: false,
+                            colPinRight: true,
+                            left: colContext.setupright[i].left + 10000,
+                            width: colContext.setupright[i].width
+                        });
+                        break;
+                    default:
+                }
+            }
+            var newColConfig = [];
+            this.colConfig.forEach(function (col, i) {
+                var temp = {
+                    colWidth: tempArray[i].width,
+                    colRowTemplate: col.colRowTemplate,
+                    colHeaderTemplate: col.colHeaderTemplate,
+                    colField: col.colField ? col.colField.replace('rowRef.', '') : col.colField,
+                    colPinLeft: tempArray[i].colPinLeft,
+                    colPinRight: tempArray[i].colPinRight,
+                    colHeaderName: col.colHeaderName,
+                    colAddLabelAttributes: col.colAddLabelAttributes,
+                    colAddFilterAttributes: col.colAddFilterAttributes,
+                    colAddRowAttributes: col.colAddRowAttributes,
+                    colSort: col.colSort,
+                    colFilter: col.colFilter,
+                    colFilterTop: col.colFilterTop,
+                    colCss: col.colCss,
+                    colType: col.colType,
+                    __colSortHelper: tempArray[i].left,
+                };
+                newColConfig.push(temp);
+            });
+            newColConfig.sort(function (a, b) {
+                return a.__colSortHelper - b.__colSortHelper;
+            });
+            return newColConfig;
+        };
+        Controller.prototype.setColumnConfig = function (colConfig) {
+            var length = this.columnBindingContext.setupgrouping;
+            this.viewSlots.unbindAndDetachColumns();
+            this.columnBindingContext.clear();
+            this.viewSlots.clear();
+            this.colConfig = colConfig || this.backupColConfig;
+            this.columnMarkup.init(this.colConfig, this.overrideContext, this.colRepeater, this.colRepeatRowTemplate, this.colRepeatRowHeaderTemplate, this.colGroupRow);
+            this.viewSlots.bindAndAttachColumns(this.overrideContext, this.columnBindingContext, this.attGridConnector.getSelection());
+            this.htmlHeightWidth.setWidthFromColumnConfig(this.colConfig);
+            this.columnBindingContext.setupgrouping = length;
+            this.htmlHeightWidth.adjustWidthsColumns(this.columnBindingContext, length);
+            this.udateHorizontalScroller();
+            this.rebindAllRows();
+        };
+        return Controller;
+    }());
+    exports.Controller = Controller;
+});
+
+//# sourceMappingURL=controller.js.map
+
+define('aurelia-v-grid/grid/footer',["require", "exports", "aurelia-framework"], function (require, exports, aurelia_framework_1) {
+    var Footer = (function () {
+        function Footer(htmlCache, viewCompiler, container, viewResources, viewSlots) {
+            this.htmlCache = htmlCache;
+            this.viewSlots = viewSlots;
+            this.viewCompiler = viewCompiler;
+            this.container = container;
+            this.viewResources = viewResources;
+        }
+        Footer.prototype.init = function (overrideContext, footerStringTemplate) {
+            this.overrideContext = overrideContext;
+            var footerTemplate = footerStringTemplate || "".replace(/\$(au{)/g, '${');
+            var viewFactory = this.viewCompiler.compile("<template>\n      " + footerTemplate + "\n      </template>", this.viewResources);
+            var view = viewFactory.create(this.container);
+            var footerViewSlot = new aurelia_framework_1.ViewSlot(this.htmlCache.avg_footer, true);
+            footerViewSlot.add(view);
+            footerViewSlot.bind(this, {
+                bindingContext: this,
+                parentOverrideContext: this.overrideContext
+            });
+            footerViewSlot.attached();
+            this.viewSlots.footerViewSlot = footerViewSlot;
+        };
+        return Footer;
+    }());
+    exports.Footer = Footer;
+});
+
+//# sourceMappingURL=footer.js.map
+
+define('aurelia-v-grid/grid/groupingElements',["require", "exports", "aurelia-framework"], function (require, exports, aurelia_framework_1) {
+    var GroupContext = (function () {
+        function GroupContext(name, field, groupingElements) {
+            this.name = name;
+            this.field = field;
+            this.groupingElements = groupingElements;
+        }
+        GroupContext.prototype.remove = function () {
+            this.groupingElements.removeGroup(this.name);
+            this.groupingElements.removeFromGrouping(this.field);
+        };
+        return GroupContext;
+    }());
+    var GroupingElements = (function () {
+        function GroupingElements(element, viewCompiler, container, viewResources, htmlCache, viewSlots, columnBindingContext) {
+            this.element = element;
+            this.htmlCache = htmlCache;
+            this.viewSlots = viewSlots;
+            this.viewCompiler = viewCompiler;
+            this.container = container;
+            this.viewResources = viewResources;
+            this.columnBindingContext = columnBindingContext;
+            this.groupContext = {};
+            this.lastAdded = null;
+        }
+        GroupingElements.prototype.init = function (controller, colGroupElement) {
+            this.controller = controller;
+            this.avgTopPanel = this.htmlCache.avg_top_panel;
+            this.colGroupElement = colGroupElement;
+        };
+        GroupingElements.prototype.addGroup = function (name, field) {
+            if (!this.groupContext[name]) {
+                this.lastAdded = name;
+                this.groupContext[name] = new GroupContext(name, field, this);
+                var viewMarkup = this.colGroupElement ||
+                    "<div class=\"avg-grouping\">  \n          <p class=\"avg-grouping-element\" v-sort=\"field.bind:field\">" + name + " \n            <i><svg click.delegate=\"remove()\" class=\"icon iconhidden\" xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 16 16\">\n              <path d=\"M3 4l4.3 4L3 12h1.4L8 8.7l3.5 3.3H13L8.6 8 13 4h-1.5L8 7.3 4.4 4H3z\"/>\n            </svg></i>\n          </p>\n         </div>";
+                var viewFactory = this.viewCompiler.compile("<template>" + viewMarkup + "</template>", this.viewResources);
+                var view = viewFactory.create(this.container);
+                var viewSlot = new aurelia_framework_1.ViewSlot(this.avgTopPanel, true);
+                viewSlot.add(view);
+                this.groupContext[name].viewSlot = viewSlot;
+                this.viewSlots.groupingViewSlots.push(this.groupContext[name]);
+            }
+            this.groupContext[name].viewSlot.bind(this.groupContext[name]);
+            this.groupContext[name].viewSlot.attached();
+        };
+        GroupingElements.prototype.removeGroup = function (name) {
+            if (name) {
+                this.groupContext[name].viewSlot.unbind();
+                this.groupContext[name].viewSlot.detached();
+                this.groupContext[name].viewSlot.removeAll();
+                this.groupContext[name] = null;
+            }
+            else {
+                if (this.lastAdded) {
+                    this.groupContext[this.lastAdded].viewSlot.unbind();
+                    this.groupContext[this.lastAdded].viewSlot.detached();
+                    this.groupContext[this.lastAdded].viewSlot.removeAll();
+                    this.groupContext[this.lastAdded] = null;
+                    this.lastAdded = null;
+                }
+            }
+        };
+        GroupingElements.prototype.addToGrouping = function () {
+            if (this.lastAdded) {
+                var toAdd = this.groupContext[this.lastAdded].field;
+                this.controller.addToGrouping(toAdd);
+                this.lastAdded = null;
+            }
+        };
+        GroupingElements.prototype.removeFromGrouping = function (field) {
+            this.controller.removeFromGrouping(field);
+        };
+        return GroupingElements;
+    }());
+    exports.GroupingElements = GroupingElements;
+});
+
+//# sourceMappingURL=groupingElements.js.map
+
+define('aurelia-v-grid/grid/htmlCache',["require", "exports"], function (require, exports) {
+    var HtmlCache = (function () {
+        function HtmlCache(element) {
+            this.element = element;
+            this.avg_top_panel = null;
+            this.avg_header = null;
+            this.avg_header_left = null;
+            this.avg_header_main = null;
+            this.avg_header_main_scroll = null;
+            this.avg_header_right = null;
+            this.avg_content = null;
+            this.avg_content_left = null;
+            this.avg_content_left_scroll = null;
+            this.avg_content_main = null;
+            this.avg_content_main_scroll = null;
+            this.avg_content_right = null;
+            this.avg_content_right_scroll = null;
+            this.avg_footer = null;
+            this.avg_content_group = null;
+            this.avg_content_group_scroll = null;
+            this.avg_content_vhandle = null;
+            this.avg_content_vhandle_scroll = null;
+            this.avg_content_hhandle = null;
+            this.avg_content_hhandle_scroll = null;
+            this.avg_left_rows = null;
+            this.avg_main_rows = null;
+            this.avg_right_rows = null;
+            this.avg_group_rows = null;
+            this.rowCache = [];
+            this.headerCache = {
+                left: null,
+                main: null,
+                right: null,
+                group: null,
+                bindingContext: null,
+                overrideContext: null,
+                leftRowViewSlot: null,
+                mainRowViewSlot: null,
+                rightRowViewSlot: null,
+                groupRowViewSlot: null
+            };
+        }
+        HtmlCache.prototype.updateRowsMarkup = function () {
+            this.avg_left_rows = this.avg_content_left_scroll.getElementsByTagName('avg-row');
+            this.avg_main_rows = this.avg_content_main_scroll.getElementsByTagName('avg-row');
+            this.avg_right_rows = this.avg_content_right_scroll.getElementsByTagName('avg-row');
+            this.avg_group_rows = this.avg_content_group_scroll.getElementsByTagName('avg-row');
+        };
+        HtmlCache.prototype.updateMainMarkup = function () {
+            this.avg_top_panel = this.element.getElementsByTagName('avg-top-panel')[0];
+            this.avg_header = this.element.getElementsByTagName('avg-header')[0];
+            this.avg_header_left = this.element.getElementsByTagName('avg-header-left')[0];
+            this.avg_header_main = this.element.getElementsByTagName('avg-header-main')[0];
+            this.avg_header_main_scroll = this.element.getElementsByTagName('avg-header-main-scroll')[0];
+            this.avg_header_right = this.element.getElementsByTagName('avg-header-right')[0];
+            this.avg_content = this.element.getElementsByTagName('avg-content')[0];
+            this.avg_content_left = this.element.getElementsByTagName('avg-content-left')[0];
+            this.avg_content_left_scroll = this.element.getElementsByTagName('avg-content-left-scroll')[0];
+            this.avg_content_main = this.element.getElementsByTagName('avg-content-main')[0];
+            this.avg_content_main_scroll = this.element.getElementsByTagName('avg-content-main-scroll')[0];
+            this.avg_content_right = this.element.getElementsByTagName('avg-content-right')[0];
+            this.avg_content_right_scroll = this.element.getElementsByTagName('avg-content-right-scroll')[0];
+            this.avg_footer = this.element.getElementsByTagName('avg-footer')[0];
+            this.avg_content_group = this.element.getElementsByTagName('avg-content-group')[0];
+            this.avg_content_group_scroll = this.element.getElementsByTagName('avg-content-group-scroll')[0];
+            this.avg_content_vhandle = this.element.getElementsByTagName('avg-content-vhandle')[0];
+            this.avg_content_vhandle_scroll = this.element.getElementsByTagName('avg-content-vhandle-scroll')[0];
+            this.avg_content_hhandle = this.element.getElementsByTagName('avg-content-hhandle')[0];
+            this.avg_content_hhandle_scroll = this.element.getElementsByTagName('avg-content-hhandle-scroll')[0];
+        };
+        return HtmlCache;
+    }());
+    exports.HtmlCache = HtmlCache;
+});
+
+//# sourceMappingURL=htmlCache.js.map
+
+define('aurelia-v-grid/grid/htmlHeightWidth',["require", "exports"], function (require, exports) {
+    var HtmlHeightWidth = (function () {
+        function HtmlHeightWidth() {
+            this.avgScrollBarWidth = this.getScrollbarWidth() || 17;
+            this.avgPanel_Height = 0;
+            this.avgHeader_Height = 30;
+            this.avgHeader_Top = 0;
+            this.avgContent_Top = 30;
+            this.avgContent_Bottom = 30;
+            this.avgHeaderLeft_Width = 200;
+            this.avgHeaderMain_Left = 200;
+            this.avgHeaderMain_Right = 150;
+            this.avgHeaderMainScroll_Width = 0;
+            this.avgHeaderMainScroll_Height = 100;
+            this.avgHeaderRight_Right = 0;
+            this.avgHeaderRight_Width = 150;
+            this.avgContentLeft_Width = 200 + this.avgScrollBarWidth;
+            this.avgContentLeftScroll_Width = '100%';
+            this.avgContentLeftScroll_Height = 0 + this.avgScrollBarWidth;
+            this.avgContentMain_Left = 200;
+            this.avgContentMain_Right = 150 - this.avgScrollBarWidth;
+            this.avgContentMainScroll_Width = 0;
+            this.avgContentMainScroll_Height = 0;
+            this.avgContentRight_Right = 0;
+            this.avgContentRight_Width = 150;
+            this.avgContentRightScroll_Width = '100%';
+            this.avgContentRightScroll_Height = 0 + this.avgScrollBarWidth;
+            this.avgContentGroup_Width = 150;
+            this.avgContentGroup_Height = 0;
+            this.avgContentGroup_Top = 0;
+            this.avgContentGroup_Bottom = 0;
+            this.avgContentVhandle_Width = 0 + this.avgScrollBarWidth;
+            this.avgContentVhandle_Height = 0;
+            this.avgContentVhandle_Top = 0;
+            this.avgContentVhandleScroll_Height = 0;
+            this.avgContentVhandle_Bottom = 0;
+            this.avgContentHhandle_Bottom = 0;
+            this.avgContentHhandle_Right = 0 + this.avgScrollBarWidth;
+            this.avgContentHhandle_Left = 0;
+            this.avgContentHhandle_Height = 17;
+            this.avgContentHhandleScroll_Width = 17;
+            this.avgFooter_Height = 30;
+        }
+        HtmlHeightWidth.prototype.getNewHeight = function (length) {
+            return length * this.attRowHeight;
+        };
+        HtmlHeightWidth.prototype.setCollectionLength = function (length, includeScroller) {
+            var rowTotal = this.getNewHeight(length);
+            var avgScrollbarHeightValue = includeScroller === false ? 0 : this.avgScrollBarWidth;
+            var total = rowTotal + avgScrollbarHeightValue;
+            this.avgContentRightScroll_Height = total;
+            this.avgContentGroup_Height = total;
+            this.avgContentVhandleScroll_Height = total;
+            this.avgContentMainScroll_Height = total;
+            this.avgContentLeftScroll_Height = total;
+        };
+        HtmlHeightWidth.prototype.addDefaultsAttributes = function (attHeaderHeight, attRowHeight, attFooterHeight, attPanelHeight) {
+            this.attHeaderHeight = attHeaderHeight;
+            this.attRowHeight = attRowHeight;
+            this.attFooterHeight = attFooterHeight;
+            this.attPanelHeight = attPanelHeight;
+            this.avgPanel_Height = attPanelHeight;
+            this.avgHeader_Top = attPanelHeight;
+            this.avgHeader_Height = attHeaderHeight;
+            this.avgContent_Top = attHeaderHeight + attPanelHeight;
+            this.avgContent_Bottom = attFooterHeight;
+            this.avgFooter_Height = attFooterHeight;
+            this.avgHeaderMainScroll_Height = attHeaderHeight;
+            this.avgContentGroup_Height = this.avgContentGroup_Height;
+            this.avgContentGroup_Top = this.avgContent_Top;
+            this.avgContentGroup_Bottom = this.avgContent_Bottom;
+            this.avgContentVhandle_Height = this.avgContentVhandle_Height;
+            this.avgContentVhandle_Top = this.avgContent_Top;
+            this.avgContentVhandle_Bottom = this.avgContent_Bottom;
+            this.avgContentHhandle_Bottom = attFooterHeight;
+            this.avgContentHhandle_Height = this.avgScrollBarWidth;
+        };
+        HtmlHeightWidth.prototype.adjustWidthsColumns = function (columnBindingContext, groupsLength) {
+            var left = groupsLength ? groupsLength * 15 : 0;
+            var main = 0;
+            var right = 0;
+            for (var i = 0; i < columnBindingContext.setupmain.length; i++) {
+                if (columnBindingContext.setupleft[i].show) {
+                    left = left + columnBindingContext.setupleft[i].width;
+                }
+                if (columnBindingContext.setupmain[i].show) {
+                    main = main + columnBindingContext.setupmain[i].width;
+                }
+                if (columnBindingContext.setupright[i].show) {
+                    right = right + columnBindingContext.setupright[i].width;
+                }
+            }
+            this.avgContentLeft_Width = left;
+            this.avgHeaderLeft_Width = left;
+            this.avgContentMain_Left = left;
+            this.avgContentMain_Right = right;
+            this.avgHeaderMain_Left = left;
+            this.avgHeaderMain_Right = right;
+            this.avgHeaderMainScroll_Width = main;
+            this.avgContentMainScroll_Width = main;
+            this.avgContentRight_Width = right;
+            this.avgHeaderRight_Width = right;
+            this.avgContentHhandle_Right = right;
+            this.avgContentHhandle_Left = left;
+            this.avgContentHhandleScroll_Width = main;
+        };
+        HtmlHeightWidth.prototype.setWidthFromColumnConfig = function (colConfig, groupsLength) {
+            var left = groupsLength ? groupsLength * 15 : 0;
+            var main = 0;
+            var right = 0;
+            for (var i = 0; i < colConfig.length; i++) {
+                switch (true) {
+                    case colConfig[i].colPinLeft && colConfig[i].colPinRight:
+                        left = left + colConfig[i].colWidth;
+                        right = right + colConfig[i].colWidth;
+                        break;
+                    case colConfig[i].colPinLeft:
+                        left = left + colConfig[i].colWidth;
+                        break;
+                    case colConfig[i].colPinRight:
+                        right = right + colConfig[i].colWidth;
+                        break;
+                    case !colConfig[i].colPinLeft && !colConfig[i].colPinRight:
+                        main = main + colConfig[i].colWidth;
+                        break;
+                    default:
+                }
+            }
+            this.avgContentLeft_Width = left;
+            this.avgHeaderLeft_Width = left;
+            this.avgContentMain_Left = left;
+            this.avgContentMain_Right = right;
+            this.avgHeaderMain_Left = left;
+            this.avgHeaderMain_Right = right;
+            this.avgHeaderMainScroll_Width = main;
+            this.avgContentMainScroll_Width = main;
+            this.avgContentRight_Width = right;
+            this.avgHeaderRight_Width = right;
+            this.avgContentHhandle_Right = right;
+            this.avgContentHhandle_Left = left;
+            this.avgContentHhandleScroll_Width = main;
+        };
+        HtmlHeightWidth.prototype.getScrollbarWidth = function () {
+            var outer = document.createElement('div');
+            outer.style.visibility = 'hidden';
+            outer.style.width = '100px';
+            document.body.appendChild(outer);
+            var widthNoScroll = outer.offsetWidth;
+            outer.style.overflow = 'scroll';
+            var inner = document.createElement('div');
+            inner.style.width = '100%';
+            outer.appendChild(inner);
+            var widthWithScroll = inner.offsetWidth;
+            outer.parentNode.removeChild(outer);
+            return widthNoScroll - widthWithScroll;
+        };
+        return HtmlHeightWidth;
+    }());
+    exports.HtmlHeightWidth = HtmlHeightWidth;
+});
+
+//# sourceMappingURL=htmlHeightWidth.js.map
+
+define('aurelia-v-grid/grid/loadingScreen',["require", "exports", "aurelia-framework"], function (require, exports, aurelia_framework_1) {
+    var LoadingScreen = (function () {
+        function LoadingScreen(element, viewCompiler, container, viewResources, viewSlots) {
+            this.element = element;
+            this.viewSlots = viewSlots;
+            this.viewCompiler = viewCompiler;
+            this.container = container;
+            this.viewResources = viewResources;
+            this.loading = false;
+            this.loadingMessage = 'Loading';
+        }
+        LoadingScreen.prototype.updateLoadingDefaultLoadingMessage = function (msg) {
+            this.loadingMessage = msg;
+        };
+        LoadingScreen.prototype.init = function (overrideContext, loadingScreenTemplate) {
+            this.overrideContext = overrideContext;
+            var loadingScreentHtml = loadingScreenTemplate || "[\n      <div class=\"avg-overlay\" if.bind=\"loading\">\n      </div>\n      <div if.two-way=\"loading\" class=\"avg-progress-indicator\">\n      <div class=\"avg-progress-bar\" role=\"progressbar\" style=\"width:100%\">\n      <span>$au{ loadingMessage }</span>\n      </div>\n      </div>".replace(/\$(au{)/g, '${');
+            var viewFactory = this.viewCompiler.compile("<template>\n      " + loadingScreentHtml + "\n      </template>", this.viewResources);
+            var view = viewFactory.create(this.container);
+            var loadingScreenViewSlot = new aurelia_framework_1.ViewSlot(this.element, true);
+            loadingScreenViewSlot.add(view);
+            loadingScreenViewSlot.bind(this, {
+                bindingContext: this,
+                parentOverrideContext: this.overrideContext
+            });
+            loadingScreenViewSlot.attached();
+            this.viewSlots.loadingScreenViewSlot = loadingScreenViewSlot;
+        };
+        LoadingScreen.prototype.enable = function (msg, collectionLength) {
+            var _this = this;
+            return new Promise(function (resolve) {
+                _this.loading = collectionLength ? collectionLength > 10000 ? true : false : false;
+                _this.loadingMessage = msg || '...';
+                setTimeout(function () {
+                    resolve(null);
+                });
+            });
+        };
+        LoadingScreen.prototype.disable = function () {
+            var _this = this;
+            return new Promise(function (resolve) {
+                _this.loading = false;
+                setTimeout(function () {
+                    resolve();
+                });
+            });
+        };
+        return LoadingScreen;
+    }());
+    exports.LoadingScreen = LoadingScreen;
+});
+
+//# sourceMappingURL=loadingScreen.js.map
+
+define('aurelia-v-grid/grid/mainMarkup',["require", "exports", "aurelia-framework", "./mainMarkupHtmlString"], function (require, exports, aurelia_framework_1, mainMarkupHtmlString_1) {
+    var MainMarkup = (function () {
+        function MainMarkup(element, viewCompiler, container, viewResources, htmlHeightWidth, viewSlots) {
+            this.element = element;
+            this.viewCompiler = viewCompiler;
+            this.container = container;
+            this.viewResources = viewResources;
+            this.htmlHeightWidth = htmlHeightWidth;
+            this.viewSlots = viewSlots;
+        }
+        MainMarkup.prototype.generateMainMarkup = function () {
+            this.viewFactory = this.viewCompiler.compile('<template>' + mainMarkupHtmlString_1.MainMarkupHtmlString + '</template>', this.viewResources);
+            this.view = this.viewFactory.create(this.container);
+            this.viewSlots.mainViewSlot = new aurelia_framework_1.ViewSlot(this.element, true);
+            this.viewSlots.mainViewSlot.add(this.view);
+            this.viewSlots.mainViewSlot.bind(this, {
+                bindingContext: this,
+                parentOverrideContext: this.htmlHeightWidth
+            });
+            this.viewSlots.mainViewSlot.attached();
+        };
+        return MainMarkup;
+    }());
+    exports.MainMarkup = MainMarkup;
+});
+
+//# sourceMappingURL=mainMarkup.js.map
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+define('aurelia-v-grid/grid/attributes/v-drag-drop-col',["require", "exports", "aurelia-framework", "../v-grid"], function (require, exports, aurelia_framework_1, v_grid_1) {
+    var VGridDragDropCol = (function () {
+        function VGridDragDropCol(element, vGrid) {
+            this.vGrid = vGrid;
+            this.vGridElement = vGrid.element;
+            this.controller = vGrid.controller;
+            this.groupingElements = vGrid.groupingElements;
+            this.sharedContext = vGrid.dragDropAttributeSharedContext;
+            this.element = element;
+            this.column = this.element;
+            this.entered = null;
+            this.curColNo = null;
+        }
+        VGridDragDropCol.prototype.bind = function (bindingContext, overrideContext) {
+            this.bindingContext = bindingContext;
+            this.overrideContext = overrideContext;
+            this.onDragstartBinded = this.onDragstart.bind(this);
+            this.onDragenterBinded = this.onDragenter.bind(this);
+            this.onDragoverBinded = this.onDragover.bind(this);
+            this.onDragendBinded = this.onDragend.bind(this);
+            this.onDragOutSideBinded = this.onDragOutSide.bind(this);
+        };
+        VGridDragDropCol.prototype.unbind = function () {
+        };
+        VGridDragDropCol.prototype.detached = function () {
+        };
+        VGridDragDropCol.prototype.attached = function () {
+            var _this = this;
+            var result = this.getTargetData(this.column);
+            if (result.ok && !result.panel) {
+                this.column = result.target;
+                this.colType = this.column.attributes.getNamedItem('avg-type').value;
+                this.colNo = parseInt(this.column.attributes.getNamedItem('avg-config-col').value, 10);
+                this.context = this.vGrid.columnBindingContext['setup' + this.colType][this.colNo];
+                this.columnsArray = this.vGrid.columnBindingContext['setup' + this.colType];
+                this.element.addEventListener('mousedown', this.onDragstartBinded);
+                result.target.addEventListener('mouseenter', this.onDragenterBinded);
+            }
+            if (result.ok && result.target.nodeName === 'AVG-TOP-PANEL') {
+                this.isPanel = true;
+                this.sharedContext.panel = result.target;
+                result.target.onmouseleave = function () {
+                    if (_this.sharedContext.dragging && _this.sharedContext.title && _this.sharedContext.field) {
+                        _this.groupingElements.removeGroup('');
+                    }
+                };
+                result.target.onmouseenter = function () {
+                    if (_this.sharedContext.dragging && _this.sharedContext.title && _this.sharedContext.field) {
+                        _this.groupingElements.addGroup(_this.sharedContext.title, _this.sharedContext.field);
+                        _this.sharedContext.lastTarget = result.target;
+                    }
+                };
+                result.target.onmouseup = function () {
+                    if (_this.sharedContext.dragging && _this.sharedContext.title && _this.sharedContext.field) {
+                        _this.groupingElements.addToGrouping();
+                    }
+                };
+            }
+        };
+        VGridDragDropCol.prototype.createDragElement = function () {
+            this.dragColumnBlock = document.createElement('div');
+            this.dragColumnBlock.classList.add(this.vGrid.attTheme);
+            this.dragColumnBlock.classList.add('avg-drag');
+            this.dragColumnBlock.style.top = -1200 + 'px';
+            this.dragColumnBlock.style.left = -1200 + 'px';
+            document.body.appendChild(this.dragColumnBlock);
+            this.dragColumnBlock.innerHTML = this.title || this.vGrid.colConfig[this.colNo].colHeaderName;
+        };
+        VGridDragDropCol.prototype.onDragstart = function () {
+            var _this = this;
+            document.addEventListener('mouseup', this.onDragendBinded);
+            this.vGridElement.addEventListener('mouseleave', this.onDragOutSideBinded);
+            this.createDragElement();
+            this.mouseMoveTimer = setTimeout(function () {
+                document.addEventListener('mousemove', _this.onDragoverBinded, false);
+            }, 300);
+            this.sharedContext.dragging = true;
+            this.sharedContext.colType = this.colType;
+            this.sharedContext.context = this.context;
+            this.sharedContext.colNo = this.colNo;
+            this.sharedContext.curColNo = this.colNo;
+            this.sharedContext.columnsArray = this.columnsArray;
+            this.sharedContext.title = this.title;
+            this.sharedContext.field = this.field;
+            this.sharedContext.columnsArraySorted = [];
+            this.sharedContext.columnsArray.forEach(function (x) {
+                _this.sharedContext.columnsArraySorted.push(x);
+            });
+        };
+        VGridDragDropCol.prototype.onDragOutSide = function (event) {
+            if (this.sharedContext.dragging) {
+                if (event.layerX < 0) {
+                    var left_1 = false;
+                    this.vGrid.columnBindingContext.setupleft.forEach(function (x) {
+                        if (x.show) {
+                            left_1 = true;
+                        }
+                    });
+                    if (!left_1) {
+                        this.switchColumns({
+                            colType: 'left'
+                        });
+                    }
+                }
+                if (event.layerX > this.vGridElement.clientWidth) {
+                    var right_1 = false;
+                    this.vGrid.columnBindingContext.setupright.forEach(function (x) {
+                        if (x.show) {
+                            right_1 = true;
+                        }
+                    });
+                    if (!right_1) {
+                        this.switchColumns({
+                            colType: 'right'
+                        });
+                    }
+                }
+            }
+        };
+        VGridDragDropCol.prototype.onDragenter = function (event) {
+            if (this.sharedContext.dragging) {
+                var result = this.getTargetData(event.target);
+                if (result.target.nodeName === 'AVG-COL' && result.ok && this.sharedContext.lastTarget !== result.target) {
+                    this.sharedContext.lastTarget = result.target;
+                    if (result.colNo !== this.sharedContext.colNo && result.colType === this.sharedContext.colType) {
+                        var newLeft = this.sharedContext.columnsArray[result.colNo].left;
+                        var oldLeft = this.sharedContext.columnsArray[this.sharedContext.colNo].left;
+                        if (newLeft < oldLeft) {
+                            this.sharedContext.columnsArray[this.sharedContext.colNo].left = newLeft;
+                            this.sharedContext.columnsArray[result.colNo].left = newLeft + 1;
+                        }
+                        else {
+                            this.sharedContext.columnsArray[this.sharedContext.colNo].left = newLeft;
+                            this.sharedContext.columnsArray[result.colNo].left = newLeft - 1;
+                        }
+                        this.sharedContext.columnsArraySorted.sort(function (a, b) {
+                            return a.left - b.left;
+                        });
+                        var appendValue_1 = 0;
+                        this.sharedContext.columnsArraySorted.forEach(function (x) {
+                            if (x.show) {
+                                x.left = appendValue_1;
+                                appendValue_1 = appendValue_1 + x.width;
+                            }
+                        });
+                    }
+                    if (result.colNo !== this.sharedContext.colNo && result.colType !== this.sharedContext.colType) {
+                        this.switchColumns(result);
+                    }
+                }
+            }
+        };
+        VGridDragDropCol.prototype.onDragover = function (event) {
+            if (this.dragColumnBlock) {
+                this.dragColumnBlock.style.top = event.clientY + 'px';
+                this.dragColumnBlock.style.left = event.clientX + 'px';
+            }
+        };
+        VGridDragDropCol.prototype.onDragend = function () {
+            clearTimeout(this.mouseMoveTimer);
+            this.sharedContext.dragging = false;
+            document.removeEventListener('mouseup', this.onDragendBinded);
+            document.removeEventListener('mousemove', this.onDragoverBinded);
+            this.vGridElement.removeEventListener('mouseleave', this.onDragOutSideBinded);
+            this.sharedContext.lastTarget = null;
+            if (this.dragColumnBlock) {
+                var parent_1 = this.dragColumnBlock.parentNode;
+                if (parent_1) {
+                    parent_1.removeChild(this.dragColumnBlock);
+                    this.dragColumnBlock = null;
+                }
+            }
+        };
+        VGridDragDropCol.prototype.switchColumns = function (result) {
+            var _this = this;
+            var width;
+            var newColType = result.colType;
+            var oldColType = this.sharedContext.colType;
+            var heightAndWidths = this.vGrid.htmlHeightWidth;
+            switch (true) {
+                case newColType === 'left' && oldColType === 'main':
+                case newColType === 'main' && oldColType === 'left':
+                case newColType === 'right' && oldColType === 'main':
+                case newColType === 'main' && oldColType === 'right':
+                case newColType === 'left' && oldColType === 'right':
+                case newColType === 'right' && oldColType === 'left':
+                    this.sharedContext.columnsArray[this.sharedContext.colNo].show = false;
+                    width = this.sharedContext.columnsArray[this.sharedContext.colNo].width;
+                    this.sharedContext.columnsArraySorted.sort(function (a, b) {
+                        return a.left - b.left;
+                    });
+                    var appendValue_2 = 0;
+                    this.sharedContext.columnsArraySorted.forEach(function (x) {
+                        if (x.show) {
+                            x.left = appendValue_2;
+                            appendValue_2 = appendValue_2 + x.width;
+                        }
+                    });
+                    this.sharedContext.colType = result.colType;
+                    this.sharedContext.columnsArray = this.vGrid.columnBindingContext['setup' + result.colType];
+                    this.sharedContext.columnsArray[this.sharedContext.colNo].show = true;
+                    this.sharedContext.columnsArray[this.sharedContext.colNo].width = width;
+                    this.sharedContext.columnsArraySorted = [];
+                    this.sharedContext.columnsArray.forEach(function (x) {
+                        _this.sharedContext.columnsArraySorted.push(x);
+                    });
+                    this.sharedContext.columnsArraySorted.sort(function (a, b) {
+                        return a.left - b.left;
+                    });
+                    appendValue_2 = 0;
+                    this.sharedContext.columnsArraySorted.forEach(function (x) {
+                        if (x.show) {
+                            x.left = appendValue_2;
+                            appendValue_2 = appendValue_2 + x.width;
+                        }
+                    });
+                    break;
+                default:
+                    break;
+            }
+            if (newColType === 'left' && oldColType === 'main') {
+                heightAndWidths.avgContentMainScroll_Width = heightAndWidths.avgContentMainScroll_Width - width;
+                heightAndWidths.avgContentHhandleScroll_Width = heightAndWidths.avgContentHhandleScroll_Width - width;
+                heightAndWidths.avgContentLeft_Width = heightAndWidths.avgContentLeft_Width + width;
+                heightAndWidths.avgHeaderLeft_Width = heightAndWidths.avgHeaderLeft_Width + width;
+                heightAndWidths.avgContentMain_Left = heightAndWidths.avgContentMain_Left + width;
+                heightAndWidths.avgHeaderMain_Left = heightAndWidths.avgHeaderMain_Left + width;
+                heightAndWidths.avgContentHhandle_Left = heightAndWidths.avgContentHhandle_Left + width;
+            }
+            if (newColType === 'main' && oldColType === 'left') {
+                heightAndWidths.avgContentMainScroll_Width = heightAndWidths.avgContentMainScroll_Width + width;
+                heightAndWidths.avgContentHhandleScroll_Width = heightAndWidths.avgContentHhandleScroll_Width + width;
+                heightAndWidths.avgContentLeft_Width = heightAndWidths.avgContentLeft_Width - width;
+                heightAndWidths.avgHeaderLeft_Width = heightAndWidths.avgHeaderLeft_Width - width;
+                heightAndWidths.avgContentMain_Left = heightAndWidths.avgContentMain_Left - width;
+                heightAndWidths.avgHeaderMain_Left = heightAndWidths.avgHeaderMain_Left - width;
+                heightAndWidths.avgContentHhandle_Left = heightAndWidths.avgContentHhandle_Left - width;
+            }
+            if (newColType === 'right' && oldColType === 'main') {
+                heightAndWidths.avgContentMainScroll_Width = heightAndWidths.avgContentMainScroll_Width - width;
+                heightAndWidths.avgContentHhandleScroll_Width = heightAndWidths.avgContentHhandleScroll_Width - width;
+                heightAndWidths.avgContentRight_Width = heightAndWidths.avgContentRight_Width + width;
+                heightAndWidths.avgHeaderRight_Width = heightAndWidths.avgHeaderRight_Width + width;
+                heightAndWidths.avgContentMain_Right = heightAndWidths.avgContentMain_Right + width;
+                heightAndWidths.avgHeaderMain_Right = heightAndWidths.avgHeaderMain_Right + width;
+                heightAndWidths.avgContentHhandle_Right = heightAndWidths.avgContentHhandle_Right + width;
+            }
+            if (newColType === 'main' && oldColType === 'right') {
+                heightAndWidths.avgContentMainScroll_Width = heightAndWidths.avgContentMainScroll_Width + width;
+                heightAndWidths.avgContentHhandleScroll_Width = heightAndWidths.avgContentHhandleScroll_Width + width;
+                heightAndWidths.avgContentRight_Width = heightAndWidths.avgContentRight_Width - width;
+                heightAndWidths.avgHeaderRight_Width = heightAndWidths.avgHeaderRight_Width - width;
+                heightAndWidths.avgContentMain_Right = heightAndWidths.avgContentMain_Right - width;
+                heightAndWidths.avgHeaderMain_Right = heightAndWidths.avgHeaderMain_Right - width;
+                heightAndWidths.avgContentHhandle_Right = heightAndWidths.avgContentHhandle_Right - width;
+            }
+            if (newColType === 'left' && oldColType === 'right') {
+                heightAndWidths.avgContentRight_Width = heightAndWidths.avgContentRight_Width - width;
+                heightAndWidths.avgHeaderRight_Width = heightAndWidths.avgHeaderRight_Width - width;
+                heightAndWidths.avgContentLeft_Width = heightAndWidths.avgContentLeft_Width + width;
+                heightAndWidths.avgHeaderLeft_Width = heightAndWidths.avgHeaderLeft_Width + width;
+                heightAndWidths.avgContentMain_Right = heightAndWidths.avgContentMain_Right - width;
+                heightAndWidths.avgHeaderMain_Right = heightAndWidths.avgHeaderMain_Right - width;
+                heightAndWidths.avgContentHhandle_Right = heightAndWidths.avgContentHhandle_Right - width;
+                heightAndWidths.avgContentMain_Left = heightAndWidths.avgContentMain_Left + width;
+                heightAndWidths.avgHeaderMain_Left = heightAndWidths.avgHeaderMain_Left + width;
+                heightAndWidths.avgContentHhandle_Left = heightAndWidths.avgContentHhandle_Left + width;
+            }
+            if (newColType === 'right' && oldColType === 'left') {
+                heightAndWidths.avgContentRight_Width = heightAndWidths.avgContentRight_Width + width;
+                heightAndWidths.avgHeaderRight_Width = heightAndWidths.avgHeaderRight_Width + width;
+                heightAndWidths.avgContentLeft_Width = heightAndWidths.avgContentLeft_Width - width;
+                heightAndWidths.avgHeaderLeft_Width = heightAndWidths.avgHeaderLeft_Width - width;
+                heightAndWidths.avgContentMain_Right = heightAndWidths.avgContentMain_Right + width;
+                heightAndWidths.avgHeaderMain_Right = heightAndWidths.avgHeaderMain_Right + width;
+                heightAndWidths.avgContentHhandle_Right = heightAndWidths.avgContentHhandle_Right + width;
+                heightAndWidths.avgContentMain_Left = heightAndWidths.avgContentMain_Left - width;
+                heightAndWidths.avgHeaderMain_Left = heightAndWidths.avgHeaderMain_Left - width;
+                heightAndWidths.avgContentHhandle_Left = heightAndWidths.avgContentHhandle_Left - width;
+            }
+        };
+        VGridDragDropCol.prototype.getTargetData = function (curTarget) {
+            var draggableTarget = null;
+            var count = 0;
+            var exit = true;
+            var isOk = false;
+            while (exit) {
+                count++;
+                if (!curTarget.parentNode) {
+                    exit = false;
+                }
+                else {
+                    if (curTarget.draggable === true && draggableTarget === null) {
+                        draggableTarget = curTarget;
+                    }
+                    switch (true) {
+                        case curTarget.nodeName === 'AVG-COL':
+                        case curTarget.nodeName === 'AVG-TOP-PANEL':
+                            isOk = true;
+                            exit = false;
+                            break;
+                        default:
+                            curTarget = curTarget.parentNode;
+                            break;
+                    }
+                }
+                if (count > 10) {
+                    exit = false;
+                }
+            }
+            var curColType = null;
+            var curColNo = null;
+            var curContext = null;
+            var curColumnsArray = null;
+            var isPanel = false;
+            if (isOk && curTarget.nodeName === 'AVG-COL') {
+                curColType = curTarget.attributes.getNamedItem('avg-type').value;
+                curColNo = parseInt(curTarget.attributes.getNamedItem('avg-config-col').value, 10);
+                curContext = this.vGrid.columnBindingContext['setup' + curColType][curColNo];
+                curColumnsArray = this.vGrid.columnBindingContext['setup' + curColType];
+            }
+            if (isOk && curTarget.nodeName === 'AVG-TOP-PANEL') {
+                isPanel = true;
+            }
+            return {
+                draggable: draggableTarget,
+                ok: isOk,
+                target: curTarget,
+                colType: curColType,
+                colNo: curColNo,
+                context: curContext,
+                columnsArray: curColumnsArray,
+                panel: isPanel
+            };
+        };
+        return VGridDragDropCol;
+    }());
+    __decorate([
+        aurelia_framework_1.bindable,
+        __metadata("design:type", String)
+    ], VGridDragDropCol.prototype, "title", void 0);
+    __decorate([
+        aurelia_framework_1.bindable,
+        __metadata("design:type", String)
+    ], VGridDragDropCol.prototype, "field", void 0);
+    VGridDragDropCol = __decorate([
+        aurelia_framework_1.customAttribute('v-drag-drop-col'),
+        aurelia_framework_1.inject(Element, v_grid_1.VGrid),
+        __metadata("design:paramtypes", [Element, v_grid_1.VGrid])
+    ], VGridDragDropCol);
+    exports.VGridDragDropCol = VGridDragDropCol;
+});
+
+//# sourceMappingURL=v-drag-drop-col.js.map
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+define('aurelia-v-grid/grid/attributes/v-filter',["require", "exports", "aurelia-framework", "../v-grid"], function (require, exports, aurelia_framework_1, v_grid_1) {
+    var VGridAttributesFilter = (function () {
+        function VGridAttributesFilter(element, vGrid) {
+            this.vGrid = vGrid;
+            this.element = element;
+        }
+        VGridAttributesFilter.prototype.getOperatorName = function (operator) {
+            return this.vGrid.filterOperatorNames[operator];
+        };
+        VGridAttributesFilter.prototype.attached = function () {
+            var _this = this;
+            if (this.attribute) {
+                this.vGrid.element.addEventListener('filterUpdate', function (e) {
+                    if (e.detail.attribute === _this.attribute) {
+                        _this.filterOperator = e.detail.operator;
+                        _this.element.placeholder =
+                            _this.getOperatorName(_this.filterOperator);
+                        _this.updateFilter(_this.vGrid.attGridConnector.getCurrentFilter());
+                    }
+                });
+                this.vGrid.element.addEventListener('filterTranslation', function () {
+                    _this.element.placeholder =
+                        _this.getOperatorName(_this.filterOperator);
+                    _this.updateFilter(_this.vGrid.attGridConnector.getCurrentFilter());
+                });
+                this.vGrid.element.addEventListener('filterClearCell', function (e) {
+                    if (e.detail.attribute === _this.attribute) {
+                        _this.resetValue();
+                        _this.updateFilter(_this.vGrid.attGridConnector.getCurrentFilter());
+                    }
+                });
+                this.vGrid.element.addEventListener('filterClearAll', function () {
+                    _this.resetValue();
+                    _this.updateFilter(_this.vGrid.attGridConnector.getCurrentFilter());
+                });
+                if (this.type !== 'checkbox') {
+                    this.element.placeholder =
+                        this.getOperatorName(this.filterOperator);
+                    this.element.onkeyup = function (e) {
+                        if (e.keyCode === 13) {
+                            _this.updateFilter(_this.vGrid.attGridConnector.getCurrentFilter());
+                            _this.vGrid.attGridConnector.query(_this.vGrid.attGridConnector.getCurrentFilter());
+                        }
+                        else {
+                            _this.updateFilter(_this.vGrid.attGridConnector.getCurrentFilter());
+                            if (_this.filterOn === 'onKeyDown') {
+                                _this.vGrid.attGridConnector.query(_this.vGrid.attGridConnector.getCurrentFilter());
+                            }
+                        }
+                    };
+                }
+                else {
+                    this.element.indeterminate = true;
+                    this.element.style.opacity = '0.3';
+                    this.element.onclick = function () {
+                        switch (_this.state) {
+                            case 0:
+                                _this.state = 2;
+                                _this.element.style.opacity = '1';
+                                _this.element.checked = true;
+                                _this.element.indeterminate = false;
+                                break;
+                            case 2:
+                                _this.state = 3;
+                                _this.element.style.opacity = '1';
+                                _this.element.indeterminate = false;
+                                break;
+                            default:
+                                _this.element.checked = false;
+                                _this.state = 0;
+                                _this.element.style.opacity = '0.3';
+                                _this.element.indeterminate = true;
+                        }
+                        _this.updateFilter(_this.vGrid.attGridConnector.getCurrentFilter());
+                        _this.vGrid.attGridConnector.query(_this.vGrid.attGridConnector.getCurrentFilter());
+                    };
+                }
+            }
+        };
+        VGridAttributesFilter.prototype.bind = function (bindingContext, overrideContext) {
+            this.bindingContext = bindingContext;
+            this.overrideContext = overrideContext;
+            var valueConverter = this.valueConverters(this.converter);
+            this.filterOn = this.keydown === 'true' ? 'onKeyDown' : 'onEnterKey';
+            this.filterOperator = this.operator || '=';
+            this.attribute = this.field;
+            this.valueFormater = valueConverter || null;
+            this.type = this.element.type;
+            this.state = 0;
+        };
+        VGridAttributesFilter.prototype.getValue = function () {
+            if (this.type !== 'checkbox') {
+                return this.valueFormater ? this.valueFormater.fromView(this.element.value) : this.element.value;
+            }
+            else {
+                if (this.valueFormater && this.state) {
+                    return this.valueFormater.fromView(this.state ? this.state === 2 ? true : false : '');
+                }
+                else {
+                    return this.state ? this.state === 2 ? true : false : '';
+                }
+            }
+        };
+        VGridAttributesFilter.prototype.resetValue = function () {
+            if (this.type !== 'checkbox') {
+                this.element.value = '';
+            }
+            else {
+                this.state = 0;
+                this.element.checked = false;
+            }
+        };
+        VGridAttributesFilter.prototype.updateFilter = function (curFilter) {
+            var _this = this;
+            var filterIndex = -1;
+            curFilter.forEach(function (filter, index) {
+                if (filter.attribute === _this.attribute) {
+                    filterIndex = index;
+                }
+            });
+            if (filterIndex !== -1) {
+                if (this.getValue() === '') {
+                    curFilter.splice(filterIndex, 1);
+                }
+                else {
+                    curFilter[filterIndex].value = this.getValue();
+                    curFilter[filterIndex].operator = this.filterOperator;
+                }
+            }
+            else {
+                if (this.getValue() !== '') {
+                    curFilter.push({
+                        attribute: this.attribute,
+                        operator: this.filterOperator,
+                        value: this.getValue()
+                    });
+                }
+            }
+        };
+        VGridAttributesFilter.prototype.valueConverters = function (value) {
+            var valueConverter = this.vGrid.viewResources.getValueConverter.bind(this.vGrid.viewResources);
+            return valueConverter(value);
+        };
+        return VGridAttributesFilter;
+    }());
+    __decorate([
+        aurelia_framework_1.bindable,
+        __metadata("design:type", String)
+    ], VGridAttributesFilter.prototype, "field", void 0);
+    __decorate([
+        aurelia_framework_1.bindable,
+        __metadata("design:type", String)
+    ], VGridAttributesFilter.prototype, "operator", void 0);
+    __decorate([
+        aurelia_framework_1.bindable,
+        __metadata("design:type", String)
+    ], VGridAttributesFilter.prototype, "converter", void 0);
+    __decorate([
+        aurelia_framework_1.bindable,
+        __metadata("design:type", String)
+    ], VGridAttributesFilter.prototype, "keydown", void 0);
+    VGridAttributesFilter = __decorate([
+        aurelia_framework_1.customAttribute('v-filter'),
+        aurelia_framework_1.inject(Element, v_grid_1.VGrid),
+        __metadata("design:paramtypes", [HTMLElement, v_grid_1.VGrid])
+    ], VGridAttributesFilter);
+    exports.VGridAttributesFilter = VGridAttributesFilter;
+});
+
+//# sourceMappingURL=v-filter.js.map
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+define('aurelia-v-grid/grid/attributes/v-filter-observer',["require", "exports", "aurelia-framework", "../v-grid"], function (require, exports, aurelia_framework_1, v_grid_1) {
+    var VGridAttributesFilterObserver = (function () {
+        function VGridAttributesFilterObserver(element, vGrid) {
+            this.vGrid = vGrid;
+            this.element = element;
+        }
+        VGridAttributesFilterObserver.prototype.valueChanged = function (newValue) {
+            if (this.attribute && newValue) {
+                this.updateFilter();
+            }
+        };
+        VGridAttributesFilterObserver.prototype.bind = function (bindingContext, overrideContext) {
+            this.bindingContext = bindingContext;
+            this.overrideContext = overrideContext;
+            var valueConverter = this.valueConverters(this.converter);
+            this.filterOperator = this.operator || '=';
+            this.attribute = this.field;
+            this.valueFormater = valueConverter || null;
+            this.state = 0;
+        };
+        VGridAttributesFilterObserver.prototype.getValue = function () {
+            return this.valueFormater ? this.valueFormater.fromView(this.value) : this.value;
+        };
+        VGridAttributesFilterObserver.prototype.updateFilter = function () {
+            var _this = this;
+            var curFilter = this.vGrid.attGridConnector.getCurrentFilter();
+            var filterIndex = -1;
+            curFilter.forEach(function (filter, index) {
+                if (filter.attribute === _this.attribute) {
+                    filterIndex = index;
+                }
+            });
+            if (filterIndex !== -1) {
+                if (this.getValue() === '') {
+                    curFilter.splice(filterIndex, 1);
+                }
+                else {
+                    curFilter[filterIndex].value = this.getValue();
+                    curFilter[filterIndex].operator = this.filterOperator;
+                }
+            }
+            else {
+                if (this.getValue() !== '') {
+                    curFilter.push({
+                        attribute: this.attribute,
+                        operator: this.filterOperator,
+                        value: this.getValue()
+                    });
+                }
+            }
+            this.vGrid.attGridConnector.query(this.vGrid.attGridConnector.getCurrentFilter());
+        };
+        VGridAttributesFilterObserver.prototype.valueConverters = function (value) {
+            var valueConverter = this.vGrid.viewResources.getValueConverter.bind(this.vGrid.viewResources);
+            return valueConverter(value);
+        };
+        return VGridAttributesFilterObserver;
+    }());
+    __decorate([
+        aurelia_framework_1.bindable,
+        __metadata("design:type", String)
+    ], VGridAttributesFilterObserver.prototype, "field", void 0);
+    __decorate([
+        aurelia_framework_1.bindable,
+        __metadata("design:type", String)
+    ], VGridAttributesFilterObserver.prototype, "operator", void 0);
+    __decorate([
+        aurelia_framework_1.bindable,
+        __metadata("design:type", String)
+    ], VGridAttributesFilterObserver.prototype, "converter", void 0);
+    __decorate([
+        aurelia_framework_1.bindable,
+        __metadata("design:type", String)
+    ], VGridAttributesFilterObserver.prototype, "value", void 0);
+    VGridAttributesFilterObserver = __decorate([
+        aurelia_framework_1.customAttribute('v-filter-observer'),
+        aurelia_framework_1.inject(Element, v_grid_1.VGrid),
+        __metadata("design:paramtypes", [HTMLElement, v_grid_1.VGrid])
+    ], VGridAttributesFilterObserver);
+    exports.VGridAttributesFilterObserver = VGridAttributesFilterObserver;
+});
+
+//# sourceMappingURL=v-filter-observer.js.map
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+define('aurelia-v-grid/grid/attributes/v-image',["require", "exports", "aurelia-framework", "../v-grid"], function (require, exports, aurelia_framework_1, v_grid_1) {
+    var VGridAttributesImageFix = (function () {
+        function VGridAttributesImageFix(element, vGrid) {
+            this.vGrid = vGrid;
+            this.element = element;
+        }
+        VGridAttributesImageFix.prototype.valueChanged = function (newValue) {
+            this.element.src = '';
+            this.element.src = this.value || newValue;
+        };
+        VGridAttributesImageFix.prototype.bind = function (bindingContext, overrideContext) {
+            this.bindingContext = bindingContext;
+            this.overrideContext = overrideContext;
+            this.element.src = '';
+            this.element.src = this.value || '';
+        };
+        return VGridAttributesImageFix;
+    }());
+    VGridAttributesImageFix = __decorate([
+        aurelia_framework_1.customAttribute('v-image-fix'),
+        aurelia_framework_1.inject(Element, v_grid_1.VGrid),
+        __metadata("design:paramtypes", [HTMLImageElement, v_grid_1.VGrid])
+    ], VGridAttributesImageFix);
+    exports.VGridAttributesImageFix = VGridAttributesImageFix;
+});
+
+//# sourceMappingURL=v-image.js.map
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+define('aurelia-v-grid/grid/attributes/v-menu',["require", "exports", "aurelia-framework", "../v-grid"], function (require, exports, aurelia_framework_1, v_grid_1) {
+    var VGridAttributeMenu = (function () {
+        function VGridAttributeMenu(element, vGrid) {
+            this.element = element;
+            this.controller = vGrid.controller;
+            this.raiseEvent = vGrid.controller.raiseEvent;
+            this.groupingElements = vGrid.groupingElements;
+            this.openBinded = this.open.bind(this);
+            this.checkBinded = this.check.bind(this);
+            this.callbackBinded = this.callback.bind(this);
+        }
+        VGridAttributeMenu.prototype.attached = function () {
+            this.element.addEventListener('contextmenu', this.openBinded);
+        };
+        VGridAttributeMenu.prototype.unbind = function () {
+            document.removeEventListener('click', this.checkBinded);
+        };
+        VGridAttributeMenu.prototype.check = function (e) {
+            var x = e.target.classList.contains('avg-menu__link');
+            if (!x) {
+                this.controller.contextMenu.setDefaults();
+                document.removeEventListener('click', this.checkBinded);
+            }
+        };
+        VGridAttributeMenu.prototype.callback = function (type, option, event) {
+            if (type === 'filter') {
+                if (option === 'clear') {
+                    this.raiseEvent('filterClearCell', { attribute: this.filter.replace('rowRef.', '') });
+                    document.removeEventListener('click', this.checkBinded);
+                    return true;
+                }
+                if (option === 'clearall') {
+                    this.raiseEvent('filterClearAll', {});
+                    document.removeEventListener('click', this.checkBinded);
+                    return true;
+                }
+                if (option === 'showall') {
+                    this.controller.attGridConnector.query(null);
+                    document.removeEventListener('click', this.checkBinded);
+                    return true;
+                }
+            }
+            if (type === 'sort') {
+                var field_1 = this.sort;
+                var arr = this.sort.split(';');
+                arr.forEach(function (x) {
+                    if (x.indexOf('field') !== -1) {
+                        field_1 = x.replace('field:', '');
+                    }
+                });
+                this.controller.attGridConnector.orderBy({
+                    attribute: field_1,
+                    asc: option === 'desc' ? false : true
+                }, event.shiftKey);
+                document.removeEventListener('click', this.checkBinded);
+                return true;
+            }
+            if (type === 'groupby') {
+                this.groupingElements.addGroup(this.groupby, this.groupby);
+                this.groupingElements.addToGrouping();
+                return true;
+            }
+            if (type === 'filterOption') {
+                var field_2 = this.filter;
+                var arr = this.filter.split(';');
+                arr.forEach(function (x) {
+                    if (x.indexOf('field') !== -1) {
+                        field_2 = x.replace('field:', '');
+                    }
+                });
+                this.raiseEvent('filterUpdate', {
+                    attribute: field_2,
+                    operator: option
+                });
+                document.removeEventListener('click', this.checkBinded);
+                return true;
+            }
+            return false;
+        };
+        VGridAttributeMenu.prototype.open = function (e) {
+            this.check(e);
+            document.addEventListener('click', this.checkBinded);
+            e.preventDefault();
+            if (!this.controller.contextMenu.show) {
+                var clickCoords = this.getPosition(e);
+                this.controller.contextMenu.openMenu({
+                    top: clickCoords.y,
+                    left: clickCoords.x,
+                    filter: this.filter,
+                    sort: this.sort,
+                    pinned: this.pinned,
+                    groupby: this.groupby,
+                    callback: this.callbackBinded
+                });
+            }
+        };
+        VGridAttributeMenu.prototype.getPosition = function (e) {
+            var posx = 0;
+            var posy = 0;
+            if (e.pageX || e.pageY) {
+                posx = e.pageX;
+                posy = e.pageY;
+            }
+            else if (e.clientX || e.clientY) {
+                posx = e.clientX + document.body.scrollLeft + document.documentElement.scrollLeft;
+                posy = e.clientY + document.body.scrollTop + document.documentElement.scrollTop;
+            }
+            return {
+                x: posx,
+                y: posy
+            };
+        };
+        return VGridAttributeMenu;
+    }());
+    __decorate([
+        aurelia_framework_1.bindable,
+        __metadata("design:type", String)
+    ], VGridAttributeMenu.prototype, "filter", void 0);
+    __decorate([
+        aurelia_framework_1.bindable,
+        __metadata("design:type", String)
+    ], VGridAttributeMenu.prototype, "sort", void 0);
+    __decorate([
+        aurelia_framework_1.bindable,
+        __metadata("design:type", String)
+    ], VGridAttributeMenu.prototype, "pinned", void 0);
+    __decorate([
+        aurelia_framework_1.bindable,
+        __metadata("design:type", String)
+    ], VGridAttributeMenu.prototype, "groupby", void 0);
+    VGridAttributeMenu = __decorate([
+        aurelia_framework_1.customAttribute('v-menu'),
+        aurelia_framework_1.inject(Element, v_grid_1.VGrid),
+        __metadata("design:paramtypes", [Element, v_grid_1.VGrid])
+    ], VGridAttributeMenu);
+    exports.VGridAttributeMenu = VGridAttributeMenu;
+});
+
+//# sourceMappingURL=v-menu.js.map
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+define('aurelia-v-grid/grid/attributes/v-resize-col',["require", "exports", "aurelia-framework", "../v-grid"], function (require, exports, aurelia_framework_1, v_grid_1) {
+    var VGridAttributesResizeCol = (function () {
+        function VGridAttributesResizeCol(element, vGrid) {
+            this.vGrid = vGrid;
+            this.ctx = vGrid.resizeAttributeSharedContext;
+            this.element = element;
+            this.screenX = 0;
+            this.originalWidth = 0;
+            this.column = this.element;
+            while (this.column.nodeName !== 'AVG-COL') {
+                this.column = this.column.parentNode;
+            }
+            this.colType = this.column.attributes.getNamedItem('avg-type').value;
+            this.colNo = parseInt(this.column.attributes.getNamedItem('avg-config-col').value, 10);
+            this.context = vGrid.columnBindingContext['setup' + this.colType][this.colNo];
+            this.columnsArray = vGrid.columnBindingContext['setup' + this.colType];
+            this.columnBindingContext = vGrid.columnBindingContext;
+        }
+        VGridAttributesResizeCol.prototype.bind = function (bindingContext, overrideContext) {
+            this.bindingContext = bindingContext;
+            this.overrideContext = overrideContext;
+        };
+        VGridAttributesResizeCol.prototype.attached = function () {
+            var _this = this;
+            var resizeHandle = document.createElement('DIV');
+            resizeHandle.classList.add('avg-draggable-handler');
+            this.onmousedownBinded = this.onmousedown.bind(this);
+            this.onmousemoveBinded = this.onmousemove.bind(this);
+            this.onmouseupBinded = this.onmouseup.bind(this);
+            resizeHandle.onmousedown = function (e) {
+                _this.ctx.resizing = true;
+                _this.onmousedown(e);
+            };
+            this.column.appendChild(resizeHandle);
+        };
+        VGridAttributesResizeCol.prototype.onmouseup = function () {
+            document.removeEventListener('mousemove', this.onmousemoveBinded);
+            document.removeEventListener('mouseup', this.onmouseupBinded);
+            this.ctx.resizing = false;
+        };
+        VGridAttributesResizeCol.prototype.onmousemove = function (e) {
+            this.updateHeader(e);
+        };
+        VGridAttributesResizeCol.prototype.updateHeader = function (e) {
+            var _this = this;
+            var w = Math.abs(this.screenX - e.screenX);
+            if (w % 2 === 0) {
+                requestAnimationFrame(function () {
+                    var movementX = _this.originalWidth - (_this.screenX - e.screenX);
+                    var appendValue = _this.originalWidth - movementX;
+                    if (_this.colType === 'main') {
+                        _this.columnsArray[_this.colNo].width = movementX;
+                        _this.vGrid.colConfig[_this.colNo].colWidth = _this.columnsArray[_this.colNo].width;
+                        for (var i = 0; i < _this.columnsArray.length; i++) {
+                            if (_this.columnsArray[_this.colNo].left < _this.columnsArray[i].left) {
+                                _this.columnsArray[i].left = _this.originals[i] - appendValue;
+                            }
+                        }
+                        _this.vGrid.htmlHeightWidth.avgContentMainScroll_Width = _this.avgContentMainScroll_Width - appendValue;
+                        _this.vGrid.htmlHeightWidth.avgContentHhandleScroll_Width = _this.avgContentHhandleScroll_Width - appendValue;
+                    }
+                    if (_this.colType === 'right') {
+                        _this.columnsArray[_this.colNo].width = movementX;
+                        _this.vGrid.colConfig[_this.colNo].colWidth = _this.columnsArray[_this.colNo].width;
+                        for (var i = 0; i < _this.columnsArray.length; i++) {
+                            if (_this.columnsArray[_this.colNo].left < _this.columnsArray[i].left) {
+                                _this.columnsArray[i].left = _this.originals[i] - appendValue;
+                            }
+                        }
+                        _this.vGrid.htmlHeightWidth.avgContentRight_Width = _this.avgContentRight_Width - appendValue;
+                        _this.vGrid.htmlHeightWidth.avgHeaderRight_Width = _this.avgHeaderRight_Width - appendValue;
+                        _this.vGrid.htmlHeightWidth.avgContentMain_Right = _this.avgContentMain_Right - appendValue;
+                        _this.vGrid.htmlHeightWidth.avgHeaderMain_Right = _this.avgHeaderMain_Right - appendValue;
+                        _this.vGrid.htmlHeightWidth.avgContentHhandle_Right = _this.avgContentHhandle_Right - appendValue;
+                    }
+                    if (_this.colType === 'left') {
+                        _this.columnsArray[_this.colNo].width = movementX;
+                        _this.vGrid.colConfig[_this.colNo].colWidth = _this.columnsArray[_this.colNo].width;
+                        for (var i = 0; i < _this.columnsArray.length; i++) {
+                            if (_this.columnsArray[_this.colNo].left < _this.columnsArray[i].left) {
+                                _this.columnsArray[i].left = _this.originals[i] - appendValue;
+                            }
+                        }
+                        _this.vGrid.htmlHeightWidth.avgContentLeft_Width = _this.avgContentLeft_Width - appendValue;
+                        _this.vGrid.htmlHeightWidth.avgHeaderLeft_Width = _this.avgHeaderLeft_Width - appendValue;
+                        _this.vGrid.htmlHeightWidth.avgContentMain_Left = _this.avgContentMain_Left - appendValue;
+                        _this.vGrid.htmlHeightWidth.avgHeaderMain_Left = _this.avgHeaderMain_Left - appendValue;
+                        _this.vGrid.htmlHeightWidth.avgContentHhandle_Left = _this.avgContentHhandle_Left - appendValue;
+                    }
+                    _this.vGrid.controller.udateHorizontalScroller();
+                });
+            }
+        };
+        VGridAttributesResizeCol.prototype.onmousedown = function (e) {
+            var _this = this;
+            this.screenX = e.screenX;
+            this.originalWidth = this.context.width;
+            this.originals = [];
+            for (var i = 0; i < this.columnsArray.length; i++) {
+                this.originals.push(this.columnsArray[i].left);
+            }
+            this.avgContentLeft_Width = this.vGrid.htmlHeightWidth.avgContentLeft_Width;
+            this.avgHeaderLeft_Width = this.vGrid.htmlHeightWidth.avgHeaderLeft_Width;
+            this.avgContentMainScroll_Width = this.vGrid.htmlHeightWidth.avgContentMainScroll_Width;
+            this.avgHeaderMain_Left = this.vGrid.htmlHeightWidth.avgHeaderMain_Left;
+            this.avgContentMain_Left = this.vGrid.htmlHeightWidth.avgContentMain_Left;
+            this.avgContentMain_Right = this.vGrid.htmlHeightWidth.avgContentMain_Right;
+            this.avgHeaderMain_Right = this.vGrid.htmlHeightWidth.avgHeaderMain_Right;
+            this.avgContentRight_Width = this.vGrid.htmlHeightWidth.avgContentRight_Width;
+            this.avgHeaderRight_Width = this.vGrid.htmlHeightWidth.avgHeaderRight_Width;
+            this.avgContentHhandle_Right = this.vGrid.htmlHeightWidth.avgContentHhandle_Right;
+            this.avgContentHhandle_Left = this.vGrid.htmlHeightWidth.avgContentHhandle_Left;
+            this.avgContentHhandleScroll_Width = this.vGrid.htmlHeightWidth.avgContentHhandleScroll_Width;
+            this.avgContentMainScrollLeft = this.vGrid.htmlCache.avg_content_main.scrollLeft;
+            if (this.colType === 'main') {
+                this.isLast = this.vGrid.htmlHeightWidth.avgContentMainScroll_Width === (this.context.left + this.context.width);
+            }
+            if (this.colType === 'left') {
+                var sumContext = this.context.left + this.context.width + this.vGrid.htmlHeightWidth.avgScrollBarWidth;
+                var sumGrouping = this.columnBindingContext.setupgrouping * 15;
+                this.isLast = this.vGrid.htmlHeightWidth.avgContentLeft_Width === (sumContext + sumGrouping);
+            }
+            if (this.colType === 'right') {
+                var sum = this.context.left + this.context.width + this.vGrid.htmlHeightWidth.avgScrollBarWidth;
+                this.isLast = this.vGrid.htmlHeightWidth.avgContentRight_Width === sum;
+            }
+            var setupRight = this.vGrid.columnBindingContext.setupright;
+            this.rightColNo = 0;
+            this.rightColNoWidth = 0;
+            setupRight.forEach(function (col, i) {
+                if (col.left === 0) {
+                    _this.rightColNo = i;
+                    _this.rightColNoWidth = col.width;
+                }
+            });
+            document.addEventListener('mousemove', this.onmousemoveBinded);
+            document.addEventListener('mouseup', this.onmouseupBinded);
+        };
+        return VGridAttributesResizeCol;
+    }());
+    VGridAttributesResizeCol = __decorate([
+        aurelia_framework_1.customAttribute('v-resize-col'),
+        aurelia_framework_1.inject(Element, v_grid_1.VGrid),
+        __metadata("design:paramtypes", [Element, v_grid_1.VGrid])
+    ], VGridAttributesResizeCol);
+    exports.VGridAttributesResizeCol = VGridAttributesResizeCol;
+});
+
+//# sourceMappingURL=v-resize-col.js.map
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+define('aurelia-v-grid/grid/attributes/v-sort',["require", "exports", "aurelia-framework", "../v-grid"], function (require, exports, aurelia_framework_1, v_grid_1) {
+    var VGridAttributesSort = (function () {
+        function VGridAttributesSort(element, vGrid) {
+            this.firstTime = true;
+            this.vGrid = vGrid;
+            this.element = element;
+        }
+        VGridAttributesSort.prototype.bind = function (bindingContext, overrideContext) {
+            this.bindingContext = bindingContext;
+            this.overrideContext = overrideContext;
+            this.attribute = this.field;
+        };
+        VGridAttributesSort.prototype.attached = function () {
+            var _this = this;
+            this.sortIcon = document.createElement('i');
+            this.sortIcon.innerHTML = this.getSortIconMarkup();
+            this.element.appendChild(this.sortIcon);
+            this.element.onmousedown = function () {
+                _this.element.onmouseup = function (e) {
+                    if (e.button === 0) {
+                        if (_this.firstTime && _this.asc === 'false') {
+                            _this.vGrid.attGridConnector.orderBy({ attribute: _this.attribute, asc: false }, e.shiftKey);
+                        }
+                        else {
+                            _this.vGrid.attGridConnector.orderBy(_this.attribute, e.shiftKey);
+                        }
+                    }
+                };
+                setTimeout(function () {
+                    _this.element.onmouseup = null;
+                }, 300);
+            };
+            this.vGrid.element.addEventListener('sortIconUpdate', function () {
+                _this.sortIcon.innerHTML = _this.getSortIconMarkup();
+            });
+        };
+        VGridAttributesSort.prototype.detached = function () {
+            this.element.removeChild(this.sortIcon);
+        };
+        VGridAttributesSort.prototype.getSortIconMarkup = function () {
+            var _this = this;
+            var markup = "";
+            var isAscHtml = "<svg class=\"icon\" xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 16 16\">\n                        <path d=\"M7.4 6L3 10h1.5L8 7l3.4 3H13L8.5 6h-1z\"/>\n                      </svg>";
+            var isDescHtml = "<svg class=\"icon\" xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 16 16\">\n                        <path d=\"M7.4 10L3 6h1.5L8 9.2 11.3 6H13l-4.5 4h-1z\"/>\n                      </svg>";
+            var sortlength = this.vGrid.attGridConnector.getCurrentOrderBy().length;
+            this.vGrid.attGridConnector.getCurrentOrderBy().forEach(function (x) {
+                if (x.attribute === _this.attribute) {
+                    _this.firstTime = false;
+                    var block = x.asc === true ? isAscHtml : isDescHtml;
+                    var main = '';
+                    if (sortlength > 1) {
+                        main = "<i class=\"" + 'avg-fa-sort-number' + "\" data-vgridsort=\"" + x.no + "\"></i>";
+                    }
+                    markup = block + main;
+                }
+            });
+            return markup;
+        };
+        return VGridAttributesSort;
+    }());
+    __decorate([
+        aurelia_framework_1.bindable,
+        __metadata("design:type", String)
+    ], VGridAttributesSort.prototype, "field", void 0);
+    __decorate([
+        aurelia_framework_1.bindable,
+        __metadata("design:type", String)
+    ], VGridAttributesSort.prototype, "asc", void 0);
+    VGridAttributesSort = __decorate([
+        aurelia_framework_1.customAttribute('v-sort'),
+        aurelia_framework_1.inject(Element, v_grid_1.VGrid),
+        __metadata("design:paramtypes", [HTMLElement, v_grid_1.VGrid])
+    ], VGridAttributesSort);
+    exports.VGridAttributesSort = VGridAttributesSort;
+});
+
+//# sourceMappingURL=v-sort.js.map
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+define('aurelia-v-grid/grid/attributes/v-selection',["require", "exports", "aurelia-framework", "../v-grid"], function (require, exports, aurelia_framework_1, v_grid_1) {
+    var VGridAttributesSelection = (function () {
+        function VGridAttributesSelection(element, vGrid) {
+            this.vGrid = vGrid;
+            this.controller = vGrid.controller;
+            this.element = element;
+        }
+        VGridAttributesSelection.prototype.selectedChanged = function (newValue) {
+            if (this.type === 'row') {
+                this.element.checked = newValue;
+            }
+        };
+        VGridAttributesSelection.prototype.bind = function (bindingContext, overrideContext) {
+            this.bindingContext = bindingContext;
+            this.overrideContext = overrideContext;
+        };
+        VGridAttributesSelection.prototype.attached = function () {
+            var _this = this;
+            this.element.checked = this.selected;
+            this.element.onclick = function () {
+                var status = _this.element.checked === 'true' || _this.element.checked === true ? true : false;
+                if (status) {
+                    if (_this.type === 'header') {
+                        _this.bindingContext.selection.selectRange(0, _this.controller.collectionLength() - 1);
+                        _this.controller.rowClickHandler.updateSelectionOnAllRows();
+                    }
+                    if (_this.type === 'row') {
+                        _this.bindingContext.selection.select(_this.bindingContext.row, true);
+                        _this.controller.rowClickHandler.updateSelectionOnAllRows();
+                    }
+                }
+                else {
+                    if (_this.type === 'header') {
+                        _this.bindingContext.selection.deSelectAll();
+                        _this.controller.rowClickHandler.updateSelectionOnAllRows();
+                    }
+                    if (_this.type === 'row') {
+                        _this.bindingContext.selection.deSelect(_this.bindingContext.row);
+                        _this.controller.rowClickHandler.updateSelectionOnAllRows();
+                    }
+                }
+            };
+        };
+        return VGridAttributesSelection;
+    }());
+    __decorate([
+        aurelia_framework_1.bindable,
+        __metadata("design:type", Boolean)
+    ], VGridAttributesSelection.prototype, "selected", void 0);
+    __decorate([
+        aurelia_framework_1.bindable,
+        __metadata("design:type", String)
+    ], VGridAttributesSelection.prototype, "type", void 0);
+    VGridAttributesSelection = __decorate([
+        aurelia_framework_1.customAttribute('v-selection'),
+        aurelia_framework_1.inject(Element, v_grid_1.VGrid),
+        __metadata("design:paramtypes", [HTMLInputElement, v_grid_1.VGrid])
+    ], VGridAttributesSelection);
+    exports.VGridAttributesSelection = VGridAttributesSelection;
+});
+
+//# sourceMappingURL=v-selection.js.map
+
+define('text!aurelia-v-grid/grid/styles/cellsAndLabels.css', ['module'], function(module) { module.exports = "/*here we can have utility classes the users can use to simply fy use, and that we can use with future markup generator*/\r\n\r\n.avg-default .avg-header-input-top {\r\n  box-sizing: border-box;\r\n  border: 0;\r\n  border-bottom: 1px solid rgb(230, 230, 230) !important;\r\n  border-radius: initial;\r\n  box-shadow: initial;\r\n  height: 50% !important;\r\n  width: 100%;\r\n  background-color: white !important;\r\n  padding: 5px 10px;\r\n  margin: initial !important;\r\n  transition: initial !important;\r\n}\r\n\r\n.avg-default .avg-header-input-bottom {\r\n  box-sizing: border-box;\r\n  border: 0;\r\n  border-radius: initial;\r\n  box-shadow: initial;\r\n  border-top: 1px solid rgb(230, 230, 230) !important;\r\n  height: 50% !important;\r\n  width: 100%;\r\n  background-color: white !important;\r\n  padding: 5px 10px;\r\n  margin: initial !important;\r\n  transition: initial !important;\r\n}\r\n\r\n.avg-default .avg-row-checkbox-100 {\r\n  height: 100% !important;\r\n  width: initial;\r\n  left: initial !important;\r\n  position: initial !important;\r\n  display: block;\r\n  opacity: initial !important;\r\n  margin: auto !important;\r\n}\r\n\r\n.avg-default .avg-row-checkbox-50 {\r\n  height: 50% !important;\r\n  width: initial;\r\n  opacity: initial;\r\n  left: initial !important;\r\n  position: initial !important;\r\n  display: block;\r\n  margin: auto !important;\r\n}\r\n\r\n.avg-default .avg-row-input {\r\n  box-sizing: border-box;\r\n  border: 0;\r\n  border-radius: initial;\r\n  box-shadow: initial;\r\n  height: 100% !important;\r\n  width: 100%;\r\n  background-color: transparent;\r\n  padding: 5px 10px !important;\r\n}\r\n\r\n.avg-default .avg-image-round {\r\n  border-radius: 50%;\r\n  height: 100%;\r\n  box-sizing: border-box;\r\n  position: relative;\r\n  left: 50%;\r\n  transform: translateX(-50%);\r\n  padding-top: 5px;\r\n}\r\n\r\n.avg-default .avg-label-bottom {\r\n  box-sizing: border-box;\r\n  border: 0;\r\n  border-radius: initial;\r\n  box-shadow: initial;\r\n  height: 50%;\r\n  width: 100%;\r\n  position: relative;\r\n  margin: 0 !important;\r\n  padding-top: 5px;\r\n  text-align: center;\r\n}\r\n\r\n.avg-default .avg-label-top {\r\n  box-sizing: border-box;\r\n  border: 0;\r\n  border-radius: initial;\r\n  box-shadow: initial;\r\n  height: 50%;\r\n  width: 100%;\r\n  position: relative;\r\n  margin: 0 !important;\r\n  padding-top: 5px;\r\n  text-align: center;\r\n}\r\n\r\n.avg-default .avg-label-top p {\r\n  margin: 0 !important;\r\n}\r\n\r\n.avg-default .avg-label-bottom p {\r\n  margin: 0 !important;\r\n}\r\n\r\n.avg-default .avg-label-full {\r\n  box-sizing: border-box;\r\n  border: 0;\r\n  border-radius: initial;\r\n  box-shadow: initial;\r\n  height: 100%;\r\n  width: 100%;\r\n  position: relative;\r\n  margin: 0 !important;\r\n  padding-top: 5px;\r\n  text-align: center;\r\n}\r\n"; });
+define('text!aurelia-v-grid/grid/styles/contextmenu.css', ['module'], function(module) { module.exports = ".avg-default.avg-menu {\r\n  position: absolute;\r\n  z-index: 10;\r\n  background-color: rgb(240, 240, 240);\r\n  min-width: 170px;\r\n}\r\n\r\n.avg-default .avg-menu--active {\r\n  display: block;\r\n}\r\n\r\n.avg-default .avg-menu__items {\r\n  padding-left: 0;\r\n  padding-bottom: 3px;\r\n}\r\n\r\n.avg-default .avg-menu__item {\r\n  list-style: none;\r\n}\r\n\r\n.avg-default .avg-menu__item p {\r\n  margin: 0 0 0 10px;\r\n}\r\n\r\n.avg-default .avg-menu__item:hover {\r\n  border-left: 6px solid grey;\r\n  background-color: lightcyan\r\n}\r\n"; });
+define('text!aurelia-v-grid/grid/styles/dragAndresize.css', ['module'], function(module) { module.exports = ".avg-default .avg-draggable-handler {\r\n  position: absolute;\r\n  cursor: w-resize;\r\n  width: 15px;\r\n  right: 0;\r\n  top: 0;\r\n  bottom: 0;\r\n  z-index: 900;\r\n}\r\n\r\n.avg-default .avg-vGridDragHandle {\r\n  cursor: move;\r\n}\r\n\r\n.avg-default.avg-drag {\r\n  border: 1px solid rgb(230, 230, 230);\r\n  box-sizing: border-box;\r\n  box-shadow: initial;\r\n  line-height: 50%;\r\n  pointer-events: none;\r\n  background-color: rgb(240, 240, 240);\r\n  height: 25px;\r\n  min-width: 100px;\r\n  position: absolute;\r\n  padding-top: 5px;\r\n  text-align: center;\r\n}\r\n"; });
+define('text!aurelia-v-grid/grid/styles/grouping.css', ['module'], function(module) { module.exports = ".avg-default .avg-grouping {\r\n  background-color: rgb(240, 240, 240);\r\n  position: relative;\r\n  margin: 3px;\r\n  height: 80%;\r\n  box-sizing: border-box;\r\n  padding-left: 10px;\r\n  padding-right: 10px;\r\n  display: block;\r\n  float: left;\r\n  border: 1px solid rgb(230, 230, 230);\r\n}\r\n\r\n.avg-default .avg-colunHelper {\r\n  top: 0;\r\n  width: 2px;\r\n  left: 0;\r\n  height: 100%;\r\n  box-sizing: border-box;\r\n  position: absolute;\r\n}\r\n\r\n.avg-default .avg-group-full {\r\n  border: 1px solid rgb(230, 230, 230);\r\n  box-sizing: border-box;\r\n  box-shadow: initial;\r\n  line-height: 50%;\r\n  background-color: rgb(240, 240, 240);\r\n  margin: 3px;\r\n  height: 80%;\r\n  position: relative;\r\n  float: left;\r\n  padding-top: 5px;\r\n}\r\n\r\n.avg-default .avg-grouping-element {\r\n  box-sizing: border-box;\r\n  border: 0;\r\n  border-radius: initial;\r\n  box-shadow: initial;\r\n  height: 100%;\r\n  width: 100%;\r\n  position: relative;\r\n  margin: 0 !important;\r\n  display: flex;\r\n  text-align: center;\r\n}\r\n"; });
+define('text!aurelia-v-grid/grid/styles/icons.css', ['module'], function(module) { module.exports = "\r\n.avg-default .avg-fa-sort-number[data-vgridsort]:after {\r\n  font: x-small;\r\n  font-size: 8px;\r\n  content: attr(data-vgridsort);\r\n}\r\n\r\n\r\n.avg-default .icon {\r\n  /* Lets the icon inherit the text color. */\r\n  fill: currentColor;\r\n\r\n  /* Inherit the text’s size too. Also allows sizing\r\n     the icon by changing its font-size. */\r\n  width: 1em;\r\n  height: 1em;\r\n\r\n  /* Nice visual alignment for icons alongside text.\r\n     (I got a few questions about this and: with most\r\n     fonts and styles, this works better than just\r\n     vertical-align:middle. Try it and see what you\r\n     like best. */\r\n  vertical-align: -0.15em;\r\n\r\n  /* Paths and strokes that overflow the viewBox can\r\n     show in IE. If you use normalize.css, it already\r\n     sets this. */\r\n  overflow: hidden;\r\n}\r\n\r\n.avg-default .iconhidden{\r\n  display:none\r\n}\r\n\r\n.avg-grouping:hover .iconhidden { display:block; }\r\n    \r\n\r\n \r\n"; });
+define('text!aurelia-v-grid/grid/styles/loader.css', ['module'], function(module) { module.exports = ".avg-default .avg-overlay {\r\n  position: absolute;\r\n  left: 0;\r\n  top: 0;\r\n  min-width: 100%;\r\n  min-height: 100%;\r\n  height: 100%;\r\n  width: 100%;\r\n  z-index: 9999 !important;\r\n  background: rgba(0, 0, 0, 0.3);\r\n  color: black;\r\n}\r\n\r\n.avg-default .avg-progress-indicator {\r\n  position: absolute;\r\n  left: 50%;\r\n  top: 50%;\r\n  z-index: 10000;\r\n  transform: translate(-50%, -50%);\r\n  width: 150px;\r\n  background-color: gray;\r\n}\r\n\r\n.avg-default .avg-progress-bar {\r\n  -webkit-animation: progress-bar-stripes 2s linear infinite;\r\n  -o-animation: progress-bar-stripes 2s linear infinite;\r\n  animation: progress-bar-stripes 2s linear infinite;\r\n  background-image: -webkit-linear-gradient(45deg, rgba(255, 255, 255, .15) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, .15) 50%, rgba(255, 255, 255, .15) 75%, transparent 75%, transparent);\r\n  background-image: -o-linear-gradient(45deg, rgba(255, 255, 255, .15) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, .15) 50%, rgba(255, 255, 255, .15) 75%, transparent 75%, transparent);\r\n  background-image: linear-gradient(45deg, rgba(255, 255, 255, .15) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, .15) 50%, rgba(255, 255, 255, .15) 75%, transparent 75%, transparent);\r\n  -webkit-background-size: 40px 40px;\r\n  background-size: 40px 40px;\r\n  color: black;\r\n  text-align: center;\r\n}\r\n"; });
+define('text!aurelia-v-grid/grid/styles/main-element-tags.css', ['module'], function(module) { module.exports = "/*here is the main tag css, keeping them here, so theming will be easier */\r\n\r\nv-grid {\r\n  display: block;\r\n  position: relative;\r\n}\r\n\r\navg-top-panel {\r\n  position: absolute;\r\n  box-sizing: border-box;\r\n  width: 100%;\r\n  top: 0;\r\n}\r\n\r\navg-footer {\r\n  position: absolute;\r\n  box-sizing: border-box;\r\n  width: 100%;\r\n  bottom: 0;\r\n}\r\n\r\navg-header {\r\n  position: absolute;\r\n  box-sizing: border-box;\r\n  display: inline-block;\r\n  width: 100%;\r\n}\r\n\r\navg-content {\r\n  position: absolute;\r\n  box-sizing: border-box;\r\n  width: 100%;\r\n}\r\n\r\navg-header-left {\r\n  position: absolute;\r\n  box-sizing: border-box;\r\n  height: 100%;\r\n}\r\n\r\navg-header-main {\r\n  position: absolute;\r\n  box-sizing: border-box;\r\n  height: 100%;\r\n  overflow: hidden;\r\n}\r\n\r\navg-header-main-scroll {\r\n  position: absolute;\r\n  box-sizing: border-box;\r\n  height: 100%;\r\n}\r\n\r\n\r\navg-header-right {\r\n  position: absolute;\r\n  box-sizing: border-box;\r\n  height: 100%;\r\n}\r\n\r\navg-content-left {\r\n  z-index:5;\r\n  position: absolute;\r\n  box-sizing: border-box;\r\n  height: 100%;\r\n  overflow: hidden;\r\n  overflow-y: hidden;\r\n}\r\n\r\n\r\navg-content-left-scroll {\r\n  position: absolute;\r\n  box-sizing: border-box;\r\n}\r\n\r\navg-content-main {\r\n  z-index:6;\r\n  position: absolute;\r\n  box-sizing: border-box;\r\n  height: 100%;\r\n  overflow: hidden;\r\n  overflow-x: hidden;\r\n  overflow-y: hidden;\r\n}\r\n\r\navg-content-main-scroll {\r\n  position: absolute;\r\n  box-sizing: border-box;\r\n}\r\n\r\navg-content-right {\r\n  z-index:7;\r\n  position: absolute;\r\n  box-sizing: border-box;\r\n  height: 100%;\r\n  overflow: hidden;\r\n  overflow-y: hidden;\r\n}\r\n\r\n\r\n\r\navg-content-right-scroll {\r\n  position: absolute;\r\n  box-sizing: border-box;\r\n}\r\n\r\navg-content-group {\r\n  position: absolute;\r\n  box-sizing: border-box;\r\n  overflow-x: hidden;\r\n  overflow-y: hidden;\r\n}\r\n\r\navg-content-group-scroll {\r\n  z-index: 9;\r\n  pointer-events: none;\r\n  position: absolute;\r\n  box-sizing: border-box;\r\n}\r\n\r\navg-content-vhandle {\r\n  z-index: 10;\r\n  position: absolute;\r\n  box-sizing: border-box;\r\n  overflow-x: hidden;\r\n  overflow-y: scroll;\r\n}\r\n\r\navg-content-vhandle-scroll {\r\n  position: absolute;\r\n  box-sizing: border-box;\r\n}\r\n\r\n\r\n\r\navg-content-hhandle {\r\n  z-index:10;\r\n  position: absolute;\r\n  box-sizing: border-box;\r\n  overflow-x: scroll;\r\n  overflow-y: hidden;\r\n}\r\n\r\navg-content-hhandle-scroll {\r\n  position: absolute;\r\n  box-sizing: border-box;\r\n}\r\n\r\navg-row {\r\n  width: 100%;\r\n  min-width: 1px; /*without this left scrolltop will not be set when hidden*/\r\n  position: absolute;\r\n}\r\n\r\navg-col {\r\n  position: absolute;\r\n  height: 100%;\r\n}\r\n"; });
+define('text!aurelia-v-grid/grid/styles/main-elements.css', ['module'], function(module) { module.exports = ".avg-default {\r\n  border: 1px solid rgb(230, 230, 230);\r\n  -webkit-touch-callout: none;\r\n  -webkit-user-select: none;\r\n  -moz-user-select: none;\r\n  -ms-user-select: none;\r\n  user-select: none;\r\n}\r\n\r\n.avg-default .avg-top-panel {\r\n  border-bottom: 1px solid rgb(230, 230, 230);\r\n  background-color: rgb(240, 240, 240);\r\n}\r\n\r\n.avg-default .avg-header {\r\n  border-bottom: 1px solid rgb(230, 230, 230);\r\n}\r\n\r\n.avg-default .avg-footer {\r\n  border-top: 1px solid rgb(230, 230, 230);\r\n  background-color: rgb(240, 240, 240);\r\n}\r\n\r\n.avg-default .avg-content-right {\r\n  background-color: white;\r\n  border-top: 1px solid rgb(230, 230, 230);\r\n}\r\n\r\n.avg-default .avg-content-left {\r\n  background-color: white;\r\n  border-top: 1px solid rgb(230, 230, 230);\r\n}\r\n\r\n.avg-default .avg-header-main {\r\n  background-color: rgb(240, 240, 240);\r\n}\r\n\r\n.avg-default .avg-header-left {\r\n  background-color: rgb(240, 240, 240);\r\n}\r\n\r\n.avg-default .avg-header-right {\r\n  background-color: rgb(240, 240, 240);\r\n}\r\n\r\n.avg-default .avg-content-main {\r\n  background-color: white;\r\n  border-top: 1px solid rgb(230, 230, 230);\r\n}\r\n\r\n.avg-default .avg-row {\r\n  border-bottom: 1px solid rgb(230, 230, 230);\r\n}\r\n\r\n.avg-default .avg-header-left .avg-col {\r\n  white-space: nowrap;\r\n  box-sizing: border-box;\r\n  text-overflow: ellipsis;\r\n  border-right: 1px solid rgb(230, 230, 230);\r\n  overflow: hidden;\r\n}\r\n\r\n.avg-default .avg-header-main .avg-col {\r\n  white-space: nowrap;\r\n  box-sizing: border-box;\r\n  text-overflow: ellipsis;\r\n  border-right: 1px solid rgb(230, 230, 230);\r\n  overflow: hidden;\r\n}\r\n\r\n.avg-default .avg-header-right .avg-col {\r\n  box-sizing: border-box;\r\n  border-left: 1px solid rgb(230, 230, 230);\r\n}\r\n\r\n.avg-default .avg-content-left .avg-col {\r\n  white-space: nowrap;\r\n  box-sizing: border-box;\r\n  text-overflow: ellipsis;\r\n  border-right: 1px solid rgb(230, 230, 230);\r\n  overflow: hidden;\r\n}\r\n\r\n.avg-default .avg-content-main .avg-col {\r\n  white-space: nowrap;\r\n  text-overflow: ellipsis;\r\n  border-right: 1px solid rgb(230, 230, 230);\r\n  overflow: hidden;\r\n}\r\n\r\n.avg-default .avg-content-right .avg-col {\r\n  border-left: 1px solid rgb(230, 230, 230);\r\n}\r\n\r\n.avg-default .avg-col-group {\r\n  pointer-events: all;\r\n  box-sizing: border-box;\r\n  white-space: nowrap;\r\n  text-overflow: ellipsis;\r\n  background-color: rgb(250, 250, 250);\r\n  border-top: 1px solid rgb(230, 230, 230);\r\n  padding: 5px 10px;\r\n}\r\n\r\n.avg-default .avg-col-grouping {\r\n  white-space: nowrap;\r\n  box-sizing: border-box;\r\n  text-overflow: ellipsis;\r\n  background-color: rgb(250, 250, 250);\r\n  border-right: 1px solid rgb(230, 230, 230);\r\n  overflow: hidden;\r\n}\r\n\r\n.avg-default .avg-col-grouping-header {\r\n  white-space: nowrap;\r\n  text-overflow: ellipsis;\r\n  background-color: rgb(240, 240, 240);\r\n  border-right: 1px solid rgb(230, 230, 230);\r\n  overflow: hidden;\r\n}\r\n\r\n.avg-default .avg-selected-row {\r\n  box-shadow: none;\r\n  background-color: rgb(203, 195, 203);\r\n}\r\n"; });
+function _aureliaConfigureModuleLoader(){requirejs.config({"baseUrl":"src/","paths":{"aurelia-binding":"..\\node_modules\\aurelia-binding\\dist\\amd\\aurelia-binding","aurelia-bootstrapper":"..\\node_modules\\aurelia-bootstrapper\\dist\\amd\\aurelia-bootstrapper","aurelia-event-aggregator":"..\\node_modules\\aurelia-event-aggregator\\dist\\amd\\aurelia-event-aggregator","aurelia-dependency-injection":"..\\node_modules\\aurelia-dependency-injection\\dist\\amd\\aurelia-dependency-injection","aurelia-framework":"..\\node_modules\\aurelia-framework\\dist\\amd\\aurelia-framework","aurelia-history":"..\\node_modules\\aurelia-history\\dist\\amd\\aurelia-history","aurelia-history-browser":"..\\node_modules\\aurelia-history-browser\\dist\\amd\\aurelia-history-browser","aurelia-loader":"..\\node_modules\\aurelia-loader\\dist\\amd\\aurelia-loader","aurelia-logging":"..\\node_modules\\aurelia-logging\\dist\\amd\\aurelia-logging","aurelia-loader-default":"..\\node_modules\\aurelia-loader-default\\dist\\amd\\aurelia-loader-default","aurelia-logging-console":"..\\node_modules\\aurelia-logging-console\\dist\\amd\\aurelia-logging-console","aurelia-metadata":"..\\node_modules\\aurelia-metadata\\dist\\amd\\aurelia-metadata","aurelia-pal-browser":"..\\node_modules\\aurelia-pal-browser\\dist\\amd\\aurelia-pal-browser","aurelia-pal":"..\\node_modules\\aurelia-pal\\dist\\amd\\aurelia-pal","aurelia-path":"..\\node_modules\\aurelia-path\\dist\\amd\\aurelia-path","aurelia-polyfills":"..\\node_modules\\aurelia-polyfills\\dist\\amd\\aurelia-polyfills","aurelia-route-recognizer":"..\\node_modules\\aurelia-route-recognizer\\dist\\amd\\aurelia-route-recognizer","aurelia-templating":"..\\node_modules\\aurelia-templating\\dist\\amd\\aurelia-templating","aurelia-task-queue":"..\\node_modules\\aurelia-task-queue\\dist\\amd\\aurelia-task-queue","aurelia-router":"..\\node_modules\\aurelia-router\\dist\\amd\\aurelia-router","aurelia-templating-binding":"..\\node_modules\\aurelia-templating-binding\\dist\\amd\\aurelia-templating-binding","text":"..\\node_modules\\text\\text","app-bundle":"../scripts/app-bundle"},"packages":[{"name":"aurelia-testing","location":"../node_modules/aurelia-testing/dist/amd","main":"aurelia-testing"},{"name":"aurelia-templating-resources","location":"../node_modules/aurelia-templating-resources/dist/amd","main":"aurelia-templating-resources"},{"name":"aurelia-templating-router","location":"../node_modules/aurelia-templating-router/dist/amd","main":"aurelia-templating-router"},{"name":"aurelia-v-grid","location":"../node_modules/aurelia-v-grid/dist/amd","main":"index"}],"stubModules":[],"shim":{},"bundles":{"app-bundle":["app","environment","main","data/data","data/dummyDataGenerator","resources/index","resources/value-converters/index","aurelia-v-grid/grid/mainMarkup","aurelia-v-grid/grid/mainMarkupHtmlString","aurelia-v-grid/grid/mainScrollEvents","aurelia-v-grid/grid/rowMarkup","aurelia-v-grid/grid/rowScrollEvents","aurelia-v-grid/grid/htmlHeightWidth","aurelia-v-grid/grid/viewSlots","aurelia-v-grid/grid/rowDataBinder","aurelia-v-grid/grid/rowClickHandler","aurelia-v-grid/grid/loadingScreen","aurelia-v-grid/grid/v-grid","aurelia-v-grid/utils/arrayUtils","aurelia-v-grid/utils/arrayFilter","aurelia-v-grid/utils/arraySort","aurelia-v-grid/utils/arrayGrouping"]}})}
