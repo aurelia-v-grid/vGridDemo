@@ -25,5 +25,18 @@ export class App {
      this.ds.setArray(this.collection);
   }
 
+  replace(x){
+    this.dummyDataGenerator.generateData(x, (data) => {
+      this.collection = data;
+    });   
+    this.ds.setArray(this.collection);
+  }
+
+  add(x){
+    this.dummyDataGenerator.generateData(x, (data) => {
+      this.ds.addRows(data);
+    });   
+    
+  }
 
 }

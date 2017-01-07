@@ -27473,9 +27473,23 @@ define('aurelia-v-grid/dataSource',["require", "exports", "./selection", "./coll
             this.selection.reset();
             this.arrayUtils.resetGrouping();
             this.arrayUtils.resetSort();
+            this.entity = null;
             this.collection.setData(array);
             this.mainArray = this.collection.getEntities();
             this.triggerEvent('collection_changed');
+        };
+        DataSource.prototype.addRows = function (array) {
+            var grouping = this.arrayUtils.getGrouping();
+            var collection = this.collection.getEntities();
+            collection = collection.concat(array);
+            this.collection.setData(collection);
+            this.arrayUtils.runOrderbyOn(this.collection.getEntities());
+            var untouchedgrouped = this.collection.getEntities();
+            if (grouping.length > 0) {
+                var groupedArray = this.arrayUtils.group(untouchedgrouped, grouping, true);
+                this.collection.setData(groupedArray, untouchedgrouped);
+            }
+            this.triggerEvent('collection_updated');
         };
         DataSource.prototype.select = function (row) {
             this.entity = this.collection.getRow(row);
@@ -27692,6 +27706,7 @@ define('aurelia-v-grid/gridConnector',["require", "exports"], function (require,
                     break;
                 case 'collection_collapsed':
                 case 'collection_expanded':
+                case 'collection_updated':
                     this.raiseEvent('sortIconUpdate');
                     this.controller.updateHeights();
                     this.controller.triggerScroll(null);
@@ -28645,8 +28660,15 @@ define('aurelia-v-grid/grid/controller',["require", "exports"], function (requir
             }
         };
         Controller.prototype.updateHeaderGrouping = function (groups) {
+            var _this = this;
             var length = groups.length;
             this.columnBindingContext.setupgrouping = length;
+            if (length === 0) {
+                var groups_1 = this.groupingElements.getGroups();
+                groups_1.forEach(function (group) {
+                    _this.groupingElements.removeGroup(group);
+                });
+            }
             this.htmlHeightWidth.adjustWidthsColumns(this.columnBindingContext, length);
         };
         Controller.prototype.collectionLength = function () {
@@ -28786,6 +28808,417 @@ define('aurelia-v-grid/grid/footer',["require", "exports", "aurelia-framework"],
 });
 
 //# sourceMappingURL=footer.js.map
+
+define('aurelia-v-grid/grid/groupingElements',["require", "exports", "aurelia-framework"], function (require, exports, aurelia_framework_1) {
+    var GroupContext = (function () {
+        function GroupContext(name, field, groupingElements) {
+            this.name = name;
+            this.field = field;
+            this.groupingElements = groupingElements;
+        }
+        GroupContext.prototype.remove = function () {
+            this.groupingElements.removeGroup(this.name);
+            this.groupingElements.removeFromGrouping(this.field);
+        };
+        return GroupContext;
+    }());
+    var GroupingElements = (function () {
+        function GroupingElements(element, viewCompiler, container, viewResources, htmlCache, viewSlots, columnBindingContext) {
+            this.element = element;
+            this.htmlCache = htmlCache;
+            this.viewSlots = viewSlots;
+            this.viewCompiler = viewCompiler;
+            this.container = container;
+            this.viewResources = viewResources;
+            this.columnBindingContext = columnBindingContext;
+            this.groupContext = {};
+            this.lastAdded = null;
+        }
+        GroupingElements.prototype.getGroups = function () {
+            var x = [];
+            for (var i in this.groupContext) {
+                if (i) {
+                    x.push(i);
+                }
+            }
+            return x;
+        };
+        GroupingElements.prototype.init = function (controller, colGroupElement) {
+            this.controller = controller;
+            this.avgTopPanel = this.htmlCache.avg_top_panel;
+            this.colGroupElement = colGroupElement;
+        };
+        GroupingElements.prototype.addGroup = function (name, field) {
+            if (!this.groupContext[name]) {
+                this.lastAdded = name;
+                this.groupContext[name] = new GroupContext(name, field, this);
+                var viewMarkup = this.colGroupElement ||
+                    "<div class=\"avg-grouping\">  \n          <p class=\"avg-grouping-element\" v-sort=\"field.bind:field\">" + name + " \n            <i><svg click.delegate=\"remove()\" class=\"icon iconhidden\" xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 16 16\">\n              <path d=\"M3 4l4.3 4L3 12h1.4L8 8.7l3.5 3.3H13L8.6 8 13 4h-1.5L8 7.3 4.4 4H3z\"/>\n            </svg></i>\n          </p>\n         </div>";
+                var viewFactory = this.viewCompiler.compile("<template>" + viewMarkup + "</template>", this.viewResources);
+                var view = viewFactory.create(this.container);
+                var viewSlot = new aurelia_framework_1.ViewSlot(this.avgTopPanel, true);
+                viewSlot.add(view);
+                this.groupContext[name].viewSlot = viewSlot;
+                this.viewSlots.groupingViewSlots.push(this.groupContext[name]);
+            }
+            this.groupContext[name].viewSlot.bind(this.groupContext[name]);
+            this.groupContext[name].viewSlot.attached();
+        };
+        GroupingElements.prototype.removeGroup = function (name) {
+            if (name) {
+                this.groupContext[name].viewSlot.unbind();
+                this.groupContext[name].viewSlot.detached();
+                this.groupContext[name].viewSlot.removeAll();
+                this.groupContext[name] = null;
+            }
+            else {
+                if (this.lastAdded) {
+                    this.groupContext[this.lastAdded].viewSlot.unbind();
+                    this.groupContext[this.lastAdded].viewSlot.detached();
+                    this.groupContext[this.lastAdded].viewSlot.removeAll();
+                    this.groupContext[this.lastAdded] = null;
+                    this.lastAdded = null;
+                }
+            }
+        };
+        GroupingElements.prototype.addToGrouping = function () {
+            if (this.lastAdded) {
+                var toAdd = this.groupContext[this.lastAdded].field;
+                this.controller.addToGrouping(toAdd);
+                this.lastAdded = null;
+            }
+        };
+        GroupingElements.prototype.removeFromGrouping = function (field) {
+            this.controller.removeFromGrouping(field);
+        };
+        return GroupingElements;
+    }());
+    exports.GroupingElements = GroupingElements;
+});
+
+//# sourceMappingURL=groupingElements.js.map
+
+define('aurelia-v-grid/grid/htmlCache',["require", "exports"], function (require, exports) {
+    var HtmlCache = (function () {
+        function HtmlCache(element) {
+            this.element = element;
+            this.avg_top_panel = null;
+            this.avg_header = null;
+            this.avg_header_left = null;
+            this.avg_header_main = null;
+            this.avg_header_main_scroll = null;
+            this.avg_header_right = null;
+            this.avg_content = null;
+            this.avg_content_left = null;
+            this.avg_content_left_scroll = null;
+            this.avg_content_main = null;
+            this.avg_content_main_scroll = null;
+            this.avg_content_right = null;
+            this.avg_content_right_scroll = null;
+            this.avg_footer = null;
+            this.avg_content_group = null;
+            this.avg_content_group_scroll = null;
+            this.avg_content_vhandle = null;
+            this.avg_content_vhandle_scroll = null;
+            this.avg_content_hhandle = null;
+            this.avg_content_hhandle_scroll = null;
+            this.avg_left_rows = null;
+            this.avg_main_rows = null;
+            this.avg_right_rows = null;
+            this.avg_group_rows = null;
+            this.rowCache = [];
+            this.headerCache = {
+                left: null,
+                main: null,
+                right: null,
+                group: null,
+                bindingContext: null,
+                overrideContext: null,
+                leftRowViewSlot: null,
+                mainRowViewSlot: null,
+                rightRowViewSlot: null,
+                groupRowViewSlot: null
+            };
+        }
+        HtmlCache.prototype.updateRowsMarkup = function () {
+            this.avg_left_rows = this.avg_content_left_scroll.getElementsByTagName('avg-row');
+            this.avg_main_rows = this.avg_content_main_scroll.getElementsByTagName('avg-row');
+            this.avg_right_rows = this.avg_content_right_scroll.getElementsByTagName('avg-row');
+            this.avg_group_rows = this.avg_content_group_scroll.getElementsByTagName('avg-row');
+        };
+        HtmlCache.prototype.updateMainMarkup = function () {
+            this.avg_top_panel = this.element.getElementsByTagName('avg-top-panel')[0];
+            this.avg_header = this.element.getElementsByTagName('avg-header')[0];
+            this.avg_header_left = this.element.getElementsByTagName('avg-header-left')[0];
+            this.avg_header_main = this.element.getElementsByTagName('avg-header-main')[0];
+            this.avg_header_main_scroll = this.element.getElementsByTagName('avg-header-main-scroll')[0];
+            this.avg_header_right = this.element.getElementsByTagName('avg-header-right')[0];
+            this.avg_content = this.element.getElementsByTagName('avg-content')[0];
+            this.avg_content_left = this.element.getElementsByTagName('avg-content-left')[0];
+            this.avg_content_left_scroll = this.element.getElementsByTagName('avg-content-left-scroll')[0];
+            this.avg_content_main = this.element.getElementsByTagName('avg-content-main')[0];
+            this.avg_content_main_scroll = this.element.getElementsByTagName('avg-content-main-scroll')[0];
+            this.avg_content_right = this.element.getElementsByTagName('avg-content-right')[0];
+            this.avg_content_right_scroll = this.element.getElementsByTagName('avg-content-right-scroll')[0];
+            this.avg_footer = this.element.getElementsByTagName('avg-footer')[0];
+            this.avg_content_group = this.element.getElementsByTagName('avg-content-group')[0];
+            this.avg_content_group_scroll = this.element.getElementsByTagName('avg-content-group-scroll')[0];
+            this.avg_content_vhandle = this.element.getElementsByTagName('avg-content-vhandle')[0];
+            this.avg_content_vhandle_scroll = this.element.getElementsByTagName('avg-content-vhandle-scroll')[0];
+            this.avg_content_hhandle = this.element.getElementsByTagName('avg-content-hhandle')[0];
+            this.avg_content_hhandle_scroll = this.element.getElementsByTagName('avg-content-hhandle-scroll')[0];
+        };
+        return HtmlCache;
+    }());
+    exports.HtmlCache = HtmlCache;
+});
+
+//# sourceMappingURL=htmlCache.js.map
+
+define('aurelia-v-grid/grid/htmlHeightWidth',["require", "exports"], function (require, exports) {
+    var HtmlHeightWidth = (function () {
+        function HtmlHeightWidth() {
+            this.avgScrollBarWidth = this.getScrollbarWidth() || 17;
+            this.avgPanel_Height = 0;
+            this.avgHeader_Height = 30;
+            this.avgHeader_Top = 0;
+            this.avgContent_Top = 30;
+            this.avgContent_Bottom = 30;
+            this.avgHeaderLeft_Width = 200;
+            this.avgHeaderMain_Left = 200;
+            this.avgHeaderMain_Right = 150;
+            this.avgHeaderMainScroll_Width = 0;
+            this.avgHeaderMainScroll_Height = 100;
+            this.avgHeaderRight_Right = 0;
+            this.avgHeaderRight_Width = 150;
+            this.avgContentLeft_Width = 200 + this.avgScrollBarWidth;
+            this.avgContentLeftScroll_Width = '100%';
+            this.avgContentLeftScroll_Height = 0 + this.avgScrollBarWidth;
+            this.avgContentMain_Left = 200;
+            this.avgContentMain_Right = 150 - this.avgScrollBarWidth;
+            this.avgContentMainScroll_Width = 0;
+            this.avgContentMainScroll_Height = 0;
+            this.avgContentRight_Right = 0;
+            this.avgContentRight_Width = 150;
+            this.avgContentRightScroll_Width = '100%';
+            this.avgContentRightScroll_Height = 0 + this.avgScrollBarWidth;
+            this.avgContentGroup_Width = 150;
+            this.avgContentGroup_Height = 0;
+            this.avgContentGroup_Top = 0;
+            this.avgContentGroup_Bottom = 0;
+            this.avgContentVhandle_Width = 0 + this.avgScrollBarWidth;
+            this.avgContentVhandle_Height = 0;
+            this.avgContentVhandle_Top = 0;
+            this.avgContentVhandleScroll_Height = 0;
+            this.avgContentVhandle_Bottom = 0;
+            this.avgContentHhandle_Bottom = 0;
+            this.avgContentHhandle_Right = 0 + this.avgScrollBarWidth;
+            this.avgContentHhandle_Left = 0;
+            this.avgContentHhandle_Height = 17;
+            this.avgContentHhandleScroll_Width = 17;
+            this.avgFooter_Height = 30;
+        }
+        HtmlHeightWidth.prototype.getNewHeight = function (length) {
+            return length * this.attRowHeight;
+        };
+        HtmlHeightWidth.prototype.setCollectionLength = function (length, includeScroller) {
+            var rowTotal = this.getNewHeight(length);
+            var avgScrollbarHeightValue = includeScroller === false ? 0 : this.avgScrollBarWidth;
+            var total = rowTotal + avgScrollbarHeightValue;
+            this.avgContentRightScroll_Height = total;
+            this.avgContentGroup_Height = total;
+            this.avgContentVhandleScroll_Height = total;
+            this.avgContentMainScroll_Height = total;
+            this.avgContentLeftScroll_Height = total;
+        };
+        HtmlHeightWidth.prototype.addDefaultsAttributes = function (attHeaderHeight, attRowHeight, attFooterHeight, attPanelHeight) {
+            this.attHeaderHeight = attHeaderHeight;
+            this.attRowHeight = attRowHeight;
+            this.attFooterHeight = attFooterHeight;
+            this.attPanelHeight = attPanelHeight;
+            this.avgPanel_Height = attPanelHeight;
+            this.avgHeader_Top = attPanelHeight;
+            this.avgHeader_Height = attHeaderHeight;
+            this.avgContent_Top = attHeaderHeight + attPanelHeight;
+            this.avgContent_Bottom = attFooterHeight;
+            this.avgFooter_Height = attFooterHeight;
+            this.avgHeaderMainScroll_Height = attHeaderHeight;
+            this.avgContentGroup_Height = this.avgContentGroup_Height;
+            this.avgContentGroup_Top = this.avgContent_Top;
+            this.avgContentGroup_Bottom = this.avgContent_Bottom;
+            this.avgContentVhandle_Height = this.avgContentVhandle_Height;
+            this.avgContentVhandle_Top = this.avgContent_Top;
+            this.avgContentVhandle_Bottom = this.avgContent_Bottom;
+            this.avgContentHhandle_Bottom = attFooterHeight;
+            this.avgContentHhandle_Height = this.avgScrollBarWidth;
+        };
+        HtmlHeightWidth.prototype.adjustWidthsColumns = function (columnBindingContext, groupsLength) {
+            var left = groupsLength ? groupsLength * 15 : 0;
+            var main = 0;
+            var right = 0;
+            for (var i = 0; i < columnBindingContext.setupmain.length; i++) {
+                if (columnBindingContext.setupleft[i].show) {
+                    left = left + columnBindingContext.setupleft[i].width;
+                }
+                if (columnBindingContext.setupmain[i].show) {
+                    main = main + columnBindingContext.setupmain[i].width;
+                }
+                if (columnBindingContext.setupright[i].show) {
+                    right = right + columnBindingContext.setupright[i].width;
+                }
+            }
+            this.avgContentLeft_Width = left;
+            this.avgHeaderLeft_Width = left;
+            this.avgContentMain_Left = left;
+            this.avgContentMain_Right = right;
+            this.avgHeaderMain_Left = left;
+            this.avgHeaderMain_Right = right;
+            this.avgHeaderMainScroll_Width = main;
+            this.avgContentMainScroll_Width = main;
+            this.avgContentRight_Width = right;
+            this.avgHeaderRight_Width = right;
+            this.avgContentHhandle_Right = right;
+            this.avgContentHhandle_Left = left;
+            this.avgContentHhandleScroll_Width = main;
+        };
+        HtmlHeightWidth.prototype.setWidthFromColumnConfig = function (colConfig, groupsLength) {
+            var left = groupsLength ? groupsLength * 15 : 0;
+            var main = 0;
+            var right = 0;
+            for (var i = 0; i < colConfig.length; i++) {
+                switch (true) {
+                    case colConfig[i].colPinLeft && colConfig[i].colPinRight:
+                        left = left + colConfig[i].colWidth;
+                        right = right + colConfig[i].colWidth;
+                        break;
+                    case colConfig[i].colPinLeft:
+                        left = left + colConfig[i].colWidth;
+                        break;
+                    case colConfig[i].colPinRight:
+                        right = right + colConfig[i].colWidth;
+                        break;
+                    case !colConfig[i].colPinLeft && !colConfig[i].colPinRight:
+                        main = main + colConfig[i].colWidth;
+                        break;
+                    default:
+                }
+            }
+            this.avgContentLeft_Width = left;
+            this.avgHeaderLeft_Width = left;
+            this.avgContentMain_Left = left;
+            this.avgContentMain_Right = right;
+            this.avgHeaderMain_Left = left;
+            this.avgHeaderMain_Right = right;
+            this.avgHeaderMainScroll_Width = main;
+            this.avgContentMainScroll_Width = main;
+            this.avgContentRight_Width = right;
+            this.avgHeaderRight_Width = right;
+            this.avgContentHhandle_Right = right;
+            this.avgContentHhandle_Left = left;
+            this.avgContentHhandleScroll_Width = main;
+        };
+        HtmlHeightWidth.prototype.getScrollbarWidth = function () {
+            var outer = document.createElement('div');
+            outer.style.visibility = 'hidden';
+            outer.style.width = '100px';
+            document.body.appendChild(outer);
+            var widthNoScroll = outer.offsetWidth;
+            outer.style.overflow = 'scroll';
+            var inner = document.createElement('div');
+            inner.style.width = '100%';
+            outer.appendChild(inner);
+            var widthWithScroll = inner.offsetWidth;
+            outer.parentNode.removeChild(outer);
+            return widthNoScroll - widthWithScroll;
+        };
+        return HtmlHeightWidth;
+    }());
+    exports.HtmlHeightWidth = HtmlHeightWidth;
+});
+
+//# sourceMappingURL=htmlHeightWidth.js.map
+
+define('aurelia-v-grid/grid/loadingScreen',["require", "exports", "aurelia-framework"], function (require, exports, aurelia_framework_1) {
+    var LoadingScreen = (function () {
+        function LoadingScreen(element, viewCompiler, container, viewResources, viewSlots) {
+            this.element = element;
+            this.viewSlots = viewSlots;
+            this.viewCompiler = viewCompiler;
+            this.container = container;
+            this.viewResources = viewResources;
+            this.loading = false;
+            this.loadingMessage = 'Loading';
+        }
+        LoadingScreen.prototype.updateLoadingDefaultLoadingMessage = function (msg) {
+            this.loadingMessage = msg;
+        };
+        LoadingScreen.prototype.init = function (overrideContext, loadingScreenTemplate) {
+            this.overrideContext = overrideContext;
+            var loadingScreentHtml = loadingScreenTemplate || "[\n      <div class=\"avg-overlay\" if.bind=\"loading\">\n      </div>\n      <div if.two-way=\"loading\" class=\"avg-progress-indicator\">\n      <div class=\"avg-progress-bar\" role=\"progressbar\" style=\"width:100%\">\n      <span>$au{ loadingMessage }</span>\n      </div>\n      </div>".replace(/\$(au{)/g, '${');
+            var viewFactory = this.viewCompiler.compile("<template>\n      " + loadingScreentHtml + "\n      </template>", this.viewResources);
+            var view = viewFactory.create(this.container);
+            var loadingScreenViewSlot = new aurelia_framework_1.ViewSlot(this.element, true);
+            loadingScreenViewSlot.add(view);
+            loadingScreenViewSlot.bind(this, {
+                bindingContext: this,
+                parentOverrideContext: this.overrideContext
+            });
+            loadingScreenViewSlot.attached();
+            this.viewSlots.loadingScreenViewSlot = loadingScreenViewSlot;
+        };
+        LoadingScreen.prototype.enable = function (msg, collectionLength) {
+            var _this = this;
+            return new Promise(function (resolve) {
+                _this.loading = collectionLength ? collectionLength > 10000 ? true : false : false;
+                _this.loadingMessage = msg || '...';
+                setTimeout(function () {
+                    resolve(null);
+                });
+            });
+        };
+        LoadingScreen.prototype.disable = function () {
+            var _this = this;
+            return new Promise(function (resolve) {
+                _this.loading = false;
+                setTimeout(function () {
+                    resolve();
+                });
+            });
+        };
+        return LoadingScreen;
+    }());
+    exports.LoadingScreen = LoadingScreen;
+});
+
+//# sourceMappingURL=loadingScreen.js.map
+
+define('aurelia-v-grid/grid/mainMarkup',["require", "exports", "aurelia-framework", "./mainMarkupHtmlString"], function (require, exports, aurelia_framework_1, mainMarkupHtmlString_1) {
+    var MainMarkup = (function () {
+        function MainMarkup(element, viewCompiler, container, viewResources, htmlHeightWidth, viewSlots) {
+            this.element = element;
+            this.viewCompiler = viewCompiler;
+            this.container = container;
+            this.viewResources = viewResources;
+            this.htmlHeightWidth = htmlHeightWidth;
+            this.viewSlots = viewSlots;
+        }
+        MainMarkup.prototype.generateMainMarkup = function () {
+            this.viewFactory = this.viewCompiler.compile('<template>' + mainMarkupHtmlString_1.MainMarkupHtmlString + '</template>', this.viewResources);
+            this.view = this.viewFactory.create(this.container);
+            this.viewSlots.mainViewSlot = new aurelia_framework_1.ViewSlot(this.element, true);
+            this.viewSlots.mainViewSlot.add(this.view);
+            this.viewSlots.mainViewSlot.bind(this, {
+                bindingContext: this,
+                parentOverrideContext: this.htmlHeightWidth
+            });
+            this.viewSlots.mainViewSlot.attached();
+        };
+        return MainMarkup;
+    }());
+    exports.MainMarkup = MainMarkup;
+});
+
+//# sourceMappingURL=mainMarkup.js.map
 
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -30117,7 +30550,7 @@ define('aurelia-v-grid/grid/attributes/v-resize-col',["require", "exports", "aur
                 requestAnimationFrame(function () {
                     var movementX = _this.originalWidth - (_this.screenX - e.screenX);
                     var appendValue = _this.originalWidth - movementX;
-                    if (_this.colType === 'main') {
+                    if (_this.colType === 'main' && movementX > 10) {
                         _this.columnsArray[_this.colNo].width = movementX;
                         _this.vGrid.colConfig[_this.colNo].colWidth = _this.columnsArray[_this.colNo].width;
                         for (var i = 0; i < _this.columnsArray.length; i++) {
@@ -30128,7 +30561,7 @@ define('aurelia-v-grid/grid/attributes/v-resize-col',["require", "exports", "aur
                         _this.vGrid.htmlHeightWidth.avgContentMainScroll_Width = _this.avgContentMainScroll_Width - appendValue;
                         _this.vGrid.htmlHeightWidth.avgContentHhandleScroll_Width = _this.avgContentHhandleScroll_Width - appendValue;
                     }
-                    if (_this.colType === 'right') {
+                    if (_this.colType === 'right' && movementX > 10) {
                         _this.columnsArray[_this.colNo].width = movementX;
                         _this.vGrid.colConfig[_this.colNo].colWidth = _this.columnsArray[_this.colNo].width;
                         for (var i = 0; i < _this.columnsArray.length; i++) {
@@ -30142,7 +30575,7 @@ define('aurelia-v-grid/grid/attributes/v-resize-col',["require", "exports", "aur
                         _this.vGrid.htmlHeightWidth.avgHeaderMain_Right = _this.avgHeaderMain_Right - appendValue;
                         _this.vGrid.htmlHeightWidth.avgContentHhandle_Right = _this.avgContentHhandle_Right - appendValue;
                     }
-                    if (_this.colType === 'left') {
+                    if (_this.colType === 'left' && movementX > 10) {
                         _this.columnsArray[_this.colNo].width = movementX;
                         _this.vGrid.colConfig[_this.colNo].colWidth = _this.columnsArray[_this.colNo].width;
                         for (var i = 0; i < _this.columnsArray.length; i++) {
@@ -30384,4 +30817,4 @@ define('text!aurelia-v-grid/grid/styles/icons.css', ['module'], function(module)
 define('text!aurelia-v-grid/grid/styles/loader.css', ['module'], function(module) { module.exports = ".avg-default .avg-overlay {\r\n  position: absolute;\r\n  left: 0;\r\n  top: 0;\r\n  min-width: 100%;\r\n  min-height: 100%;\r\n  height: 100%;\r\n  width: 100%;\r\n  z-index: 9999 !important;\r\n  background: rgba(0, 0, 0, 0.3);\r\n  color: black;\r\n}\r\n\r\n.avg-default .avg-progress-indicator {\r\n  position: absolute;\r\n  left: 50%;\r\n  top: 50%;\r\n  z-index: 10000;\r\n  transform: translate(-50%, -50%);\r\n  width: 150px;\r\n  background-color: gray;\r\n}\r\n\r\n.avg-default .avg-progress-bar {\r\n  -webkit-animation: progress-bar-stripes 2s linear infinite;\r\n  -o-animation: progress-bar-stripes 2s linear infinite;\r\n  animation: progress-bar-stripes 2s linear infinite;\r\n  background-image: -webkit-linear-gradient(45deg, rgba(255, 255, 255, .15) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, .15) 50%, rgba(255, 255, 255, .15) 75%, transparent 75%, transparent);\r\n  background-image: -o-linear-gradient(45deg, rgba(255, 255, 255, .15) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, .15) 50%, rgba(255, 255, 255, .15) 75%, transparent 75%, transparent);\r\n  background-image: linear-gradient(45deg, rgba(255, 255, 255, .15) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, .15) 50%, rgba(255, 255, 255, .15) 75%, transparent 75%, transparent);\r\n  -webkit-background-size: 40px 40px;\r\n  background-size: 40px 40px;\r\n  color: black;\r\n  text-align: center;\r\n}\r\n"; });
 define('text!aurelia-v-grid/grid/styles/main-element-tags.css', ['module'], function(module) { module.exports = "/*here is the main tag css, keeping them here, so theming will be easier */\r\n\r\nv-grid {\r\n  display: block;\r\n  position: relative;\r\n}\r\n\r\navg-top-panel {\r\n  position: absolute;\r\n  box-sizing: border-box;\r\n  width: 100%;\r\n  top: 0;\r\n}\r\n\r\navg-footer {\r\n  position: absolute;\r\n  box-sizing: border-box;\r\n  width: 100%;\r\n  bottom: 0;\r\n}\r\n\r\navg-header {\r\n  position: absolute;\r\n  box-sizing: border-box;\r\n  display: inline-block;\r\n  width: 100%;\r\n}\r\n\r\navg-content {\r\n  position: absolute;\r\n  box-sizing: border-box;\r\n  width: 100%;\r\n}\r\n\r\navg-header-left {\r\n  position: absolute;\r\n  box-sizing: border-box;\r\n  height: 100%;\r\n}\r\n\r\navg-header-main {\r\n  position: absolute;\r\n  box-sizing: border-box;\r\n  height: 100%;\r\n  overflow: hidden;\r\n}\r\n\r\navg-header-main-scroll {\r\n  position: absolute;\r\n  box-sizing: border-box;\r\n  height: 100%;\r\n}\r\n\r\n\r\navg-header-right {\r\n  position: absolute;\r\n  box-sizing: border-box;\r\n  height: 100%;\r\n}\r\n\r\navg-content-left {\r\n  z-index:5;\r\n  position: absolute;\r\n  box-sizing: border-box;\r\n  height: 100%;\r\n  overflow: hidden;\r\n  overflow-y: hidden;\r\n}\r\n\r\n\r\navg-content-left-scroll {\r\n  position: absolute;\r\n  box-sizing: border-box;\r\n}\r\n\r\navg-content-main {\r\n  z-index:6;\r\n  position: absolute;\r\n  box-sizing: border-box;\r\n  height: 100%;\r\n  overflow: hidden;\r\n  overflow-x: hidden;\r\n  overflow-y: hidden;\r\n}\r\n\r\navg-content-main-scroll {\r\n  position: absolute;\r\n  box-sizing: border-box;\r\n}\r\n\r\navg-content-right {\r\n  z-index:7;\r\n  position: absolute;\r\n  box-sizing: border-box;\r\n  height: 100%;\r\n  overflow: hidden;\r\n  overflow-y: hidden;\r\n}\r\n\r\n\r\n\r\navg-content-right-scroll {\r\n  position: absolute;\r\n  box-sizing: border-box;\r\n}\r\n\r\navg-content-group {\r\n  position: absolute;\r\n  box-sizing: border-box;\r\n  overflow-x: hidden;\r\n  overflow-y: hidden;\r\n}\r\n\r\navg-content-group-scroll {\r\n  z-index: 9;\r\n  pointer-events: none;\r\n  position: absolute;\r\n  box-sizing: border-box;\r\n}\r\n\r\navg-content-vhandle {\r\n  z-index: 10;\r\n  position: absolute;\r\n  box-sizing: border-box;\r\n  overflow-x: hidden;\r\n  overflow-y: scroll;\r\n}\r\n\r\navg-content-vhandle-scroll {\r\n  position: absolute;\r\n  box-sizing: border-box;\r\n}\r\n\r\n\r\n\r\navg-content-hhandle {\r\n  z-index:10;\r\n  position: absolute;\r\n  box-sizing: border-box;\r\n  overflow-x: scroll;\r\n  overflow-y: hidden;\r\n}\r\n\r\navg-content-hhandle-scroll {\r\n  position: absolute;\r\n  box-sizing: border-box;\r\n}\r\n\r\navg-row {\r\n  width: 100%;\r\n  min-width: 1px; /*without this left scrolltop will not be set when hidden*/\r\n  position: absolute;\r\n}\r\n\r\navg-col {\r\n  position: absolute;\r\n  height: 100%;\r\n}\r\n"; });
 define('text!aurelia-v-grid/grid/styles/main-elements.css', ['module'], function(module) { module.exports = ".avg-default {\r\n  border: 1px solid rgb(230, 230, 230);\r\n  -webkit-touch-callout: none;\r\n  -webkit-user-select: none;\r\n  -moz-user-select: none;\r\n  -ms-user-select: none;\r\n  user-select: none;\r\n}\r\n\r\n.avg-default .avg-top-panel {\r\n  border-bottom: 1px solid rgb(230, 230, 230);\r\n  background-color: rgb(240, 240, 240);\r\n}\r\n\r\n.avg-default .avg-header {\r\n  border-bottom: 1px solid rgb(230, 230, 230);\r\n}\r\n\r\n.avg-default .avg-footer {\r\n  border-top: 1px solid rgb(230, 230, 230);\r\n  background-color: rgb(240, 240, 240);\r\n}\r\n\r\n.avg-default .avg-content-right {\r\n  background-color: white;\r\n  border-top: 1px solid rgb(230, 230, 230);\r\n}\r\n\r\n.avg-default .avg-content-left {\r\n  background-color: white;\r\n  border-top: 1px solid rgb(230, 230, 230);\r\n}\r\n\r\n.avg-default .avg-header-main {\r\n  background-color: rgb(240, 240, 240);\r\n}\r\n\r\n.avg-default .avg-header-left {\r\n  background-color: rgb(240, 240, 240);\r\n}\r\n\r\n.avg-default .avg-header-right {\r\n  background-color: rgb(240, 240, 240);\r\n}\r\n\r\n.avg-default .avg-content-main {\r\n  background-color: white;\r\n  border-top: 1px solid rgb(230, 230, 230);\r\n}\r\n\r\n.avg-default .avg-row {\r\n  border-bottom: 1px solid rgb(230, 230, 230);\r\n}\r\n\r\n.avg-default .avg-header-left .avg-col {\r\n  white-space: nowrap;\r\n  box-sizing: border-box;\r\n  text-overflow: ellipsis;\r\n  border-right: 1px solid rgb(230, 230, 230);\r\n  overflow: hidden;\r\n}\r\n\r\n.avg-default .avg-header-main .avg-col {\r\n  white-space: nowrap;\r\n  box-sizing: border-box;\r\n  text-overflow: ellipsis;\r\n  border-right: 1px solid rgb(230, 230, 230);\r\n  overflow: hidden;\r\n}\r\n\r\n.avg-default .avg-header-right .avg-col {\r\n  box-sizing: border-box;\r\n  border-left: 1px solid rgb(230, 230, 230);\r\n}\r\n\r\n.avg-default .avg-content-left .avg-col {\r\n  white-space: nowrap;\r\n  box-sizing: border-box;\r\n  text-overflow: ellipsis;\r\n  border-right: 1px solid rgb(230, 230, 230);\r\n  overflow: hidden;\r\n}\r\n\r\n.avg-default .avg-content-main .avg-col {\r\n  white-space: nowrap;\r\n  text-overflow: ellipsis;\r\n  border-right: 1px solid rgb(230, 230, 230);\r\n  overflow: hidden;\r\n}\r\n\r\n.avg-default .avg-content-right .avg-col {\r\n  border-left: 1px solid rgb(230, 230, 230);\r\n}\r\n\r\n.avg-default .avg-col-group {\r\n  pointer-events: all;\r\n  box-sizing: border-box;\r\n  white-space: nowrap;\r\n  text-overflow: ellipsis;\r\n  background-color: rgb(250, 250, 250);\r\n  border-top: 1px solid rgb(230, 230, 230);\r\n  padding: 5px 10px;\r\n}\r\n\r\n.avg-default .avg-col-grouping {\r\n  white-space: nowrap;\r\n  box-sizing: border-box;\r\n  text-overflow: ellipsis;\r\n  background-color: rgb(250, 250, 250);\r\n  border-right: 1px solid rgb(230, 230, 230);\r\n  overflow: hidden;\r\n}\r\n\r\n.avg-default .avg-col-grouping-header {\r\n  white-space: nowrap;\r\n  text-overflow: ellipsis;\r\n  background-color: rgb(240, 240, 240);\r\n  border-right: 1px solid rgb(230, 230, 230);\r\n  overflow: hidden;\r\n}\r\n\r\n.avg-default .avg-selected-row {\r\n  box-shadow: none;\r\n  background-color: rgb(203, 195, 203);\r\n}\r\n"; });
-function _aureliaConfigureModuleLoader(){requirejs.config({"baseUrl":"src/","paths":{"aurelia-binding":"..\\node_modules\\aurelia-binding\\dist\\amd\\aurelia-binding","aurelia-bootstrapper":"..\\node_modules\\aurelia-bootstrapper\\dist\\amd\\aurelia-bootstrapper","aurelia-dependency-injection":"..\\node_modules\\aurelia-dependency-injection\\dist\\amd\\aurelia-dependency-injection","aurelia-event-aggregator":"..\\node_modules\\aurelia-event-aggregator\\dist\\amd\\aurelia-event-aggregator","aurelia-framework":"..\\node_modules\\aurelia-framework\\dist\\amd\\aurelia-framework","aurelia-history":"..\\node_modules\\aurelia-history\\dist\\amd\\aurelia-history","aurelia-loader":"..\\node_modules\\aurelia-loader\\dist\\amd\\aurelia-loader","aurelia-history-browser":"..\\node_modules\\aurelia-history-browser\\dist\\amd\\aurelia-history-browser","aurelia-logging":"..\\node_modules\\aurelia-logging\\dist\\amd\\aurelia-logging","aurelia-loader-default":"..\\node_modules\\aurelia-loader-default\\dist\\amd\\aurelia-loader-default","aurelia-logging-console":"..\\node_modules\\aurelia-logging-console\\dist\\amd\\aurelia-logging-console","aurelia-pal":"..\\node_modules\\aurelia-pal\\dist\\amd\\aurelia-pal","aurelia-metadata":"..\\node_modules\\aurelia-metadata\\dist\\amd\\aurelia-metadata","aurelia-pal-browser":"..\\node_modules\\aurelia-pal-browser\\dist\\amd\\aurelia-pal-browser","aurelia-path":"..\\node_modules\\aurelia-path\\dist\\amd\\aurelia-path","aurelia-polyfills":"..\\node_modules\\aurelia-polyfills\\dist\\amd\\aurelia-polyfills","aurelia-route-recognizer":"..\\node_modules\\aurelia-route-recognizer\\dist\\amd\\aurelia-route-recognizer","aurelia-router":"..\\node_modules\\aurelia-router\\dist\\amd\\aurelia-router","aurelia-task-queue":"..\\node_modules\\aurelia-task-queue\\dist\\amd\\aurelia-task-queue","aurelia-templating":"..\\node_modules\\aurelia-templating\\dist\\amd\\aurelia-templating","aurelia-templating-binding":"..\\node_modules\\aurelia-templating-binding\\dist\\amd\\aurelia-templating-binding","text":"..\\node_modules\\text\\text","app-bundle":"../scripts/app-bundle"},"packages":[{"name":"aurelia-templating-resources","location":"../node_modules/aurelia-templating-resources/dist/amd","main":"aurelia-templating-resources"},{"name":"aurelia-templating-router","location":"../node_modules/aurelia-templating-router/dist/amd","main":"aurelia-templating-router"},{"name":"aurelia-testing","location":"../node_modules/aurelia-testing/dist/amd","main":"aurelia-testing"},{"name":"aurelia-v-grid","location":"../node_modules/aurelia-v-grid/dist/amd","main":"index"}],"stubModules":[],"shim":{},"bundles":{"app-bundle":["app","environment","main","data/data","data/dummyDataGenerator","resources/index","resources/value-converters/index","aurelia-v-grid/grid/htmlCache","aurelia-v-grid/grid/controller","aurelia-v-grid/grid/mainMarkup","aurelia-v-grid/grid/mainMarkupHtmlString","aurelia-v-grid/grid/mainScrollEvents","aurelia-v-grid/grid/rowMarkup","aurelia-v-grid/grid/rowScrollEvents","aurelia-v-grid/grid/htmlHeightWidth","aurelia-v-grid/grid/viewSlots","aurelia-v-grid/grid/rowDataBinder","aurelia-v-grid/grid/rowClickHandler","aurelia-v-grid/grid/groupingElements","aurelia-v-grid/grid/loadingScreen","aurelia-v-grid/grid/contextMenu","aurelia-v-grid/grid/v-grid","aurelia-v-grid/grid/footer","aurelia-v-grid/utils/arrayUtils","aurelia-v-grid/utils/arrayFilter","aurelia-v-grid/utils/arraySort","aurelia-v-grid/utils/arrayGrouping"]}})}
+function _aureliaConfigureModuleLoader(){requirejs.config({"baseUrl":"src/","paths":{"aurelia-binding":"..\\node_modules\\aurelia-binding\\dist\\amd\\aurelia-binding","aurelia-bootstrapper":"..\\node_modules\\aurelia-bootstrapper\\dist\\amd\\aurelia-bootstrapper","aurelia-event-aggregator":"..\\node_modules\\aurelia-event-aggregator\\dist\\amd\\aurelia-event-aggregator","aurelia-dependency-injection":"..\\node_modules\\aurelia-dependency-injection\\dist\\amd\\aurelia-dependency-injection","aurelia-framework":"..\\node_modules\\aurelia-framework\\dist\\amd\\aurelia-framework","aurelia-history":"..\\node_modules\\aurelia-history\\dist\\amd\\aurelia-history","aurelia-loader-default":"..\\node_modules\\aurelia-loader-default\\dist\\amd\\aurelia-loader-default","aurelia-history-browser":"..\\node_modules\\aurelia-history-browser\\dist\\amd\\aurelia-history-browser","aurelia-loader":"..\\node_modules\\aurelia-loader\\dist\\amd\\aurelia-loader","aurelia-logging":"..\\node_modules\\aurelia-logging\\dist\\amd\\aurelia-logging","aurelia-logging-console":"..\\node_modules\\aurelia-logging-console\\dist\\amd\\aurelia-logging-console","aurelia-metadata":"..\\node_modules\\aurelia-metadata\\dist\\amd\\aurelia-metadata","aurelia-pal":"..\\node_modules\\aurelia-pal\\dist\\amd\\aurelia-pal","aurelia-path":"..\\node_modules\\aurelia-path\\dist\\amd\\aurelia-path","aurelia-polyfills":"..\\node_modules\\aurelia-polyfills\\dist\\amd\\aurelia-polyfills","aurelia-route-recognizer":"..\\node_modules\\aurelia-route-recognizer\\dist\\amd\\aurelia-route-recognizer","aurelia-router":"..\\node_modules\\aurelia-router\\dist\\amd\\aurelia-router","aurelia-pal-browser":"..\\node_modules\\aurelia-pal-browser\\dist\\amd\\aurelia-pal-browser","aurelia-templating":"..\\node_modules\\aurelia-templating\\dist\\amd\\aurelia-templating","aurelia-task-queue":"..\\node_modules\\aurelia-task-queue\\dist\\amd\\aurelia-task-queue","aurelia-templating-binding":"..\\node_modules\\aurelia-templating-binding\\dist\\amd\\aurelia-templating-binding","text":"..\\node_modules\\text\\text","app-bundle":"../scripts/app-bundle"},"packages":[{"name":"aurelia-templating-resources","location":"../node_modules/aurelia-templating-resources/dist/amd","main":"aurelia-templating-resources"},{"name":"aurelia-testing","location":"../node_modules/aurelia-testing/dist/amd","main":"aurelia-testing"},{"name":"aurelia-templating-router","location":"../node_modules/aurelia-templating-router/dist/amd","main":"aurelia-templating-router"},{"name":"aurelia-v-grid","location":"../node_modules/aurelia-v-grid/dist/amd","main":"index"}],"stubModules":[],"shim":{},"bundles":{"app-bundle":["app","environment","main","data/data","data/dummyDataGenerator","resources/index","resources/value-converters/index","aurelia-v-grid/grid/mainMarkup","aurelia-v-grid/grid/mainMarkupHtmlString","aurelia-v-grid/grid/mainScrollEvents","aurelia-v-grid/grid/rowMarkup","aurelia-v-grid/grid/rowScrollEvents","aurelia-v-grid/grid/viewSlots","aurelia-v-grid/grid/rowDataBinder","aurelia-v-grid/grid/rowClickHandler","aurelia-v-grid/grid/loadingScreen","aurelia-v-grid/grid/v-grid","aurelia-v-grid/utils/arrayUtils","aurelia-v-grid/utils/arrayFilter","aurelia-v-grid/utils/arraySort","aurelia-v-grid/utils/arrayGrouping"]}})}
