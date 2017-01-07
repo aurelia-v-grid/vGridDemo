@@ -56,11 +56,11 @@
       <form>
         <div class="form-group">
           <label for="exampleInputEmail1">name</label>
-          <input value.bind="ds.entity.name" disabled.bind="!ds.entity.name" class="form-control" id="exampleInputEmail1">
+          <input value.bind="ds.entity.name" disabled.bind="!ds.entity.__avgKey" class="form-control" id="exampleInputEmail1">
         </div>
         <div class="checkbox">
           <label>
-      <input type="checkbox" checked.bind="ds.entity.bool | booleanFormatter" disabled.bind="!ds.entity.bool"> Bool
+      <input type="checkbox" checked.bind="ds.entity.bool | booleanFormatter" disabled.bind="!ds.entity.__avgKey"> Bool
     </label>
         </div>
       </form>
