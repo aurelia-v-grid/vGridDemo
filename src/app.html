@@ -60,7 +60,7 @@
         </div>
         <div class="checkbox">
           <label>
-      <input type="checkbox" checked.bind="ds.entity.bool" disabled.bind="!ds.entity.bool"> Bool
+      <input type="checkbox" checked.bind="ds.entity.bool | booleanFormatter" disabled.bind="!ds.entity.bool"> Bool
     </label>
         </div>
       </form>
