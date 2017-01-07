@@ -29107,87 +29107,453 @@ define('aurelia-v-grid/grid/htmlHeightWidth',["require", "exports"], function (r
 
 //# sourceMappingURL=htmlHeightWidth.js.map
 
-define('aurelia-v-grid/grid/loadingScreen',["require", "exports", "aurelia-framework"], function (require, exports, aurelia_framework_1) {
-    var LoadingScreen = (function () {
-        function LoadingScreen(element, viewCompiler, container, viewResources, viewSlots) {
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+define('aurelia-v-grid/grid/v-grid-row-repeat',["require", "exports", "aurelia-framework", "./v-grid"], function (require, exports, aurelia_framework_1, v_grid_1) {
+    var VGridElementRowRepeat = (function () {
+        function VGridElementRowRepeat(element, vGrid, targetInstruction) {
             this.element = element;
-            this.viewSlots = viewSlots;
-            this.viewCompiler = viewCompiler;
-            this.container = container;
-            this.viewResources = viewResources;
-            this.loading = false;
-            this.loadingMessage = 'Loading';
+            this.vGrid = vGrid;
+            this.rowTemplate = targetInstruction.elementInstruction.rowTemplate;
+            this.headerTemplate = targetInstruction.elementInstruction.headerTemplate;
         }
-        LoadingScreen.prototype.updateLoadingDefaultLoadingMessage = function (msg) {
-            this.loadingMessage = msg;
+        VGridElementRowRepeat.prototype.bind = function () {
+            this.vGrid.colRepeater = true;
+            this.vGrid.colRepeatRowTemplate = this.rowTemplate;
+            this.vGrid.colRepeatRowHeaderTemplate = this.headerTemplate;
         };
-        LoadingScreen.prototype.init = function (overrideContext, loadingScreenTemplate) {
+        return VGridElementRowRepeat;
+    }());
+    VGridElementRowRepeat = __decorate([
+        aurelia_framework_1.noView(),
+        aurelia_framework_1.customElement('v-grid-row-repeat'),
+        aurelia_framework_1.processContent(function (compiler, resources, element, instruction) {
+            compiler = null;
+            resources = null;
+            var headerTemplateElement = element.getElementsByTagName('V-HEADER-TEMPLATE')[0];
+            var headerTemplateHtml = headerTemplateElement ? headerTemplateElement.innerHTML : null;
+            if (headerTemplateHtml !== '') {
+                instruction.headerTemplate = headerTemplateHtml;
+            }
+            var rowTemplateElement = element.getElementsByTagName('V-ROW-TEMPLATE')[0];
+            var rowTemplateHtml = rowTemplateElement ? rowTemplateElement.innerHTML : null;
+            if (rowTemplateHtml !== '') {
+                instruction.rowTemplate = rowTemplateHtml;
+            }
+            if (!rowTemplateHtml) {
+                instruction.rowTemplate = element.innerHTML;
+            }
+            element.innerHTML = '';
+        }),
+        aurelia_framework_1.inject(Element, v_grid_1.VGrid, aurelia_framework_1.TargetInstruction),
+        __metadata("design:paramtypes", [Element, v_grid_1.VGrid, Object])
+    ], VGridElementRowRepeat);
+    exports.VGridElementRowRepeat = VGridElementRowRepeat;
+});
+
+//# sourceMappingURL=v-grid-row-repeat.js.map
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+define('aurelia-v-grid/grid/v-grid-group-row',["require", "exports", "aurelia-framework", "./v-grid"], function (require, exports, aurelia_framework_1, v_grid_1) {
+    var VGridGroupRow = (function () {
+        function VGridGroupRow(element, vGrid, targetInstruction) {
+            this.element = element;
+            this.vGrid = vGrid;
+            this.rowTemplate = targetInstruction.elementInstruction.rowTemplate;
+        }
+        VGridGroupRow.prototype.bind = function () {
+            this.vGrid.colGroupRow = this.rowTemplate;
+        };
+        return VGridGroupRow;
+    }());
+    VGridGroupRow = __decorate([
+        aurelia_framework_1.noView(),
+        aurelia_framework_1.customElement('v-grid-group-row'),
+        aurelia_framework_1.processContent(function (compiler, resources, element, instruction) {
+            compiler = null;
+            resources = null;
+            instruction.rowTemplate = element.innerHTML;
+            element.innerHTML = '';
+        }),
+        aurelia_framework_1.inject(Element, v_grid_1.VGrid, aurelia_framework_1.TargetInstruction),
+        __metadata("design:paramtypes", [Element, v_grid_1.VGrid, Object])
+    ], VGridGroupRow);
+    exports.VGridGroupRow = VGridGroupRow;
+});
+
+//# sourceMappingURL=v-grid-group-row.js.map
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+define('aurelia-v-grid/grid/v-grid-group-element',["require", "exports", "aurelia-framework", "./v-grid"], function (require, exports, aurelia_framework_1, v_grid_1) {
+    var VGridGroupElement = (function () {
+        function VGridGroupElement(element, vGrid, targetInstruction) {
+            this.element = element;
+            this.vGrid = vGrid;
+            this.rowTemplate = targetInstruction.elementInstruction.rowTemplate;
+        }
+        VGridGroupElement.prototype.bind = function () {
+            this.vGrid.colGroupElement = this.rowTemplate;
+        };
+        return VGridGroupElement;
+    }());
+    VGridGroupElement = __decorate([
+        aurelia_framework_1.noView(),
+        aurelia_framework_1.customElement('v-grid-group-element'),
+        aurelia_framework_1.processContent(function (compiler, resources, element, instruction) {
+            compiler = null;
+            resources = null;
+            instruction.rowTemplate = element.innerHTML;
+            element.innerHTML = '';
+        }),
+        aurelia_framework_1.inject(Element, v_grid_1.VGrid, aurelia_framework_1.TargetInstruction),
+        __metadata("design:paramtypes", [Element, v_grid_1.VGrid, Object])
+    ], VGridGroupElement);
+    exports.VGridGroupElement = VGridGroupElement;
+});
+
+//# sourceMappingURL=v-grid-group-element.js.map
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+define('aurelia-v-grid/grid/v-grid-loadingscreen',["require", "exports", "aurelia-framework", "./v-grid"], function (require, exports, aurelia_framework_1, v_grid_1) {
+    var VGridLoadingScreen = (function () {
+        function VGridLoadingScreen(element, vGrid, targetInstruction) {
+            this.element = element;
+            this.vGrid = vGrid;
+            this.template = targetInstruction.elementInstruction.template;
+        }
+        VGridLoadingScreen.prototype.bind = function () {
+            this.vGrid.loadingScreenTemplate = this.template;
+        };
+        return VGridLoadingScreen;
+    }());
+    VGridLoadingScreen = __decorate([
+        aurelia_framework_1.noView(),
+        aurelia_framework_1.customElement('v-grid-loadingscreen'),
+        aurelia_framework_1.processContent(function (compiler, resources, element, instruction) {
+            compiler = null;
+            resources = null;
+            instruction.template = element.innerHTML;
+            element.innerHTML = '';
+        }),
+        aurelia_framework_1.inject(Element, v_grid_1.VGrid, aurelia_framework_1.TargetInstruction),
+        __metadata("design:paramtypes", [Element, v_grid_1.VGrid, Object])
+    ], VGridLoadingScreen);
+    exports.VGridLoadingScreen = VGridLoadingScreen;
+});
+
+//# sourceMappingURL=v-grid-loadingscreen.js.map
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+define('aurelia-v-grid/grid/v-grid-contextmenu',["require", "exports", "aurelia-framework", "./v-grid"], function (require, exports, aurelia_framework_1, v_grid_1) {
+    var VGridContextmenu = (function () {
+        function VGridContextmenu(element, vGrid, targetInstruction) {
+            this.element = element;
+            this.vGrid = vGrid;
+            this.customMenuTemplates = targetInstruction.elementInstruction.menuTemplates;
+        }
+        VGridContextmenu.prototype.bind = function () {
+            this.vGrid.customMenuTemplates = this.customMenuTemplates;
+        };
+        return VGridContextmenu;
+    }());
+    VGridContextmenu = __decorate([
+        aurelia_framework_1.noView(),
+        aurelia_framework_1.customElement('v-grid-contextmenu'),
+        aurelia_framework_1.processContent(function (compiler, resources, element, instruction) {
+            compiler = null;
+            resources = null;
+            instruction.menuTemplates = {};
+            var template;
+            var templateHTML;
+            template = element.getElementsByTagName('V-MENU-CLOSE')[0];
+            templateHTML = template ? template.innerHTML : null;
+            if (templateHTML !== '') {
+                instruction.menuTemplates.close = templateHTML;
+            }
+            template = element.getElementsByTagName('V-MENU-PINNED')[0];
+            templateHTML = template ? template.innerHTML : null;
+            if (templateHTML !== '') {
+                instruction.menuTemplates.pinned = templateHTML;
+            }
+            template = element.getElementsByTagName('V-MENU-GROUPBY')[0];
+            templateHTML = template ? template.innerHTML : null;
+            if (templateHTML !== '') {
+                instruction.menuTemplates.groupby = templateHTML;
+            }
+            template = element.getElementsByTagName('V-MENU-SORT')[0];
+            templateHTML = template ? template.innerHTML : null;
+            if (templateHTML !== '') {
+                instruction.menuTemplates.sort = templateHTML;
+            }
+            template = element.getElementsByTagName('V-MENU-FILTER')[0];
+            templateHTML = template ? template.innerHTML : null;
+            if (templateHTML !== '') {
+                instruction.menuTemplates.filter = templateHTML;
+            }
+            template = element.getElementsByTagName('V-MENU-FILTER-OPTIONS')[0];
+            templateHTML = template ? template.innerHTML : null;
+            if (templateHTML !== '') {
+                instruction.menuTemplates.filterOptions = templateHTML;
+            }
+            template = element.getElementsByTagName('V-MENU-ALL')[0];
+            templateHTML = template ? template.innerHTML : null;
+            if (templateHTML !== '') {
+                instruction.menuTemplates.all = templateHTML;
+            }
+            element.innerHTML = '';
+        }),
+        aurelia_framework_1.inject(Element, v_grid_1.VGrid, aurelia_framework_1.TargetInstruction),
+        __metadata("design:paramtypes", [Element, v_grid_1.VGrid, Object])
+    ], VGridContextmenu);
+    exports.VGridContextmenu = VGridContextmenu;
+});
+
+//# sourceMappingURL=v-grid-contextmenu.js.map
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+define('aurelia-v-grid/grid/v-grid-footer',["require", "exports", "aurelia-framework", "./v-grid"], function (require, exports, aurelia_framework_1, v_grid_1) {
+    var VGridFooter = (function () {
+        function VGridFooter(element, vGrid, targetInstruction) {
+            this.element = element;
+            this.vGrid = vGrid;
+            this.template = targetInstruction.elementInstruction.template;
+        }
+        VGridFooter.prototype.bind = function () {
+            this.vGrid.footerTemplate = this.template;
+        };
+        return VGridFooter;
+    }());
+    VGridFooter = __decorate([
+        aurelia_framework_1.noView(),
+        aurelia_framework_1.customElement('v-grid-footer'),
+        aurelia_framework_1.processContent(function (compiler, resources, element, instruction) {
+            compiler = null;
+            resources = null;
+            instruction.template = element.innerHTML;
+            element.innerHTML = '';
+        }),
+        aurelia_framework_1.inject(Element, v_grid_1.VGrid, aurelia_framework_1.TargetInstruction),
+        __metadata("design:paramtypes", [Element, v_grid_1.VGrid, Object])
+    ], VGridFooter);
+    exports.VGridFooter = VGridFooter;
+});
+
+//# sourceMappingURL=v-grid-footer.js.map
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+define('aurelia-v-grid/grid/v-grid-col',["require", "exports", "aurelia-framework", "./v-grid"], function (require, exports, aurelia_framework_1, v_grid_1) {
+    var VGridElementColConfig = (function () {
+        function VGridElementColConfig(element, vGrid, targetInstruction) {
+            this.vGrid = vGrid;
+            this.element = element;
+            this.colRowTemplate = targetInstruction.elementInstruction.colRowTemplate;
+            this.colHeaderTemplate = targetInstruction.elementInstruction.colHeaderTemplate;
+            this.colCss = targetInstruction.elementInstruction.colCss;
+        }
+        VGridElementColConfig.prototype.bind = function (bindingContext, overrideContext) {
+            this.bindingContext = bindingContext;
             this.overrideContext = overrideContext;
-            var loadingScreentHtml = loadingScreenTemplate || "[\n      <div class=\"avg-overlay\" if.bind=\"loading\">\n      </div>\n      <div if.two-way=\"loading\" class=\"avg-progress-indicator\">\n      <div class=\"avg-progress-bar\" role=\"progressbar\" style=\"width:100%\">\n      <span>$au{ loadingMessage }</span>\n      </div>\n      </div>".replace(/\$(au{)/g, '${');
-            var viewFactory = this.viewCompiler.compile("<template>\n      " + loadingScreentHtml + "\n      </template>", this.viewResources);
-            var view = viewFactory.create(this.container);
-            var loadingScreenViewSlot = new aurelia_framework_1.ViewSlot(this.element, true);
-            loadingScreenViewSlot.add(view);
-            loadingScreenViewSlot.bind(this, {
-                bindingContext: this,
-                parentOverrideContext: this.overrideContext
-            });
-            loadingScreenViewSlot.attached();
-            this.viewSlots.loadingScreenViewSlot = loadingScreenViewSlot;
-        };
-        LoadingScreen.prototype.enable = function (msg, collectionLength) {
-            var _this = this;
-            return new Promise(function (resolve) {
-                _this.loading = collectionLength ? collectionLength > 10000 ? true : false : false;
-                _this.loadingMessage = msg || '...';
-                setTimeout(function () {
-                    resolve(null);
-                });
-            });
-        };
-        LoadingScreen.prototype.disable = function () {
-            var _this = this;
-            return new Promise(function (resolve) {
-                _this.loading = false;
-                setTimeout(function () {
-                    resolve();
-                });
+            this.vGrid.colConfig.push({
+                colWidth: this.colWidth ? this.colWidth * 1 : 100,
+                colRowTemplate: this.colRowTemplate,
+                colHeaderTemplate: this.colHeaderTemplate,
+                colField: this.colField,
+                colPinLeft: this.checkBool(this.colPinLeft),
+                colPinRight: this.checkBool(this.colPinRight),
+                colHeaderName: this.colHeaderName,
+                colFilterMenu: this.colFilterMenu,
+                colLabelMenu: this.colLabelMenu,
+                colRowMenu: this.colRowMenu,
+                colHidden: this.checkBool(this.colHidden),
+                colDragDrop: this.colDragDrop,
+                colResizeable: this.colResizeable,
+                colAddLabelAttributes: this.colAddLabelAttributes,
+                colAddFilterAttributes: this.colAddFilterAttributes,
+                colAddRowAttributes: this.colAddRowAttributes,
+                colSort: this.colSort,
+                colFilter: this.colFilter,
+                colFilterTop: this.checkBool(this.colFilterTop),
+                colCss: this.colCss,
+                colType: this.colType || 'text'
             });
         };
-        return LoadingScreen;
+        VGridElementColConfig.prototype.checkBool = function (value) {
+            if (typeof value === 'string') {
+                value = value.toLowerCase();
+            }
+            switch (true) {
+                case value === 'true':
+                case value === true:
+                    value = true;
+                    break;
+                case value === 'false':
+                case value === false:
+                    value = false;
+                    break;
+                default:
+                    value = false;
+                    break;
+            }
+            return value;
+        };
+        return VGridElementColConfig;
     }());
-    exports.LoadingScreen = LoadingScreen;
+    __decorate([
+        aurelia_framework_1.bindable({ attribute: 'col-width' }),
+        __metadata("design:type", Number)
+    ], VGridElementColConfig.prototype, "colWidth", void 0);
+    __decorate([
+        aurelia_framework_1.bindable({ attribute: 'col-field' }),
+        __metadata("design:type", String)
+    ], VGridElementColConfig.prototype, "colField", void 0);
+    __decorate([
+        aurelia_framework_1.bindable({ attribute: 'col-header-name' }),
+        __metadata("design:type", String)
+    ], VGridElementColConfig.prototype, "colHeaderName", void 0);
+    __decorate([
+        aurelia_framework_1.bindable({ attribute: 'col-sort' }),
+        __metadata("design:type", String)
+    ], VGridElementColConfig.prototype, "colSort", void 0);
+    __decorate([
+        aurelia_framework_1.bindable({ attribute: 'col-pin-left' }),
+        __metadata("design:type", Boolean)
+    ], VGridElementColConfig.prototype, "colPinLeft", void 0);
+    __decorate([
+        aurelia_framework_1.bindable({ attribute: 'col-pin-right' }),
+        __metadata("design:type", Boolean)
+    ], VGridElementColConfig.prototype, "colPinRight", void 0);
+    __decorate([
+        aurelia_framework_1.bindable({ attribute: 'col-filter' }),
+        __metadata("design:type", String)
+    ], VGridElementColConfig.prototype, "colFilter", void 0);
+    __decorate([
+        aurelia_framework_1.bindable({ attribute: 'col-filter-top' }),
+        __metadata("design:type", Boolean)
+    ], VGridElementColConfig.prototype, "colFilterTop", void 0);
+    __decorate([
+        aurelia_framework_1.bindable({ attribute: 'col-add-label-attributes' }),
+        __metadata("design:type", String)
+    ], VGridElementColConfig.prototype, "colAddLabelAttributes", void 0);
+    __decorate([
+        aurelia_framework_1.bindable({ attribute: 'col-add-filter-attributes' }),
+        __metadata("design:type", String)
+    ], VGridElementColConfig.prototype, "colAddFilterAttributes", void 0);
+    __decorate([
+        aurelia_framework_1.bindable({ attribute: 'col-add-row-attributes' }),
+        __metadata("design:type", String)
+    ], VGridElementColConfig.prototype, "colAddRowAttributes", void 0);
+    __decorate([
+        aurelia_framework_1.bindable({ attribute: 'col-type' }),
+        __metadata("design:type", String)
+    ], VGridElementColConfig.prototype, "colType", void 0);
+    __decorate([
+        aurelia_framework_1.bindable({ attribute: 'col-filter-menu' }),
+        __metadata("design:type", String)
+    ], VGridElementColConfig.prototype, "colFilterMenu", void 0);
+    __decorate([
+        aurelia_framework_1.bindable({ attribute: 'col-label-menu' }),
+        __metadata("design:type", String)
+    ], VGridElementColConfig.prototype, "colLabelMenu", void 0);
+    __decorate([
+        aurelia_framework_1.bindable({ attribute: 'col-row-menu' }),
+        __metadata("design:type", String)
+    ], VGridElementColConfig.prototype, "colRowMenu", void 0);
+    __decorate([
+        aurelia_framework_1.bindable({ attribute: 'col-hidden' }),
+        __metadata("design:type", Boolean)
+    ], VGridElementColConfig.prototype, "colHidden", void 0);
+    __decorate([
+        aurelia_framework_1.bindable({ attribute: 'col-drag-drop' }),
+        __metadata("design:type", String)
+    ], VGridElementColConfig.prototype, "colDragDrop", void 0);
+    __decorate([
+        aurelia_framework_1.bindable({ attribute: 'col-resizeable' }),
+        __metadata("design:type", String)
+    ], VGridElementColConfig.prototype, "colResizeable", void 0);
+    VGridElementColConfig = __decorate([
+        aurelia_framework_1.noView(),
+        aurelia_framework_1.processContent(function (compiler, resources, element, instruction) {
+            compiler = null;
+            resources = null;
+            var headerTemplateElement = element.getElementsByTagName('V-HEADER-TEMPLATE')[0];
+            var headerTemplateHtml = headerTemplateElement ? headerTemplateElement.innerHTML : null;
+            if (headerTemplateHtml !== '') {
+                instruction.colHeaderTemplate = headerTemplateHtml;
+            }
+            var rowTemplateElement = element.getElementsByTagName('V-ROW-TEMPLATE')[0];
+            var rowTemplateHtml = rowTemplateElement ? rowTemplateElement.innerHTML : null;
+            if (rowTemplateHtml !== '') {
+                instruction.colRowTemplate = rowTemplateHtml;
+            }
+            element.innerHTML = '';
+            var css = element.getAttribute('col-css');
+            if (css) {
+                instruction.colCss = css;
+            }
+        }),
+        aurelia_framework_1.customElement('v-grid-col'),
+        aurelia_framework_1.inject(Element, v_grid_1.VGrid, aurelia_framework_1.TargetInstruction),
+        __metadata("design:paramtypes", [Element, v_grid_1.VGrid, Object])
+    ], VGridElementColConfig);
+    exports.VGridElementColConfig = VGridElementColConfig;
 });
 
-//# sourceMappingURL=loadingScreen.js.map
-
-define('aurelia-v-grid/grid/mainMarkup',["require", "exports", "aurelia-framework", "./mainMarkupHtmlString"], function (require, exports, aurelia_framework_1, mainMarkupHtmlString_1) {
-    var MainMarkup = (function () {
-        function MainMarkup(element, viewCompiler, container, viewResources, htmlHeightWidth, viewSlots) {
-            this.element = element;
-            this.viewCompiler = viewCompiler;
-            this.container = container;
-            this.viewResources = viewResources;
-            this.htmlHeightWidth = htmlHeightWidth;
-            this.viewSlots = viewSlots;
-        }
-        MainMarkup.prototype.generateMainMarkup = function () {
-            this.viewFactory = this.viewCompiler.compile('<template>' + mainMarkupHtmlString_1.MainMarkupHtmlString + '</template>', this.viewResources);
-            this.view = this.viewFactory.create(this.container);
-            this.viewSlots.mainViewSlot = new aurelia_framework_1.ViewSlot(this.element, true);
-            this.viewSlots.mainViewSlot.add(this.view);
-            this.viewSlots.mainViewSlot.bind(this, {
-                bindingContext: this,
-                parentOverrideContext: this.htmlHeightWidth
-            });
-            this.viewSlots.mainViewSlot.attached();
-        };
-        return MainMarkup;
-    }());
-    exports.MainMarkup = MainMarkup;
-});
-
-//# sourceMappingURL=mainMarkup.js.map
+//# sourceMappingURL=v-grid-col.js.map
 
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -30338,4 +30704,4 @@ define('text!aurelia-v-grid/grid/styles/icons.css', ['module'], function(module)
 define('text!aurelia-v-grid/grid/styles/loader.css', ['module'], function(module) { module.exports = ".avg-default .avg-overlay {\r\n  position: absolute;\r\n  left: 0;\r\n  top: 0;\r\n  min-width: 100%;\r\n  min-height: 100%;\r\n  height: 100%;\r\n  width: 100%;\r\n  z-index: 9999 !important;\r\n  background: rgba(0, 0, 0, 0.3);\r\n  color: black;\r\n}\r\n\r\n.avg-default .avg-progress-indicator {\r\n  position: absolute;\r\n  left: 50%;\r\n  top: 50%;\r\n  z-index: 10000;\r\n  transform: translate(-50%, -50%);\r\n  width: 150px;\r\n  background-color: gray;\r\n}\r\n\r\n.avg-default .avg-progress-bar {\r\n  -webkit-animation: progress-bar-stripes 2s linear infinite;\r\n  -o-animation: progress-bar-stripes 2s linear infinite;\r\n  animation: progress-bar-stripes 2s linear infinite;\r\n  background-image: -webkit-linear-gradient(45deg, rgba(255, 255, 255, .15) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, .15) 50%, rgba(255, 255, 255, .15) 75%, transparent 75%, transparent);\r\n  background-image: -o-linear-gradient(45deg, rgba(255, 255, 255, .15) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, .15) 50%, rgba(255, 255, 255, .15) 75%, transparent 75%, transparent);\r\n  background-image: linear-gradient(45deg, rgba(255, 255, 255, .15) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, .15) 50%, rgba(255, 255, 255, .15) 75%, transparent 75%, transparent);\r\n  -webkit-background-size: 40px 40px;\r\n  background-size: 40px 40px;\r\n  color: black;\r\n  text-align: center;\r\n}\r\n"; });
 define('text!aurelia-v-grid/grid/styles/main-element-tags.css', ['module'], function(module) { module.exports = "/*here is the main tag css, keeping them here, so theming will be easier */\r\n\r\nv-grid {\r\n  display: block;\r\n  position: relative;\r\n}\r\n\r\navg-top-panel {\r\n  position: absolute;\r\n  box-sizing: border-box;\r\n  width: 100%;\r\n  top: 0;\r\n}\r\n\r\navg-footer {\r\n  position: absolute;\r\n  box-sizing: border-box;\r\n  width: 100%;\r\n  bottom: 0;\r\n}\r\n\r\navg-header {\r\n  position: absolute;\r\n  box-sizing: border-box;\r\n  display: inline-block;\r\n  width: 100%;\r\n}\r\n\r\navg-content {\r\n  position: absolute;\r\n  box-sizing: border-box;\r\n  width: 100%;\r\n}\r\n\r\navg-header-left {\r\n  position: absolute;\r\n  box-sizing: border-box;\r\n  height: 100%;\r\n}\r\n\r\navg-header-main {\r\n  position: absolute;\r\n  box-sizing: border-box;\r\n  height: 100%;\r\n  overflow: hidden;\r\n}\r\n\r\navg-header-main-scroll {\r\n  position: absolute;\r\n  box-sizing: border-box;\r\n  height: 100%;\r\n}\r\n\r\n\r\navg-header-right {\r\n  position: absolute;\r\n  box-sizing: border-box;\r\n  height: 100%;\r\n}\r\n\r\navg-content-left {\r\n  z-index:5;\r\n  position: absolute;\r\n  box-sizing: border-box;\r\n  height: 100%;\r\n  overflow: hidden;\r\n  overflow-y: hidden;\r\n}\r\n\r\n\r\navg-content-left-scroll {\r\n  position: absolute;\r\n  box-sizing: border-box;\r\n}\r\n\r\navg-content-main {\r\n  z-index:6;\r\n  position: absolute;\r\n  box-sizing: border-box;\r\n  height: 100%;\r\n  overflow: hidden;\r\n  overflow-x: hidden;\r\n  overflow-y: hidden;\r\n}\r\n\r\navg-content-main-scroll {\r\n  position: absolute;\r\n  box-sizing: border-box;\r\n}\r\n\r\navg-content-right {\r\n  z-index:7;\r\n  position: absolute;\r\n  box-sizing: border-box;\r\n  height: 100%;\r\n  overflow: hidden;\r\n  overflow-y: hidden;\r\n}\r\n\r\n\r\n\r\navg-content-right-scroll {\r\n  position: absolute;\r\n  box-sizing: border-box;\r\n}\r\n\r\navg-content-group {\r\n  position: absolute;\r\n  box-sizing: border-box;\r\n  overflow-x: hidden;\r\n  overflow-y: hidden;\r\n}\r\n\r\navg-content-group-scroll {\r\n  z-index: 9;\r\n  pointer-events: none;\r\n  position: absolute;\r\n  box-sizing: border-box;\r\n}\r\n\r\navg-content-vhandle {\r\n  z-index: 10;\r\n  position: absolute;\r\n  box-sizing: border-box;\r\n  overflow-x: hidden;\r\n  overflow-y: scroll;\r\n}\r\n\r\navg-content-vhandle-scroll {\r\n  position: absolute;\r\n  box-sizing: border-box;\r\n}\r\n\r\n\r\n\r\navg-content-hhandle {\r\n  z-index:10;\r\n  position: absolute;\r\n  box-sizing: border-box;\r\n  overflow-x: scroll;\r\n  overflow-y: hidden;\r\n}\r\n\r\navg-content-hhandle-scroll {\r\n  position: absolute;\r\n  box-sizing: border-box;\r\n}\r\n\r\navg-row {\r\n  width: 100%;\r\n  min-width: 1px; /*without this left scrolltop will not be set when hidden*/\r\n  position: absolute;\r\n}\r\n\r\navg-col {\r\n  position: absolute;\r\n  height: 100%;\r\n}\r\n"; });
 define('text!aurelia-v-grid/grid/styles/main-elements.css', ['module'], function(module) { module.exports = ".avg-default {\r\n  border: 1px solid rgb(230, 230, 230);\r\n  -webkit-touch-callout: none;\r\n  -webkit-user-select: none;\r\n  -moz-user-select: none;\r\n  -ms-user-select: none;\r\n  user-select: none;\r\n}\r\n\r\n.avg-default .avg-top-panel {\r\n  border-bottom: 1px solid rgb(230, 230, 230);\r\n  background-color: rgb(240, 240, 240);\r\n}\r\n\r\n.avg-default .avg-header {\r\n  border-bottom: 1px solid rgb(230, 230, 230);\r\n}\r\n\r\n.avg-default .avg-footer {\r\n  border-top: 1px solid rgb(230, 230, 230);\r\n  background-color: rgb(240, 240, 240);\r\n}\r\n\r\n.avg-default .avg-content-right {\r\n  background-color: white;\r\n  border-top: 1px solid rgb(230, 230, 230);\r\n}\r\n\r\n.avg-default .avg-content-left {\r\n  background-color: white;\r\n  border-top: 1px solid rgb(230, 230, 230);\r\n}\r\n\r\n.avg-default .avg-header-main {\r\n  background-color: rgb(240, 240, 240);\r\n}\r\n\r\n.avg-default .avg-header-left {\r\n  background-color: rgb(240, 240, 240);\r\n}\r\n\r\n.avg-default .avg-header-right {\r\n  background-color: rgb(240, 240, 240);\r\n}\r\n\r\n.avg-default .avg-content-main {\r\n  background-color: white;\r\n  border-top: 1px solid rgb(230, 230, 230);\r\n}\r\n\r\n.avg-default .avg-row {\r\n  border-bottom: 1px solid rgb(230, 230, 230);\r\n}\r\n\r\n.avg-default .avg-header-left .avg-col {\r\n  white-space: nowrap;\r\n  box-sizing: border-box;\r\n  text-overflow: ellipsis;\r\n  border-right: 1px solid rgb(230, 230, 230);\r\n  overflow: hidden;\r\n}\r\n\r\n.avg-default .avg-header-main .avg-col {\r\n  white-space: nowrap;\r\n  box-sizing: border-box;\r\n  text-overflow: ellipsis;\r\n  border-right: 1px solid rgb(230, 230, 230);\r\n  overflow: hidden;\r\n}\r\n\r\n.avg-default .avg-header-right .avg-col {\r\n  box-sizing: border-box;\r\n  border-left: 1px solid rgb(230, 230, 230);\r\n}\r\n\r\n.avg-default .avg-content-left .avg-col {\r\n  white-space: nowrap;\r\n  box-sizing: border-box;\r\n  text-overflow: ellipsis;\r\n  border-right: 1px solid rgb(230, 230, 230);\r\n  overflow: hidden;\r\n}\r\n\r\n.avg-default .avg-content-main .avg-col {\r\n  white-space: nowrap;\r\n  text-overflow: ellipsis;\r\n  border-right: 1px solid rgb(230, 230, 230);\r\n  overflow: hidden;\r\n}\r\n\r\n.avg-default .avg-content-right .avg-col {\r\n  border-left: 1px solid rgb(230, 230, 230);\r\n}\r\n\r\n.avg-default .avg-col-group {\r\n  pointer-events: all;\r\n  box-sizing: border-box;\r\n  white-space: nowrap;\r\n  text-overflow: ellipsis;\r\n  background-color: rgb(250, 250, 250);\r\n  border-top: 1px solid rgb(230, 230, 230);\r\n  padding: 5px 10px;\r\n}\r\n\r\n.avg-default .avg-col-grouping {\r\n  white-space: nowrap;\r\n  box-sizing: border-box;\r\n  text-overflow: ellipsis;\r\n  background-color: rgb(250, 250, 250);\r\n  border-right: 1px solid rgb(230, 230, 230);\r\n  overflow: hidden;\r\n}\r\n\r\n.avg-default .avg-col-grouping-header {\r\n  white-space: nowrap;\r\n  text-overflow: ellipsis;\r\n  background-color: rgb(240, 240, 240);\r\n  border-right: 1px solid rgb(230, 230, 230);\r\n  overflow: hidden;\r\n}\r\n\r\n.avg-default .avg-selected-row {\r\n  box-shadow: none;\r\n  background-color: rgb(203, 195, 203);\r\n}\r\n"; });
-function _aureliaConfigureModuleLoader(){requirejs.config({"baseUrl":"src/","paths":{"aurelia-binding":"..\\node_modules\\aurelia-binding\\dist\\amd\\aurelia-binding","aurelia-bootstrapper":"..\\node_modules\\aurelia-bootstrapper\\dist\\amd\\aurelia-bootstrapper","aurelia-event-aggregator":"..\\node_modules\\aurelia-event-aggregator\\dist\\amd\\aurelia-event-aggregator","aurelia-dependency-injection":"..\\node_modules\\aurelia-dependency-injection\\dist\\amd\\aurelia-dependency-injection","aurelia-framework":"..\\node_modules\\aurelia-framework\\dist\\amd\\aurelia-framework","aurelia-history":"..\\node_modules\\aurelia-history\\dist\\amd\\aurelia-history","aurelia-history-browser":"..\\node_modules\\aurelia-history-browser\\dist\\amd\\aurelia-history-browser","aurelia-loader":"..\\node_modules\\aurelia-loader\\dist\\amd\\aurelia-loader","aurelia-logging":"..\\node_modules\\aurelia-logging\\dist\\amd\\aurelia-logging","aurelia-loader-default":"..\\node_modules\\aurelia-loader-default\\dist\\amd\\aurelia-loader-default","aurelia-logging-console":"..\\node_modules\\aurelia-logging-console\\dist\\amd\\aurelia-logging-console","aurelia-metadata":"..\\node_modules\\aurelia-metadata\\dist\\amd\\aurelia-metadata","aurelia-pal-browser":"..\\node_modules\\aurelia-pal-browser\\dist\\amd\\aurelia-pal-browser","aurelia-pal":"..\\node_modules\\aurelia-pal\\dist\\amd\\aurelia-pal","aurelia-path":"..\\node_modules\\aurelia-path\\dist\\amd\\aurelia-path","aurelia-polyfills":"..\\node_modules\\aurelia-polyfills\\dist\\amd\\aurelia-polyfills","aurelia-route-recognizer":"..\\node_modules\\aurelia-route-recognizer\\dist\\amd\\aurelia-route-recognizer","aurelia-templating":"..\\node_modules\\aurelia-templating\\dist\\amd\\aurelia-templating","aurelia-task-queue":"..\\node_modules\\aurelia-task-queue\\dist\\amd\\aurelia-task-queue","aurelia-router":"..\\node_modules\\aurelia-router\\dist\\amd\\aurelia-router","aurelia-templating-binding":"..\\node_modules\\aurelia-templating-binding\\dist\\amd\\aurelia-templating-binding","text":"..\\node_modules\\text\\text","app-bundle":"../scripts/app-bundle"},"packages":[{"name":"aurelia-testing","location":"../node_modules/aurelia-testing/dist/amd","main":"aurelia-testing"},{"name":"aurelia-templating-resources","location":"../node_modules/aurelia-templating-resources/dist/amd","main":"aurelia-templating-resources"},{"name":"aurelia-templating-router","location":"../node_modules/aurelia-templating-router/dist/amd","main":"aurelia-templating-router"},{"name":"aurelia-v-grid","location":"../node_modules/aurelia-v-grid/dist/amd","main":"index"}],"stubModules":[],"shim":{},"bundles":{"app-bundle":["app","environment","main","data/data","data/dummyDataGenerator","resources/index","resources/value-converters/index","aurelia-v-grid/grid/mainMarkup","aurelia-v-grid/grid/mainMarkupHtmlString","aurelia-v-grid/grid/mainScrollEvents","aurelia-v-grid/grid/rowMarkup","aurelia-v-grid/grid/rowScrollEvents","aurelia-v-grid/grid/htmlHeightWidth","aurelia-v-grid/grid/viewSlots","aurelia-v-grid/grid/rowDataBinder","aurelia-v-grid/grid/rowClickHandler","aurelia-v-grid/grid/loadingScreen","aurelia-v-grid/grid/v-grid","aurelia-v-grid/utils/arrayUtils","aurelia-v-grid/utils/arrayFilter","aurelia-v-grid/utils/arraySort","aurelia-v-grid/utils/arrayGrouping"]}})}
+function _aureliaConfigureModuleLoader(){requirejs.config({"baseUrl":"src/","paths":{"aurelia-binding":"..\\node_modules\\aurelia-binding\\dist\\amd\\aurelia-binding","aurelia-bootstrapper":"..\\node_modules\\aurelia-bootstrapper\\dist\\amd\\aurelia-bootstrapper","aurelia-dependency-injection":"..\\node_modules\\aurelia-dependency-injection\\dist\\amd\\aurelia-dependency-injection","aurelia-event-aggregator":"..\\node_modules\\aurelia-event-aggregator\\dist\\amd\\aurelia-event-aggregator","aurelia-framework":"..\\node_modules\\aurelia-framework\\dist\\amd\\aurelia-framework","aurelia-history":"..\\node_modules\\aurelia-history\\dist\\amd\\aurelia-history","aurelia-history-browser":"..\\node_modules\\aurelia-history-browser\\dist\\amd\\aurelia-history-browser","aurelia-loader":"..\\node_modules\\aurelia-loader\\dist\\amd\\aurelia-loader","aurelia-loader-default":"..\\node_modules\\aurelia-loader-default\\dist\\amd\\aurelia-loader-default","aurelia-logging":"..\\node_modules\\aurelia-logging\\dist\\amd\\aurelia-logging","aurelia-metadata":"..\\node_modules\\aurelia-metadata\\dist\\amd\\aurelia-metadata","aurelia-logging-console":"..\\node_modules\\aurelia-logging-console\\dist\\amd\\aurelia-logging-console","aurelia-pal":"..\\node_modules\\aurelia-pal\\dist\\amd\\aurelia-pal","aurelia-pal-browser":"..\\node_modules\\aurelia-pal-browser\\dist\\amd\\aurelia-pal-browser","aurelia-path":"..\\node_modules\\aurelia-path\\dist\\amd\\aurelia-path","aurelia-polyfills":"..\\node_modules\\aurelia-polyfills\\dist\\amd\\aurelia-polyfills","aurelia-route-recognizer":"..\\node_modules\\aurelia-route-recognizer\\dist\\amd\\aurelia-route-recognizer","aurelia-router":"..\\node_modules\\aurelia-router\\dist\\amd\\aurelia-router","aurelia-task-queue":"..\\node_modules\\aurelia-task-queue\\dist\\amd\\aurelia-task-queue","aurelia-templating-binding":"..\\node_modules\\aurelia-templating-binding\\dist\\amd\\aurelia-templating-binding","aurelia-templating":"..\\node_modules\\aurelia-templating\\dist\\amd\\aurelia-templating","text":"..\\node_modules\\text\\text","app-bundle":"../scripts/app-bundle"},"packages":[{"name":"aurelia-templating-router","location":"../node_modules/aurelia-templating-router/dist/amd","main":"aurelia-templating-router"},{"name":"aurelia-testing","location":"../node_modules/aurelia-testing/dist/amd","main":"aurelia-testing"},{"name":"aurelia-templating-resources","location":"../node_modules/aurelia-templating-resources/dist/amd","main":"aurelia-templating-resources"},{"name":"aurelia-v-grid","location":"../node_modules/aurelia-v-grid/dist/amd","main":"index"}],"stubModules":[],"shim":{},"bundles":{"app-bundle":["app","environment","main","data/data","data/dummyDataGenerator","resources/index","resources/value-converters/index","aurelia-v-grid/grid/htmlCache","aurelia-v-grid/grid/mainMarkup","aurelia-v-grid/grid/mainMarkupHtmlString","aurelia-v-grid/grid/mainScrollEvents","aurelia-v-grid/grid/rowMarkup","aurelia-v-grid/grid/rowScrollEvents","aurelia-v-grid/grid/htmlHeightWidth","aurelia-v-grid/grid/viewSlots","aurelia-v-grid/grid/rowDataBinder","aurelia-v-grid/grid/rowClickHandler","aurelia-v-grid/grid/loadingScreen","aurelia-v-grid/grid/v-grid","aurelia-v-grid/utils/arrayUtils","aurelia-v-grid/utils/arrayFilter","aurelia-v-grid/utils/arraySort","aurelia-v-grid/utils/arrayGrouping"]}})}
