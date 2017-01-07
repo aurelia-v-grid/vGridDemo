@@ -8,6 +8,7 @@ export class App {
     this.message = 'Simple demo';
     
     //dummy data
+    this.columns = null;
     this.collection = []
     this.dummyDataGenerator = new DummyDataGenerator();
 
@@ -36,7 +37,18 @@ export class App {
     this.dummyDataGenerator.generateData(x, (data) => {
       this.ds.addRows(data);
     });   
-    
+  }
+
+  default(){
+    this.gridConnector.setColConfig(null);
+  }
+
+  load(){
+    this.gridConnector.setColConfig(this.columns);
+  }
+
+  save(){
+    this.columns = this.gridConnector.getColConfig();
   }
 
 }
