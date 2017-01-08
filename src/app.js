@@ -49,6 +49,11 @@ export class App {
     }
   }
 
+  remove(){
+     console.log("removed");
+     console.log(this.ds.remove(this.gridConnector.getSelection().getSelectedRows()));
+  }
+
   refresh(x) {
     if (x) {
       this.dummyDataGenerator.generateData(x, (data) => {
