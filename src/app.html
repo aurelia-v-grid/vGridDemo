@@ -32,23 +32,31 @@
                         </v-grid-col>
                         </v-grid>
       </div>
-      <div class="col-md-3">
+      <div class="col-md-5">
         <div class="row">
-          <input class="btn btn-default" type="button" click.delegate="replace(10)" value="replace 10">
-          <input class="btn btn-default" type="button" click.delegate="replace(1000)" value="replace 1000">
-          <input class="btn btn-default" type="button" click.delegate="replace(5000)" value="replace 5000">
-          <input class="btn btn-default" type="button" click.delegate="replace(10000)" value="replace 10 000">
+          <input class="btn btn-default" type="button" click.delegate="replace(10)" value="setArray(data) 10">
+          <input class="btn btn-default" type="button" click.delegate="replace(1000)" value="setArray(data) 1000">
+          <input class="btn btn-default" type="button" click.delegate="replace(5000)" value="setArray(data) 5000">
+          <input class="btn btn-default" type="button" click.delegate="replace(10000)" value="setArray(data) 10 000">
         </div>
         <div class="row">
-          <input class="btn btn-default" type="button" click.delegate="add(10)" value="add 10">
-          <input class="btn btn-default" type="button" click.delegate="add(1000)" value="add 1000">
-          <input class="btn btn-default" type="button" click.delegate="add(5000)" value="add 5000">
-          <input class="btn btn-default" type="button" click.delegate="add(10000)" value="add 10 000">
+          <input class="btn btn-default" type="button" click.delegate="add(10)" value="push(data) 10">
+          <input class="btn btn-default" type="button" click.delegate="add(1000)" value="push(data) 1000">
+          <input class="btn btn-default" type="button" click.delegate="add(5000)" value="push(data) 5000">
+          <input class="btn btn-default" type="button" click.delegate="add(10000)" value="push(data) 10 000">
         </div>
         <div class="row">
           <input class="btn btn-default" type="button" click.delegate="default()" value="default columns">
           <input class="btn btn-default" type="button" click.delegate="save()" value="save columns">
           <input class="btn btn-default" type="button" click.delegate="load()" value="load columns">
+        </div>
+        <div class="row">
+          <input class="btn btn-default" type="button" click.delegate="refresh()" value="refresh() only (grouping/orderby)">
+          <input class="btn btn-default" type="button" click.delegate="refresh(10)" value="refresh(data) by replacing, but keeping orderby/grouping">
+        </div>
+        <div class="row">
+          <input class="btn btn-default" type="button" click.delegate="addNew()" value="addBlankRow()">
+          <input class="btn btn-default" type="button" click.delegate="addNew(10)" value="unshift({ name: 'new' })">
         </div>
       </div>
     </div>

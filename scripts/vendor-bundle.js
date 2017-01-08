@@ -27478,14 +27478,33 @@ define('aurelia-v-grid/dataSource',["require", "exports", "./selection", "./coll
             this.mainArray = this.collection.getEntities();
             this.triggerEvent('collection_changed');
         };
-        DataSource.prototype.addRows = function (array) {
+        DataSource.prototype.push = function (array) {
+            if (Array.isArray(array)) {
+                var grouping = this.arrayUtils.getGrouping();
+                var collection = this.collection.getEntities();
+                collection = collection.concat(array);
+                this.collection.setData(collection);
+                this.mainArray = this.collection.getEntities();
+                this.arrayUtils.runOrderbyOn(this.collection.getEntities());
+                var untouchedgrouped = this.collection.getEntities();
+                if (grouping.length > 0) {
+                    var groupedArray = this.arrayUtils.group(untouchedgrouped, grouping, true);
+                    this.collection.setData(groupedArray, untouchedgrouped);
+                }
+                this.triggerEvent('collection_updated');
+            }
+        };
+        DataSource.prototype.refresh = function (data) {
+            if (data) {
+                this.collection = new collection_1.Collection(this);
+                this.collection.setData(data);
+                this.mainArray = this.collection.getEntities();
+                this.entity = null;
+            }
             var grouping = this.arrayUtils.getGrouping();
-            var collection = this.collection.getEntities();
-            collection = collection.concat(array);
-            this.collection.setData(collection);
             this.arrayUtils.runOrderbyOn(this.collection.getEntities());
-            var untouchedgrouped = this.collection.getEntities();
             if (grouping.length > 0) {
+                var untouchedgrouped = this.collection.getEntities();
                 var groupedArray = this.arrayUtils.group(untouchedgrouped, grouping, true);
                 this.collection.setData(groupedArray, untouchedgrouped);
             }
@@ -27562,21 +27581,41 @@ define('aurelia-v-grid/dataSource',["require", "exports", "./selection", "./coll
         DataSource.prototype.getGrouping = function () {
             return this.arrayUtils.getGrouping();
         };
-        DataSource.prototype.addElement = function (data) {
-            if (data) {
+        DataSource.prototype.addBlankRow = function () {
+            var newElement = {};
+            this.mainArray.unshift(newElement);
+            var oldArray = this.collection.getEntities();
+            var oldMaybeGroupedArray = this.collection.getCurrentEntities();
+            var index = oldArray.indexOf(newElement);
+            if (index === -1) {
+                oldArray.unshift(newElement);
             }
-            else {
-                var newElement = {};
-                this.mainArray.unshift(newElement);
+            oldMaybeGroupedArray.unshift(newElement);
+            this.collection.setData(oldMaybeGroupedArray, oldArray);
+            this.entity = newElement;
+            this.triggerEvent('collection_filtered');
+        };
+        DataSource.prototype.unshift = function (data) {
+            if (data) {
+                this.mainArray.unshift(data);
                 var oldArray = this.collection.getEntities();
                 var oldMaybeGroupedArray = this.collection.getCurrentEntities();
-                var index = oldArray.indexOf(newElement);
+                var index = oldArray.indexOf(data);
                 if (index === -1) {
-                    oldArray.unshift(newElement);
+                    oldArray.unshift(data);
                 }
-                oldMaybeGroupedArray.unshift(newElement);
+                oldMaybeGroupedArray.unshift(data);
                 this.collection.setData(oldMaybeGroupedArray, oldArray);
+                this.entity = data;
                 this.triggerEvent('collection_filtered');
+            }
+        };
+        DataSource.prototype.remove = function (rows) {
+            if (Array.isArray(rows)) {
+            }
+            else {
+                if (this.entity) {
+                }
             }
         };
         DataSource.prototype.getRowKey = function (row) {
@@ -29192,34 +29231,6 @@ define('aurelia-v-grid/grid/loadingScreen',["require", "exports", "aurelia-frame
 
 //# sourceMappingURL=loadingScreen.js.map
 
-define('aurelia-v-grid/grid/mainMarkup',["require", "exports", "aurelia-framework", "./mainMarkupHtmlString"], function (require, exports, aurelia_framework_1, mainMarkupHtmlString_1) {
-    var MainMarkup = (function () {
-        function MainMarkup(element, viewCompiler, container, viewResources, htmlHeightWidth, viewSlots) {
-            this.element = element;
-            this.viewCompiler = viewCompiler;
-            this.container = container;
-            this.viewResources = viewResources;
-            this.htmlHeightWidth = htmlHeightWidth;
-            this.viewSlots = viewSlots;
-        }
-        MainMarkup.prototype.generateMainMarkup = function () {
-            this.viewFactory = this.viewCompiler.compile('<template>' + mainMarkupHtmlString_1.MainMarkupHtmlString + '</template>', this.viewResources);
-            this.view = this.viewFactory.create(this.container);
-            this.viewSlots.mainViewSlot = new aurelia_framework_1.ViewSlot(this.element, true);
-            this.viewSlots.mainViewSlot.add(this.view);
-            this.viewSlots.mainViewSlot.bind(this, {
-                bindingContext: this,
-                parentOverrideContext: this.htmlHeightWidth
-            });
-            this.viewSlots.mainViewSlot.attached();
-        };
-        return MainMarkup;
-    }());
-    exports.MainMarkup = MainMarkup;
-});
-
-//# sourceMappingURL=mainMarkup.js.map
-
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -30817,4 +30828,4 @@ define('text!aurelia-v-grid/grid/styles/icons.css', ['module'], function(module)
 define('text!aurelia-v-grid/grid/styles/loader.css', ['module'], function(module) { module.exports = ".avg-default .avg-overlay {\r\n  position: absolute;\r\n  left: 0;\r\n  top: 0;\r\n  min-width: 100%;\r\n  min-height: 100%;\r\n  height: 100%;\r\n  width: 100%;\r\n  z-index: 9999 !important;\r\n  background: rgba(0, 0, 0, 0.3);\r\n  color: black;\r\n}\r\n\r\n.avg-default .avg-progress-indicator {\r\n  position: absolute;\r\n  left: 50%;\r\n  top: 50%;\r\n  z-index: 10000;\r\n  transform: translate(-50%, -50%);\r\n  width: 150px;\r\n  background-color: gray;\r\n}\r\n\r\n.avg-default .avg-progress-bar {\r\n  -webkit-animation: progress-bar-stripes 2s linear infinite;\r\n  -o-animation: progress-bar-stripes 2s linear infinite;\r\n  animation: progress-bar-stripes 2s linear infinite;\r\n  background-image: -webkit-linear-gradient(45deg, rgba(255, 255, 255, .15) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, .15) 50%, rgba(255, 255, 255, .15) 75%, transparent 75%, transparent);\r\n  background-image: -o-linear-gradient(45deg, rgba(255, 255, 255, .15) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, .15) 50%, rgba(255, 255, 255, .15) 75%, transparent 75%, transparent);\r\n  background-image: linear-gradient(45deg, rgba(255, 255, 255, .15) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, .15) 50%, rgba(255, 255, 255, .15) 75%, transparent 75%, transparent);\r\n  -webkit-background-size: 40px 40px;\r\n  background-size: 40px 40px;\r\n  color: black;\r\n  text-align: center;\r\n}\r\n"; });
 define('text!aurelia-v-grid/grid/styles/main-element-tags.css', ['module'], function(module) { module.exports = "/*here is the main tag css, keeping them here, so theming will be easier */\r\n\r\nv-grid {\r\n  display: block;\r\n  position: relative;\r\n}\r\n\r\navg-top-panel {\r\n  position: absolute;\r\n  box-sizing: border-box;\r\n  width: 100%;\r\n  top: 0;\r\n}\r\n\r\navg-footer {\r\n  position: absolute;\r\n  box-sizing: border-box;\r\n  width: 100%;\r\n  bottom: 0;\r\n}\r\n\r\navg-header {\r\n  position: absolute;\r\n  box-sizing: border-box;\r\n  display: inline-block;\r\n  width: 100%;\r\n}\r\n\r\navg-content {\r\n  position: absolute;\r\n  box-sizing: border-box;\r\n  width: 100%;\r\n}\r\n\r\navg-header-left {\r\n  position: absolute;\r\n  box-sizing: border-box;\r\n  height: 100%;\r\n}\r\n\r\navg-header-main {\r\n  position: absolute;\r\n  box-sizing: border-box;\r\n  height: 100%;\r\n  overflow: hidden;\r\n}\r\n\r\navg-header-main-scroll {\r\n  position: absolute;\r\n  box-sizing: border-box;\r\n  height: 100%;\r\n}\r\n\r\n\r\navg-header-right {\r\n  position: absolute;\r\n  box-sizing: border-box;\r\n  height: 100%;\r\n}\r\n\r\navg-content-left {\r\n  z-index:5;\r\n  position: absolute;\r\n  box-sizing: border-box;\r\n  height: 100%;\r\n  overflow: hidden;\r\n  overflow-y: hidden;\r\n}\r\n\r\n\r\navg-content-left-scroll {\r\n  position: absolute;\r\n  box-sizing: border-box;\r\n}\r\n\r\navg-content-main {\r\n  z-index:6;\r\n  position: absolute;\r\n  box-sizing: border-box;\r\n  height: 100%;\r\n  overflow: hidden;\r\n  overflow-x: hidden;\r\n  overflow-y: hidden;\r\n}\r\n\r\navg-content-main-scroll {\r\n  position: absolute;\r\n  box-sizing: border-box;\r\n}\r\n\r\navg-content-right {\r\n  z-index:7;\r\n  position: absolute;\r\n  box-sizing: border-box;\r\n  height: 100%;\r\n  overflow: hidden;\r\n  overflow-y: hidden;\r\n}\r\n\r\n\r\n\r\navg-content-right-scroll {\r\n  position: absolute;\r\n  box-sizing: border-box;\r\n}\r\n\r\navg-content-group {\r\n  position: absolute;\r\n  box-sizing: border-box;\r\n  overflow-x: hidden;\r\n  overflow-y: hidden;\r\n}\r\n\r\navg-content-group-scroll {\r\n  z-index: 9;\r\n  pointer-events: none;\r\n  position: absolute;\r\n  box-sizing: border-box;\r\n}\r\n\r\navg-content-vhandle {\r\n  z-index: 10;\r\n  position: absolute;\r\n  box-sizing: border-box;\r\n  overflow-x: hidden;\r\n  overflow-y: scroll;\r\n}\r\n\r\navg-content-vhandle-scroll {\r\n  position: absolute;\r\n  box-sizing: border-box;\r\n}\r\n\r\n\r\n\r\navg-content-hhandle {\r\n  z-index:10;\r\n  position: absolute;\r\n  box-sizing: border-box;\r\n  overflow-x: scroll;\r\n  overflow-y: hidden;\r\n}\r\n\r\navg-content-hhandle-scroll {\r\n  position: absolute;\r\n  box-sizing: border-box;\r\n}\r\n\r\navg-row {\r\n  width: 100%;\r\n  min-width: 1px; /*without this left scrolltop will not be set when hidden*/\r\n  position: absolute;\r\n}\r\n\r\navg-col {\r\n  position: absolute;\r\n  height: 100%;\r\n}\r\n"; });
 define('text!aurelia-v-grid/grid/styles/main-elements.css', ['module'], function(module) { module.exports = ".avg-default {\r\n  border: 1px solid rgb(230, 230, 230);\r\n  -webkit-touch-callout: none;\r\n  -webkit-user-select: none;\r\n  -moz-user-select: none;\r\n  -ms-user-select: none;\r\n  user-select: none;\r\n}\r\n\r\n.avg-default .avg-top-panel {\r\n  border-bottom: 1px solid rgb(230, 230, 230);\r\n  background-color: rgb(240, 240, 240);\r\n}\r\n\r\n.avg-default .avg-header {\r\n  border-bottom: 1px solid rgb(230, 230, 230);\r\n}\r\n\r\n.avg-default .avg-footer {\r\n  border-top: 1px solid rgb(230, 230, 230);\r\n  background-color: rgb(240, 240, 240);\r\n}\r\n\r\n.avg-default .avg-content-right {\r\n  background-color: white;\r\n  border-top: 1px solid rgb(230, 230, 230);\r\n}\r\n\r\n.avg-default .avg-content-left {\r\n  background-color: white;\r\n  border-top: 1px solid rgb(230, 230, 230);\r\n}\r\n\r\n.avg-default .avg-header-main {\r\n  background-color: rgb(240, 240, 240);\r\n}\r\n\r\n.avg-default .avg-header-left {\r\n  background-color: rgb(240, 240, 240);\r\n}\r\n\r\n.avg-default .avg-header-right {\r\n  background-color: rgb(240, 240, 240);\r\n}\r\n\r\n.avg-default .avg-content-main {\r\n  background-color: white;\r\n  border-top: 1px solid rgb(230, 230, 230);\r\n}\r\n\r\n.avg-default .avg-row {\r\n  border-bottom: 1px solid rgb(230, 230, 230);\r\n}\r\n\r\n.avg-default .avg-header-left .avg-col {\r\n  white-space: nowrap;\r\n  box-sizing: border-box;\r\n  text-overflow: ellipsis;\r\n  border-right: 1px solid rgb(230, 230, 230);\r\n  overflow: hidden;\r\n}\r\n\r\n.avg-default .avg-header-main .avg-col {\r\n  white-space: nowrap;\r\n  box-sizing: border-box;\r\n  text-overflow: ellipsis;\r\n  border-right: 1px solid rgb(230, 230, 230);\r\n  overflow: hidden;\r\n}\r\n\r\n.avg-default .avg-header-right .avg-col {\r\n  box-sizing: border-box;\r\n  border-left: 1px solid rgb(230, 230, 230);\r\n}\r\n\r\n.avg-default .avg-content-left .avg-col {\r\n  white-space: nowrap;\r\n  box-sizing: border-box;\r\n  text-overflow: ellipsis;\r\n  border-right: 1px solid rgb(230, 230, 230);\r\n  overflow: hidden;\r\n}\r\n\r\n.avg-default .avg-content-main .avg-col {\r\n  white-space: nowrap;\r\n  text-overflow: ellipsis;\r\n  border-right: 1px solid rgb(230, 230, 230);\r\n  overflow: hidden;\r\n}\r\n\r\n.avg-default .avg-content-right .avg-col {\r\n  border-left: 1px solid rgb(230, 230, 230);\r\n}\r\n\r\n.avg-default .avg-col-group {\r\n  pointer-events: all;\r\n  box-sizing: border-box;\r\n  white-space: nowrap;\r\n  text-overflow: ellipsis;\r\n  background-color: rgb(250, 250, 250);\r\n  border-top: 1px solid rgb(230, 230, 230);\r\n  padding: 5px 10px;\r\n}\r\n\r\n.avg-default .avg-col-grouping {\r\n  white-space: nowrap;\r\n  box-sizing: border-box;\r\n  text-overflow: ellipsis;\r\n  background-color: rgb(250, 250, 250);\r\n  border-right: 1px solid rgb(230, 230, 230);\r\n  overflow: hidden;\r\n}\r\n\r\n.avg-default .avg-col-grouping-header {\r\n  white-space: nowrap;\r\n  text-overflow: ellipsis;\r\n  background-color: rgb(240, 240, 240);\r\n  border-right: 1px solid rgb(230, 230, 230);\r\n  overflow: hidden;\r\n}\r\n\r\n.avg-default .avg-selected-row {\r\n  box-shadow: none;\r\n  background-color: rgb(203, 195, 203);\r\n}\r\n"; });
-function _aureliaConfigureModuleLoader(){requirejs.config({"baseUrl":"src/","paths":{"aurelia-binding":"..\\node_modules\\aurelia-binding\\dist\\amd\\aurelia-binding","aurelia-bootstrapper":"..\\node_modules\\aurelia-bootstrapper\\dist\\amd\\aurelia-bootstrapper","aurelia-event-aggregator":"..\\node_modules\\aurelia-event-aggregator\\dist\\amd\\aurelia-event-aggregator","aurelia-dependency-injection":"..\\node_modules\\aurelia-dependency-injection\\dist\\amd\\aurelia-dependency-injection","aurelia-framework":"..\\node_modules\\aurelia-framework\\dist\\amd\\aurelia-framework","aurelia-history":"..\\node_modules\\aurelia-history\\dist\\amd\\aurelia-history","aurelia-loader-default":"..\\node_modules\\aurelia-loader-default\\dist\\amd\\aurelia-loader-default","aurelia-history-browser":"..\\node_modules\\aurelia-history-browser\\dist\\amd\\aurelia-history-browser","aurelia-loader":"..\\node_modules\\aurelia-loader\\dist\\amd\\aurelia-loader","aurelia-logging":"..\\node_modules\\aurelia-logging\\dist\\amd\\aurelia-logging","aurelia-logging-console":"..\\node_modules\\aurelia-logging-console\\dist\\amd\\aurelia-logging-console","aurelia-metadata":"..\\node_modules\\aurelia-metadata\\dist\\amd\\aurelia-metadata","aurelia-pal":"..\\node_modules\\aurelia-pal\\dist\\amd\\aurelia-pal","aurelia-path":"..\\node_modules\\aurelia-path\\dist\\amd\\aurelia-path","aurelia-polyfills":"..\\node_modules\\aurelia-polyfills\\dist\\amd\\aurelia-polyfills","aurelia-route-recognizer":"..\\node_modules\\aurelia-route-recognizer\\dist\\amd\\aurelia-route-recognizer","aurelia-router":"..\\node_modules\\aurelia-router\\dist\\amd\\aurelia-router","aurelia-pal-browser":"..\\node_modules\\aurelia-pal-browser\\dist\\amd\\aurelia-pal-browser","aurelia-templating":"..\\node_modules\\aurelia-templating\\dist\\amd\\aurelia-templating","aurelia-task-queue":"..\\node_modules\\aurelia-task-queue\\dist\\amd\\aurelia-task-queue","aurelia-templating-binding":"..\\node_modules\\aurelia-templating-binding\\dist\\amd\\aurelia-templating-binding","text":"..\\node_modules\\text\\text","app-bundle":"../scripts/app-bundle"},"packages":[{"name":"aurelia-templating-resources","location":"../node_modules/aurelia-templating-resources/dist/amd","main":"aurelia-templating-resources"},{"name":"aurelia-testing","location":"../node_modules/aurelia-testing/dist/amd","main":"aurelia-testing"},{"name":"aurelia-templating-router","location":"../node_modules/aurelia-templating-router/dist/amd","main":"aurelia-templating-router"},{"name":"aurelia-v-grid","location":"../node_modules/aurelia-v-grid/dist/amd","main":"index"}],"stubModules":[],"shim":{},"bundles":{"app-bundle":["app","environment","main","data/data","data/dummyDataGenerator","resources/index","resources/value-converters/index","aurelia-v-grid/grid/mainMarkup","aurelia-v-grid/grid/mainMarkupHtmlString","aurelia-v-grid/grid/mainScrollEvents","aurelia-v-grid/grid/rowMarkup","aurelia-v-grid/grid/rowScrollEvents","aurelia-v-grid/grid/viewSlots","aurelia-v-grid/grid/rowDataBinder","aurelia-v-grid/grid/rowClickHandler","aurelia-v-grid/grid/loadingScreen","aurelia-v-grid/grid/v-grid","aurelia-v-grid/utils/arrayUtils","aurelia-v-grid/utils/arrayFilter","aurelia-v-grid/utils/arraySort","aurelia-v-grid/utils/arrayGrouping"]}})}
+function _aureliaConfigureModuleLoader(){requirejs.config({"baseUrl":"src/","paths":{"aurelia-binding":"..\\node_modules\\aurelia-binding\\dist\\amd\\aurelia-binding","aurelia-bootstrapper":"..\\node_modules\\aurelia-bootstrapper\\dist\\amd\\aurelia-bootstrapper","aurelia-dependency-injection":"..\\node_modules\\aurelia-dependency-injection\\dist\\amd\\aurelia-dependency-injection","aurelia-event-aggregator":"..\\node_modules\\aurelia-event-aggregator\\dist\\amd\\aurelia-event-aggregator","aurelia-framework":"..\\node_modules\\aurelia-framework\\dist\\amd\\aurelia-framework","aurelia-history":"..\\node_modules\\aurelia-history\\dist\\amd\\aurelia-history","aurelia-history-browser":"..\\node_modules\\aurelia-history-browser\\dist\\amd\\aurelia-history-browser","aurelia-loader":"..\\node_modules\\aurelia-loader\\dist\\amd\\aurelia-loader","aurelia-loader-default":"..\\node_modules\\aurelia-loader-default\\dist\\amd\\aurelia-loader-default","aurelia-logging":"..\\node_modules\\aurelia-logging\\dist\\amd\\aurelia-logging","aurelia-logging-console":"..\\node_modules\\aurelia-logging-console\\dist\\amd\\aurelia-logging-console","aurelia-metadata":"..\\node_modules\\aurelia-metadata\\dist\\amd\\aurelia-metadata","aurelia-pal":"..\\node_modules\\aurelia-pal\\dist\\amd\\aurelia-pal","aurelia-pal-browser":"..\\node_modules\\aurelia-pal-browser\\dist\\amd\\aurelia-pal-browser","aurelia-path":"..\\node_modules\\aurelia-path\\dist\\amd\\aurelia-path","aurelia-polyfills":"..\\node_modules\\aurelia-polyfills\\dist\\amd\\aurelia-polyfills","aurelia-route-recognizer":"..\\node_modules\\aurelia-route-recognizer\\dist\\amd\\aurelia-route-recognizer","aurelia-router":"..\\node_modules\\aurelia-router\\dist\\amd\\aurelia-router","aurelia-task-queue":"..\\node_modules\\aurelia-task-queue\\dist\\amd\\aurelia-task-queue","aurelia-templating":"..\\node_modules\\aurelia-templating\\dist\\amd\\aurelia-templating","aurelia-templating-binding":"..\\node_modules\\aurelia-templating-binding\\dist\\amd\\aurelia-templating-binding","text":"..\\node_modules\\text\\text","app-bundle":"../scripts/app-bundle"},"packages":[{"name":"aurelia-templating-resources","location":"../node_modules/aurelia-templating-resources/dist/amd","main":"aurelia-templating-resources"},{"name":"aurelia-templating-router","location":"../node_modules/aurelia-templating-router/dist/amd","main":"aurelia-templating-router"},{"name":"aurelia-testing","location":"../node_modules/aurelia-testing/dist/amd","main":"aurelia-testing"},{"name":"aurelia-v-grid","location":"../node_modules/aurelia-v-grid/dist/amd","main":"index"}],"stubModules":[],"shim":{},"bundles":{"app-bundle":["app","environment","main","data/data","data/dummyDataGenerator","resources/index","resources/value-converters/index","aurelia-v-grid/grid/mainMarkup","aurelia-v-grid/grid/mainMarkupHtmlString","aurelia-v-grid/grid/mainScrollEvents","aurelia-v-grid/grid/rowMarkup","aurelia-v-grid/grid/rowScrollEvents","aurelia-v-grid/grid/htmlHeightWidth","aurelia-v-grid/grid/viewSlots","aurelia-v-grid/grid/rowDataBinder","aurelia-v-grid/grid/rowClickHandler","aurelia-v-grid/grid/loadingScreen","aurelia-v-grid/grid/v-grid","aurelia-v-grid/utils/arrayUtils","aurelia-v-grid/utils/arrayFilter","aurelia-v-grid/utils/arraySort","aurelia-v-grid/utils/arrayGrouping"]}})}
