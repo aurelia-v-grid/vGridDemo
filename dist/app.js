@@ -1,154 +1,221 @@
-define('app',['exports', 'aurelia-v-grid', './data/dummyDataGenerator'], function (exports, _aureliaVGrid, _dummyDataGenerator) {
-  'use strict';
+(function(FuseBox){FuseBox.$fuse$=FuseBox;
+FuseBox.pkg("default", {}, function(___scope___){
+___scope___.file("main.js", function(exports, require, module, __filename, __dirname){
 
-  Object.defineProperty(exports, "__esModule", {
-    value: true
-  });
-  exports.App = undefined;
+Object.defineProperty(exports, "__esModule", { value: true });
+require("fuse-box-aurelia-loader");
+require("aurelia-bootstrapper");
+function configure(aurelia) {
+    aurelia.use
+        .standardConfiguration()
+        .plugin('aurelia-v-grid');
+    aurelia.start().then(function () { return aurelia.setRoot(); });
+}
+exports.configure = configure;
+//# sourceMappingURL=main.js.map
+});
+___scope___.file("app.html", function(exports, require, module, __filename, __dirname){
 
-  function _classCallCheck(instance, Constructor) {
-    if (!(instance instanceof Constructor)) {
-      throw new TypeError("Cannot call a class as a function");
-    }
-  }
+module.exports.default =  "<template>\r\n  <p>Updated: 4 April-2017</p>\r\n  <require from=\"./resources/value-converters/index\"></require>\r\n  <span style=\"margin:5px\"><iframe src=\"https://ghbtns.com/github-btn.html?user=vegarringdal&repo=vGrid&type=star&count=true\" frameborder=\"0\" scrolling=\"0\" width=\"100px\" height=\"20px\"></iframe></span>\r\n\r\n  <div style=\"margin:25px\">\r\n    <div class=\"row\">\r\n      <div class=\"col-md-5\">\r\n        <v-grid \r\n          v-multi-select=\"true\" \r\n          v-grid-connector.bind=\"gridConnector\" \r\n          v-row-height=\"25\" \r\n          v-header-height=\"50\" \r\n          v-panel-height=\"25\"\r\n          v-footer-height=\"25\" \r\n          style=\"height:400px;width:100%\">\r\n\r\n          <v-grid-col \r\n            col-filter-menu=\"filter:country\" \r\n            col-label-menu=\"sort:country;groupby:country;hideshow:true\" \r\n            col-width=\"100\" c\r\n            col-drag-drop=\"title:Country;field:country\"\r\n            col-sort=\"field:country\" \r\n            col-filter=\"field:country;i18n.call:translate()\" \r\n            col-field=\"country\">\r\n          </v-grid-col>\r\n\r\n          <v-grid-col \r\n            col-filter-menu=\"filter:index\" \r\n            col-label-menu=\"sort:index;hideshow:true\" \r\n            col-width=\"100\" \r\n            col-sort=\"field:index;asc:false\" \r\n            col-filter=\"field:index\"\r\n            col-field=\"index | numberFormatter\" \r\n            col-pin-left=\"true\">\r\n          </v-grid-col>\r\n\r\n          <v-grid-col \r\n            col-filter-menu=\"filter:high\" \r\n            col-label-menu=\"sort:high;groupby:high;hideshow:true\" \r\n            col-filter-menu=\"filter:high\" \r\n            col-width=\"100\"\r\n            col-drag-drop=\"title:High;field:high\" \r\n            col-sort=\"field:high\" \r\n            col-filter=\"field:high\" \r\n            col-field=\"high\">\r\n          </v-grid-col>\r\n\r\n          <v-grid-col \r\n            col-filter-menu=\"filter:bool\" \r\n            col-label-menu=\"sort:bool;groupby:bool;hideshow:true\" \r\n            col-width=\"100\" \r\n            col-sort=\"field:bool\" \r\n            col-drag-drop=\"title:Bool;field:bool\"\r\n            col-filter=\"field:bool\" \r\n            col-field=\"bool | booleanFormatter\" \r\n            col-type=\"checkbox\">\r\n          </v-grid-col>\r\n\r\n          <v-grid-col \r\n            col-filter-menu=\"filter:guid\" \r\n            col-label-menu=\"sort:guid;hideshow:true\" \r\n            col-width=\"100\" \r\n            col-sort=\"field:guid\" \r\n            col-filter=\"field:guid\"\r\n            col-field=\"guid\">\r\n          </v-grid-col>\r\n\r\n          <v-grid-col \r\n            col-label-menu=\"sort:name;hideshow:true\" \r\n            col-width=\"100\" \r\n            col-sort=\"field:name\" \r\n            col-type=\"image\" \r\n            col-field=\"images\" \r\n            image-fix>\r\n          </v-grid-col>\r\n\r\n          <v-grid-col \r\n            col-filter-menu=\"filter:name\" \r\n            col-label-menu=\"sort:name;hideshow:true\" \r\n            col-width=\"160\" \r\n            col-sort=\"field:name\" \r\n            col-filter=\"field:name;operator:*\"\r\n            col-field=\"name\" \r\n            col-pin-left=\"true\">\r\n          </v-grid-col>\r\n\r\n          <v-grid-col \r\n            col-filter-menu=\"filter:number\" \r\n            col-label-menu=\"sort:number;hideshow:true\" \r\n            col-width=\"100\" \r\n            col-sort=\"field:number\" \r\n            col-filter=\"field:number\"\r\n            col-field=\"number | numberFormatter\" \r\n            col-pin-right=\"true\">\r\n          </v-grid-col>\r\n\r\n        </v-grid>\r\n      </div>\r\n      <div class=\"col-md-5\">\r\n        <div class=\"row\">\r\n          <input class=\"btn btn-default\" type=\"button\" click.delegate=\"replace(10)\" value=\"setArray(data) 10\">\r\n          <input class=\"btn btn-default\" type=\"button\" click.delegate=\"replace(1000)\" value=\"setArray(data) 1000\">\r\n          <input class=\"btn btn-default\" type=\"button\" click.delegate=\"replace(5000)\" value=\"setArray(data) 5000\">\r\n          <input class=\"btn btn-default\" type=\"button\" click.delegate=\"replace(10000)\" value=\"setArray(data) 10 000\">\r\n        </div>\r\n        <div class=\"row\">\r\n          <input class=\"btn btn-default\" type=\"button\" click.delegate=\"add(10)\" value=\"push(data) 10\">\r\n          <input class=\"btn btn-default\" type=\"button\" click.delegate=\"add(1000)\" value=\"push(data) 1000\">\r\n          <input class=\"btn btn-default\" type=\"button\" click.delegate=\"add(5000)\" value=\"push(data) 5000\">\r\n          <input class=\"btn btn-default\" type=\"button\" click.delegate=\"add(10000)\" value=\"push(data) 10 000\">\r\n        </div>\r\n        <div class=\"row\">\r\n          <input class=\"btn btn-default\" type=\"button\" click.delegate=\"default()\" value=\"default columns\">\r\n          <input class=\"btn btn-default\" type=\"button\" click.delegate=\"save()\" value=\"save columns\">\r\n          <input class=\"btn btn-default\" type=\"button\" click.delegate=\"load()\" value=\"load columns\">\r\n        </div>\r\n        <div class=\"row\">\r\n          <input class=\"btn btn-default\" type=\"button\" click.delegate=\"refresh()\" value=\"refresh() only (grouping/orderby)\">\r\n          <input class=\"btn btn-default\" type=\"button\" click.delegate=\"refresh(10)\" value=\"refresh(data) by replacing, but keeping orderby/grouping\">\r\n        </div>\r\n        <div class=\"row\">\r\n          <input class=\"btn btn-default\" type=\"button\" click.delegate=\"addNew()\" value=\"addBlankRow()\">\r\n          <input class=\"btn btn-default\" type=\"button\" click.delegate=\"addNew(10)\" value=\"unshift({ name: 'new' })\">\r\n        </div>\r\n        <div class=\"row\">\r\n          <input class=\"btn btn-default\" type=\"button\" click.delegate=\"remove()\" value=\"remove() (selected rows)\">\r\n        </div>\r\n      </div>\r\n    </div>\r\n    <div class=\"row col-md-5\">\r\n      <form>\r\n        <div class=\"form-group\">\r\n          <label for=\"exampleInputEmail1\">name</label>\r\n          <input value.bind=\"ds.entity.name\" disabled.bind=\"!ds.entity.__avgKey\" class=\"form-control\" id=\"exampleInputEmail1\">\r\n        </div>\r\n        <div class=\"checkbox\">\r\n          <label>\r\n      <input type=\"checkbox\" checked.bind=\"ds.entity.bool | booleanFormatter\" disabled.bind=\"!ds.entity.__avgKey\"> Bool\r\n    </label>\r\n        </div>\r\n      </form>\r\n    </div>\r\n</template>"
+});
+___scope___.file("app.js", function(exports, require, module, __filename, __dirname){
 
-  var App = exports.App = function () {
+Object.defineProperty(exports, "__esModule", { value: true });
+var aurelia_v_grid_1 = require("aurelia-v-grid");
+var aurelia_v_grid_2 = require("aurelia-v-grid");
+var aurelia_v_grid_3 = require("aurelia-v-grid");
+var dummyDataGenerator_1 = require("./data/dummyDataGenerator");
+var App = (function () {
     function App() {
-      var _this = this;
-
-      _classCallCheck(this, App);
-
-      this.message = 'Simple demo';
-
-      this.columns = null;
-      this.collection = [];
-      this.dummyDataGenerator = new _dummyDataGenerator.DummyDataGenerator();
-
-      this.dummyDataGenerator.generateData(500, function (data) {
-        _this.collection = data;
-      });
-
-      this.ds = new _aureliaVGrid.DataSource(new _aureliaVGrid.Selection('multiple'));
-
-      this.gridConnector = new _aureliaVGrid.GridConnector(this.ds);
-
-      this.ds.setArray(this.collection);
-    }
-
-    App.prototype.replace = function replace(x) {
-      var _this2 = this;
-
-      this.dummyDataGenerator.generateData(x, function (data) {
-        _this2.collection = data;
-      });
-      this.ds.setArray(this.collection);
-    };
-
-    App.prototype.addNew = function addNew(data) {
-      if (!data) {
-        this.ds.addBlankRow();
-      } else {
-        this.ds.unshift({ name: 'new' });
-      }
-    };
-
-    App.prototype.remove = function remove() {
-      console.log("removed");
-      console.log(this.ds.remove(this.gridConnector.getSelection().getSelectedRows()));
-    };
-
-    App.prototype.refresh = function refresh(x) {
-      var _this3 = this;
-
-      if (x) {
-        this.dummyDataGenerator.generateData(x, function (data) {
-          _this3.collection = data;
-          _this3.ds.refresh(_this3.collection);
+        var _this = this;
+        this.message = 'Simple demo';
+        this.columns = null;
+        this.collection = [];
+        this.dummyDataGenerator = new dummyDataGenerator_1.DummyDataGenerator();
+        this.dummyDataGenerator.generateData(500, function (data) {
+            _this.collection = data;
         });
-      } else {
-        this.ds.refresh();
-      }
+        this.ds = new aurelia_v_grid_2.DataSource(new aurelia_v_grid_3.Selection('multiple'));
+        this.gridConnector = new aurelia_v_grid_1.GridConnector(this.ds);
+        this.ds.setArray(this.collection);
+    }
+    App.prototype.replace = function (x) {
+        var _this = this;
+        this.dummyDataGenerator.generateData(x, function (data) {
+            _this.collection = data;
+        });
+        this.ds.setArray(this.collection);
     };
-
-    App.prototype.add = function add(x) {
-      var _this4 = this;
-
-      this.dummyDataGenerator.generateData(x, function (data) {
-        _this4.ds.push(data);
-      });
+    App.prototype.addNew = function (data) {
+        if (!data) {
+            this.ds.addBlankRow();
+        }
+        else {
+            this.ds.unshift({
+                name: 'new'
+            });
+        }
     };
-
-    App.prototype.default = function _default() {
-      this.gridConnector.setColConfig(null);
+    App.prototype.remove = function () {
+        console.log("removed");
+        console.log(this.ds.remove(this.gridConnector.getSelection().getSelectedRows()));
     };
-
-    App.prototype.load = function load() {
-      this.gridConnector.setColConfig(this.columns);
+    App.prototype.refresh = function (x) {
+        var _this = this;
+        if (x) {
+            this.dummyDataGenerator.generateData(x, function (data) {
+                _this.collection = data;
+                _this.ds.refresh(_this.collection);
+            });
+        }
+        else {
+            this.ds.refresh();
+        }
     };
-
-    App.prototype.save = function save() {
-      this.columns = this.gridConnector.getColConfig();
+    App.prototype.add = function (x) {
+        var _this = this;
+        this.dummyDataGenerator.generateData(x, function (data) {
+            _this.ds.push(data);
+        });
     };
-
+    App.prototype.default = function () {
+        this.gridConnector.setColConfig(null);
+    };
+    App.prototype.load = function () {
+        this.gridConnector.setColConfig(this.columns);
+    };
+    App.prototype.save = function () {
+        this.columns = this.gridConnector.getColConfig();
+    };
     return App;
-  }();
+}());
+exports.App = App;
+//# sourceMappingURL=app.js.map
 });
-define('environment',["exports"], function (exports) {
-  "use strict";
+___scope___.file("data/dummyDataGenerator.js", function(exports, require, module, __filename, __dirname){
 
-  Object.defineProperty(exports, "__esModule", {
-    value: true
-  });
-  exports.default = {
-    debug: true,
-    testing: true
-  };
-});
-define('main',['exports', './environment'], function (exports, _environment) {
-  'use strict';
-
-  Object.defineProperty(exports, "__esModule", {
-    value: true
-  });
-  exports.configure = configure;
-
-  var _environment2 = _interopRequireDefault(_environment);
-
-  function _interopRequireDefault(obj) {
-    return obj && obj.__esModule ? obj : {
-      default: obj
+Object.defineProperty(exports, "__esModule", { value: true });
+var data_1 = require("./data");
+var DummyDataGenerator = (function () {
+    function DummyDataGenerator() {
+        this.totalGenerated = 0;
+        this.internalDataArray = data_1.data;
+        this.index = [];
+        this.name = [];
+        this.first = [];
+        this.last = [];
+        this.images = [];
+        this.expanded = [];
+        this.guid = [];
+        this.integer = [];
+        this.shortText = [];
+        this.expanded = [];
+        this.date = [];
+        this.shortText = [];
+        this.mediumText = [];
+        this.longText = [];
+        this.address = [];
+        this.guid = [];
+        this.city = [];
+        this.state = [];
+        this.zip = [];
+        this.country = [];
+        this.email = [];
+        this.phone = [];
+        this.color = [];
+        this.number = [];
+        this.bool = [];
+        for (var i = 0; i < this.internalDataArray.length; i++) {
+            this.index.push(this.internalDataArray[i].index);
+            this.name.push(this.internalDataArray[i].name);
+            this.first.push(this.internalDataArray[i].first);
+            this.last.push(this.internalDataArray[i].last);
+            this.images.push(this.internalDataArray[i].image);
+            this.expanded.push(this.internalDataArray[i].expanded);
+            this.guid.push(this.internalDataArray[i].guid);
+            this.integer.push(this.internalDataArray[i].integer);
+            this.shortText.push(this.internalDataArray[i].shortText);
+            this.expanded.push(this.internalDataArray[i].expanded);
+            this.date.push(new Date(this.internalDataArray[i].date));
+            this.shortText.push(this.internalDataArray[i].shortText);
+            this.mediumText.push(this.internalDataArray[i].mediumText);
+            this.longText.push(this.internalDataArray[i].longText);
+            this.address.push(this.internalDataArray[i].address);
+            this.guid.push(this.internalDataArray[i].guid);
+            this.city.push(this.internalDataArray[i].city);
+            this.state.push(this.internalDataArray[i].state);
+            this.zip.push(this.internalDataArray[i].zip);
+            this.country.push(this.internalDataArray[i].country);
+            this.email.push(this.internalDataArray[i].email);
+            this.phone.push(this.internalDataArray[i].phone);
+            this.color.push(this.internalDataArray[i].color);
+            this.number.push(1 * ((Math.floor(Math.random() * 500) + 0) + "." + (Math.floor(Math.random() * 500) + 0)));
+        }
+    }
+    DummyDataGenerator.prototype.reset = function () {
+        this.totalGenerated = 0;
     };
-  }
-
-  Promise.config({
-    warnings: {
-      wForgottenReturn: false
-    }
-  });
-
-  function configure(aurelia) {
-    aurelia.use.standardConfiguration().plugin('aurelia-v-grid').feature('resources');
-
-    if (_environment2.default.debug) {
-      aurelia.use.developmentLogging();
-    }
-
-    if (_environment2.default.testing) {
-      aurelia.use.plugin('aurelia-testing');
-    }
-
-    aurelia.start().then(function () {
-      return aurelia.setRoot();
-    });
-  }
+    DummyDataGenerator.prototype.generateData = function (number, callback) {
+        var dummyArray = [];
+        for (var i = 0; i < number; i++) {
+            this.totalGenerated++;
+            var random1 = Math.floor(Math.random() * 500) + 0;
+            var random2 = Math.floor(Math.random() * 500) + 0;
+            var random3 = Math.floor(Math.random() * 500) + 0;
+            var random4 = Math.floor(Math.random() * 500) + 0;
+            var random5 = Math.floor(Math.random() * 500) + 0;
+            var x = 'high';
+            if (random2 > 50) {
+                x = 'very low';
+            }
+            if (random2 > 100) {
+                x = 'low';
+            }
+            if (random2 > 250) {
+                x = 'normal';
+            }
+            if (random2 > 400) {
+                x = 'high';
+            }
+            dummyArray.push({
+                "index": this.totalGenerated,
+                "name": this.first[random2] + " " + this.last[random3],
+                "first": this.first[random2],
+                "last": this.last[random3],
+                "images": this.images[random4],
+                "expanded": this.expanded[random5],
+                "guid": this.guid[random1],
+                "integer": this.integer[random2],
+                "date": this.date[random3],
+                "shortText": this.shortText[random4],
+                "mediumText": this.mediumText[random5],
+                "longText": this.longText[random1],
+                "address": this.address[random2],
+                "city": this.city[random3],
+                "state": this.state[random4],
+                "zip": this.zip[random5],
+                "country": this.country[random1],
+                "email": this.email[random2],
+                "phone": this.phone[random3],
+                "color": this.color[random4],
+                "number": this.number[random4],
+                'bool': random1 % 3 ? true : false,
+                'gender': random1 % 2 === 0 ? 'male' : 'female',
+                'high': x
+            });
+        }
+        callback(dummyArray);
+    };
+    return DummyDataGenerator;
+}());
+exports.DummyDataGenerator = DummyDataGenerator;
+//# sourceMappingURL=dummyDataGenerator.js.map
 });
-define('data/data',["exports"], function (exports) {
-    "use strict";
+___scope___.file("data/data.js", function(exports, require, module, __filename, __dirname){
 
-    Object.defineProperty(exports, "__esModule", {
-        value: true
-    });
-    var data = exports.data = [{
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.data = [
+    {
         "index": 0,
         "name": "Liz Grimes",
         "first": "Isabel",
@@ -169,7 +236,8 @@ define('data/data',["exports"], function (exports) {
         "email": "isabelconrad@scentric.com",
         "phone": "(817) 426-2901",
         "color": "rgb(76,120,108)"
-    }, {
+    },
+    {
         "index": 1,
         "name": "Frazier Lara",
         "first": "Jocelyn",
@@ -190,7 +258,8 @@ define('data/data',["exports"], function (exports) {
         "email": "jocelynwooten@scentric.com",
         "phone": "(901) 441-2582",
         "color": "rgb(134,91,60)"
-    }, {
+    },
+    {
         "index": 2,
         "name": "Dora Griffith",
         "first": "Valentine",
@@ -211,7 +280,8 @@ define('data/data',["exports"], function (exports) {
         "email": "valentinemeyer@scentric.com",
         "phone": "(956) 428-2996",
         "color": "rgb(201,142,97)"
-    }, {
+    },
+    {
         "index": 3,
         "name": "Shelley Molina",
         "first": "Silva",
@@ -232,7 +302,8 @@ define('data/data',["exports"], function (exports) {
         "email": "silvaalexander@scentric.com",
         "phone": "(823) 415-2224",
         "color": "rgb(113,105,251)"
-    }, {
+    },
+    {
         "index": 4,
         "name": "Rita Lopez",
         "first": "Hopkins",
@@ -253,7 +324,8 @@ define('data/data',["exports"], function (exports) {
         "email": "hopkinswong@scentric.com",
         "phone": "(814) 488-2063",
         "color": "rgb(133,126,66)"
-    }, {
+    },
+    {
         "index": 5,
         "name": "Wagner Shelton",
         "first": "Harriet",
@@ -274,7 +346,8 @@ define('data/data',["exports"], function (exports) {
         "email": "harrietsherman@scentric.com",
         "phone": "(887) 497-3612",
         "color": "rgb(195,89,110)"
-    }, {
+    },
+    {
         "index": 6,
         "name": "Bethany Adkins",
         "first": "Stacie",
@@ -295,7 +368,8 @@ define('data/data',["exports"], function (exports) {
         "email": "staciebartlett@scentric.com",
         "phone": "(957) 412-3261",
         "color": "rgb(164,84,221)"
-    }, {
+    },
+    {
         "index": 7,
         "name": "Angelia Rowe",
         "first": "Charlene",
@@ -316,7 +390,8 @@ define('data/data',["exports"], function (exports) {
         "email": "charlenestevens@scentric.com",
         "phone": "(946) 404-2511",
         "color": "rgb(99,147,74)"
-    }, {
+    },
+    {
         "index": 8,
         "name": "Knox Rivers",
         "first": "Reyes",
@@ -337,7 +412,8 @@ define('data/data',["exports"], function (exports) {
         "email": "reyeshartman@scentric.com",
         "phone": "(910) 533-3832",
         "color": "rgb(99,55,193)"
-    }, {
+    },
+    {
         "index": 9,
         "name": "Warren Scott",
         "first": "Alissa",
@@ -358,7 +434,8 @@ define('data/data',["exports"], function (exports) {
         "email": "alissaduncan@scentric.com",
         "phone": "(876) 584-3746",
         "color": "rgb(218,58,52)"
-    }, {
+    },
+    {
         "index": 10,
         "name": "Mai Shepherd",
         "first": "Christina",
@@ -379,7 +456,8 @@ define('data/data',["exports"], function (exports) {
         "email": "christinacraft@scentric.com",
         "phone": "(842) 503-2389",
         "color": "rgb(181,253,141)"
-    }, {
+    },
+    {
         "index": 11,
         "name": "Flora Tran",
         "first": "Burt",
@@ -400,7 +478,8 @@ define('data/data',["exports"], function (exports) {
         "email": "burtlandry@scentric.com",
         "phone": "(914) 461-3510",
         "color": "rgb(95,147,193)"
-    }, {
+    },
+    {
         "index": 12,
         "name": "Crawford Jordan",
         "first": "Baldwin",
@@ -421,7 +500,8 @@ define('data/data',["exports"], function (exports) {
         "email": "baldwinhammond@scentric.com",
         "phone": "(800) 559-2165",
         "color": "rgb(175,176,59)"
-    }, {
+    },
+    {
         "index": 13,
         "name": "Stanley Williams",
         "first": "Laverne",
@@ -442,7 +522,8 @@ define('data/data',["exports"], function (exports) {
         "email": "lavernehampton@scentric.com",
         "phone": "(988) 478-3842",
         "color": "rgb(225,78,134)"
-    }, {
+    },
+    {
         "index": 14,
         "name": "Key Keith",
         "first": "Kirsten",
@@ -463,7 +544,8 @@ define('data/data',["exports"], function (exports) {
         "email": "kirstenchang@scentric.com",
         "phone": "(882) 531-2818",
         "color": "rgb(118,83,134)"
-    }, {
+    },
+    {
         "index": 15,
         "name": "Lizzie Oneal",
         "first": "Mercado",
@@ -484,7 +566,8 @@ define('data/data',["exports"], function (exports) {
         "email": "mercadohancock@scentric.com",
         "phone": "(996) 557-3624",
         "color": "rgb(244,178,231)"
-    }, {
+    },
+    {
         "index": 16,
         "name": "Bentley Guthrie",
         "first": "Obrien",
@@ -505,7 +588,8 @@ define('data/data',["exports"], function (exports) {
         "email": "obrienbruce@scentric.com",
         "phone": "(923) 461-2312",
         "color": "rgb(52,103,133)"
-    }, {
+    },
+    {
         "index": 17,
         "name": "Marsh Cleveland",
         "first": "Pearl",
@@ -526,7 +610,8 @@ define('data/data',["exports"], function (exports) {
         "email": "pearlmoran@scentric.com",
         "phone": "(964) 543-3486",
         "color": "rgb(168,119,234)"
-    }, {
+    },
+    {
         "index": 18,
         "name": "Maude Perry",
         "first": "Underwood",
@@ -547,7 +632,8 @@ define('data/data',["exports"], function (exports) {
         "email": "underwoodbarton@scentric.com",
         "phone": "(946) 414-3492",
         "color": "rgb(112,197,153)"
-    }, {
+    },
+    {
         "index": 19,
         "name": "Knapp Pratt",
         "first": "Solomon",
@@ -568,7 +654,8 @@ define('data/data',["exports"], function (exports) {
         "email": "solomonlloyd@scentric.com",
         "phone": "(802) 539-3360",
         "color": "rgb(69,68,176)"
-    }, {
+    },
+    {
         "index": 20,
         "name": "Jodi Tanner",
         "first": "Lyons",
@@ -589,7 +676,8 @@ define('data/data',["exports"], function (exports) {
         "email": "lyonsstevenson@scentric.com",
         "phone": "(818) 424-2348",
         "color": "rgb(178,99,182)"
-    }, {
+    },
+    {
         "index": 21,
         "name": "Mamie Crane",
         "first": "Swanson",
@@ -610,7 +698,8 @@ define('data/data',["exports"], function (exports) {
         "email": "swansonrichardson@scentric.com",
         "phone": "(810) 406-3416",
         "color": "rgb(230,107,202)"
-    }, {
+    },
+    {
         "index": 22,
         "name": "Cooley Macdonald",
         "first": "Aida",
@@ -631,7 +720,8 @@ define('data/data',["exports"], function (exports) {
         "email": "aidahurley@scentric.com",
         "phone": "(975) 451-3272",
         "color": "rgb(119,239,85)"
-    }, {
+    },
+    {
         "index": 23,
         "name": "Snow Blankenship",
         "first": "Mccormick",
@@ -652,7 +742,8 @@ define('data/data',["exports"], function (exports) {
         "email": "mccormickjensen@scentric.com",
         "phone": "(961) 443-3343",
         "color": "rgb(204,198,130)"
-    }, {
+    },
+    {
         "index": 24,
         "name": "Gabriela Brock",
         "first": "Ramona",
@@ -673,7 +764,8 @@ define('data/data',["exports"], function (exports) {
         "email": "ramonameyers@scentric.com",
         "phone": "(839) 591-3993",
         "color": "rgb(236,222,59)"
-    }, {
+    },
+    {
         "index": 25,
         "name": "Graciela Orr",
         "first": "Sharp",
@@ -694,7 +786,8 @@ define('data/data',["exports"], function (exports) {
         "email": "sharplindsay@scentric.com",
         "phone": "(852) 538-3232",
         "color": "rgb(218,74,95)"
-    }, {
+    },
+    {
         "index": 26,
         "name": "Ethel Wood",
         "first": "Dina",
@@ -715,7 +808,8 @@ define('data/data',["exports"], function (exports) {
         "email": "dinarobbins@scentric.com",
         "phone": "(967) 410-2522",
         "color": "rgb(158,62,57)"
-    }, {
+    },
+    {
         "index": 27,
         "name": "Tameka Francis",
         "first": "Franco",
@@ -736,7 +830,8 @@ define('data/data',["exports"], function (exports) {
         "email": "francocarrillo@scentric.com",
         "phone": "(812) 540-2032",
         "color": "rgb(89,84,186)"
-    }, {
+    },
+    {
         "index": 28,
         "name": "Hendricks Levy",
         "first": "Guadalupe",
@@ -757,7 +852,8 @@ define('data/data',["exports"], function (exports) {
         "email": "guadalupeodom@scentric.com",
         "phone": "(902) 544-3976",
         "color": "rgb(180,227,238)"
-    }, {
+    },
+    {
         "index": 29,
         "name": "Porter Mcpherson",
         "first": "Mcguire",
@@ -778,7 +874,8 @@ define('data/data',["exports"], function (exports) {
         "email": "mcguirekerr@scentric.com",
         "phone": "(812) 545-2648",
         "color": "rgb(122,207,233)"
-    }, {
+    },
+    {
         "index": 30,
         "name": "Rosalie Noble",
         "first": "Giles",
@@ -799,7 +896,8 @@ define('data/data',["exports"], function (exports) {
         "email": "gilesmiller@scentric.com",
         "phone": "(937) 481-3812",
         "color": "rgb(117,82,141)"
-    }, {
+    },
+    {
         "index": 31,
         "name": "Katrina Stuart",
         "first": "Norton",
@@ -820,7 +918,8 @@ define('data/data',["exports"], function (exports) {
         "email": "nortoncarr@scentric.com",
         "phone": "(807) 556-3727",
         "color": "rgb(189,210,164)"
-    }, {
+    },
+    {
         "index": 32,
         "name": "Katy Guzman",
         "first": "Marcie",
@@ -841,7 +940,8 @@ define('data/data',["exports"], function (exports) {
         "email": "marcierose@scentric.com",
         "phone": "(968) 546-3854",
         "color": "rgb(211,242,218)"
-    }, {
+    },
+    {
         "index": 33,
         "name": "Lindsay Vega",
         "first": "Loraine",
@@ -862,7 +962,8 @@ define('data/data',["exports"], function (exports) {
         "email": "lorainecastro@scentric.com",
         "phone": "(816) 465-3014",
         "color": "rgb(76,135,180)"
-    }, {
+    },
+    {
         "index": 34,
         "name": "Hughes Flynn",
         "first": "Fry",
@@ -883,7 +984,8 @@ define('data/data',["exports"], function (exports) {
         "email": "fryharmon@scentric.com",
         "phone": "(810) 510-3744",
         "color": "rgb(157,152,156)"
-    }, {
+    },
+    {
         "index": 35,
         "name": "Massey Merritt",
         "first": "Cooper",
@@ -904,7 +1006,8 @@ define('data/data',["exports"], function (exports) {
         "email": "coopersampson@scentric.com",
         "phone": "(982) 438-3850",
         "color": "rgb(248,164,122)"
-    }, {
+    },
+    {
         "index": 36,
         "name": "Estelle Owen",
         "first": "Rosa",
@@ -925,7 +1028,8 @@ define('data/data',["exports"], function (exports) {
         "email": "rosavelazquez@scentric.com",
         "phone": "(887) 500-3974",
         "color": "rgb(112,251,244)"
-    }, {
+    },
+    {
         "index": 37,
         "name": "Jamie Clarke",
         "first": "Claire",
@@ -946,7 +1050,8 @@ define('data/data',["exports"], function (exports) {
         "email": "clairejefferson@scentric.com",
         "phone": "(897) 481-2359",
         "color": "rgb(219,64,230)"
-    }, {
+    },
+    {
         "index": 38,
         "name": "Louella Vincent",
         "first": "Frieda",
@@ -967,7 +1072,8 @@ define('data/data',["exports"], function (exports) {
         "email": "friedabutler@scentric.com",
         "phone": "(867) 520-2422",
         "color": "rgb(159,133,82)"
-    }, {
+    },
+    {
         "index": 39,
         "name": "Schultz Rosario",
         "first": "Juliana",
@@ -988,7 +1094,8 @@ define('data/data',["exports"], function (exports) {
         "email": "julianagutierrez@scentric.com",
         "phone": "(968) 541-2220",
         "color": "rgb(102,250,175)"
-    }, {
+    },
+    {
         "index": 40,
         "name": "April Mejia",
         "first": "Mallory",
@@ -1009,7 +1116,8 @@ define('data/data',["exports"], function (exports) {
         "email": "mallorygross@scentric.com",
         "phone": "(822) 493-3031",
         "color": "rgb(161,51,155)"
-    }, {
+    },
+    {
         "index": 41,
         "name": "Vicki Phelps",
         "first": "Elsie",
@@ -1030,7 +1138,8 @@ define('data/data',["exports"], function (exports) {
         "email": "elsiehahn@scentric.com",
         "phone": "(821) 517-2066",
         "color": "rgb(63,164,79)"
-    }, {
+    },
+    {
         "index": 42,
         "name": "Faulkner Mcdaniel",
         "first": "Hayes",
@@ -1051,7 +1160,8 @@ define('data/data',["exports"], function (exports) {
         "email": "hayesball@scentric.com",
         "phone": "(875) 561-3839",
         "color": "rgb(215,92,182)"
-    }, {
+    },
+    {
         "index": 43,
         "name": "Wilson Booth",
         "first": "Baker",
@@ -1072,7 +1182,8 @@ define('data/data',["exports"], function (exports) {
         "email": "bakerslater@scentric.com",
         "phone": "(980) 527-2867",
         "color": "rgb(98,119,186)"
-    }, {
+    },
+    {
         "index": 44,
         "name": "Galloway Michael",
         "first": "Martha",
@@ -1093,7 +1204,8 @@ define('data/data',["exports"], function (exports) {
         "email": "marthaknight@scentric.com",
         "phone": "(893) 423-2241",
         "color": "rgb(87,159,93)"
-    }, {
+    },
+    {
         "index": 45,
         "name": "Mcintosh Evans",
         "first": "Slater",
@@ -1114,7 +1226,8 @@ define('data/data',["exports"], function (exports) {
         "email": "slatererickson@scentric.com",
         "phone": "(916) 568-2718",
         "color": "rgb(61,216,133)"
-    }, {
+    },
+    {
         "index": 46,
         "name": "Garrison Conway",
         "first": "Beck",
@@ -1135,7 +1248,8 @@ define('data/data',["exports"], function (exports) {
         "email": "beckpotts@scentric.com",
         "phone": "(865) 596-2021",
         "color": "rgb(156,172,221)"
-    }, {
+    },
+    {
         "index": 47,
         "name": "Hopper Anthony",
         "first": "Pugh",
@@ -1156,7 +1270,8 @@ define('data/data',["exports"], function (exports) {
         "email": "pughdouglas@scentric.com",
         "phone": "(829) 562-3502",
         "color": "rgb(70,112,74)"
-    }, {
+    },
+    {
         "index": 48,
         "name": "Edwina Wiley",
         "first": "Margo",
@@ -1177,7 +1292,8 @@ define('data/data',["exports"], function (exports) {
         "email": "margohodges@scentric.com",
         "phone": "(852) 558-3074",
         "color": "rgb(56,222,148)"
-    }, {
+    },
+    {
         "index": 49,
         "name": "Salazar Nolan",
         "first": "Polly",
@@ -1198,7 +1314,8 @@ define('data/data',["exports"], function (exports) {
         "email": "pollymitchell@scentric.com",
         "phone": "(891) 598-2904",
         "color": "rgb(119,240,183)"
-    }, {
+    },
+    {
         "index": 50,
         "name": "Pat Delgado",
         "first": "Brown",
@@ -1219,7 +1336,8 @@ define('data/data',["exports"], function (exports) {
         "email": "brownperkins@scentric.com",
         "phone": "(908) 488-3939",
         "color": "rgb(100,214,126)"
-    }, {
+    },
+    {
         "index": 51,
         "name": "York Marks",
         "first": "Janette",
@@ -1240,7 +1358,8 @@ define('data/data',["exports"], function (exports) {
         "email": "janettecherry@scentric.com",
         "phone": "(828) 500-2593",
         "color": "rgb(100,221,172)"
-    }, {
+    },
+    {
         "index": 52,
         "name": "Wilkinson Nelson",
         "first": "Florine",
@@ -1261,7 +1380,8 @@ define('data/data',["exports"], function (exports) {
         "email": "florinehobbs@scentric.com",
         "phone": "(869) 544-3589",
         "color": "rgb(208,253,152)"
-    }, {
+    },
+    {
         "index": 53,
         "name": "Alta Wright",
         "first": "Farley",
@@ -1282,7 +1402,8 @@ define('data/data',["exports"], function (exports) {
         "email": "farleysantos@scentric.com",
         "phone": "(808) 507-2955",
         "color": "rgb(143,68,160)"
-    }, {
+    },
+    {
         "index": 54,
         "name": "Ivy Sparks",
         "first": "Gray",
@@ -1303,7 +1424,8 @@ define('data/data',["exports"], function (exports) {
         "email": "graypaul@scentric.com",
         "phone": "(896) 543-3314",
         "color": "rgb(180,93,104)"
-    }, {
+    },
+    {
         "index": 55,
         "name": "Henrietta Riddle",
         "first": "Roman",
@@ -1324,7 +1446,8 @@ define('data/data',["exports"], function (exports) {
         "email": "romandunlap@scentric.com",
         "phone": "(852) 477-2611",
         "color": "rgb(73,51,135)"
-    }, {
+    },
+    {
         "index": 56,
         "name": "Odom Hicks",
         "first": "Meyer",
@@ -1345,7 +1468,8 @@ define('data/data',["exports"], function (exports) {
         "email": "meyerblackburn@scentric.com",
         "phone": "(812) 415-2585",
         "color": "rgb(132,80,57)"
-    }, {
+    },
+    {
         "index": 57,
         "name": "Dalton Bishop",
         "first": "Schwartz",
@@ -1366,7 +1490,8 @@ define('data/data',["exports"], function (exports) {
         "email": "schwartzgarcia@scentric.com",
         "phone": "(890) 442-3503",
         "color": "rgb(97,239,223)"
-    }, {
+    },
+    {
         "index": 58,
         "name": "Adela Key",
         "first": "Thornton",
@@ -1387,7 +1512,8 @@ define('data/data',["exports"], function (exports) {
         "email": "thorntonsykes@scentric.com",
         "phone": "(895) 528-2574",
         "color": "rgb(134,86,134)"
-    }, {
+    },
+    {
         "index": 59,
         "name": "Church Walls",
         "first": "Webb",
@@ -1408,7 +1534,8 @@ define('data/data',["exports"], function (exports) {
         "email": "webbmaddox@scentric.com",
         "phone": "(944) 564-2803",
         "color": "rgb(162,85,229)"
-    }, {
+    },
+    {
         "index": 60,
         "name": "Kristi Crosby",
         "first": "Cathleen",
@@ -1429,7 +1556,8 @@ define('data/data',["exports"], function (exports) {
         "email": "cathleennichols@scentric.com",
         "phone": "(963) 428-3124",
         "color": "rgb(237,75,179)"
-    }, {
+    },
+    {
         "index": 61,
         "name": "Winnie Coleman",
         "first": "Ila",
@@ -1450,7 +1578,8 @@ define('data/data',["exports"], function (exports) {
         "email": "ilabentley@scentric.com",
         "phone": "(947) 456-2663",
         "color": "rgb(77,78,128)"
-    }, {
+    },
+    {
         "index": 62,
         "name": "Clemons Chen",
         "first": "Warner",
@@ -1471,7 +1600,8 @@ define('data/data',["exports"], function (exports) {
         "email": "warnerblair@scentric.com",
         "phone": "(811) 480-2342",
         "color": "rgb(88,244,211)"
-    }, {
+    },
+    {
         "index": 63,
         "name": "Marcy William",
         "first": "Garcia",
@@ -1492,7 +1622,8 @@ define('data/data',["exports"], function (exports) {
         "email": "garciacarter@scentric.com",
         "phone": "(838) 400-3578",
         "color": "rgb(238,146,141)"
-    }, {
+    },
+    {
         "index": 64,
         "name": "Saunders Tyler",
         "first": "Bowen",
@@ -1513,7 +1644,8 @@ define('data/data',["exports"], function (exports) {
         "email": "bowenolson@scentric.com",
         "phone": "(895) 420-2620",
         "color": "rgb(71,127,188)"
-    }, {
+    },
+    {
         "index": 65,
         "name": "Landry Hendricks",
         "first": "Kidd",
@@ -1534,7 +1666,8 @@ define('data/data',["exports"], function (exports) {
         "email": "kiddsanders@scentric.com",
         "phone": "(857) 415-3707",
         "color": "rgb(205,180,193)"
-    }, {
+    },
+    {
         "index": 66,
         "name": "Hogan Strickland",
         "first": "Deanne",
@@ -1555,7 +1688,8 @@ define('data/data',["exports"], function (exports) {
         "email": "deannecasey@scentric.com",
         "phone": "(935) 548-2580",
         "color": "rgb(106,182,101)"
-    }, {
+    },
+    {
         "index": 67,
         "name": "Hart Carlson",
         "first": "Hardin",
@@ -1576,7 +1710,8 @@ define('data/data',["exports"], function (exports) {
         "email": "hardinthornton@scentric.com",
         "phone": "(905) 466-2231",
         "color": "rgb(145,123,64)"
-    }, {
+    },
+    {
         "index": 68,
         "name": "Benita Lester",
         "first": "Taylor",
@@ -1597,7 +1732,8 @@ define('data/data',["exports"], function (exports) {
         "email": "taylorirwin@scentric.com",
         "phone": "(898) 517-3041",
         "color": "rgb(85,97,125)"
-    }, {
+    },
+    {
         "index": 69,
         "name": "Cantu Owens",
         "first": "Stone",
@@ -1618,7 +1754,8 @@ define('data/data',["exports"], function (exports) {
         "email": "stonewatson@scentric.com",
         "phone": "(867) 474-2146",
         "color": "rgb(96,110,114)"
-    }, {
+    },
+    {
         "index": 70,
         "name": "Colon Jarvis",
         "first": "Avery",
@@ -1639,7 +1776,8 @@ define('data/data',["exports"], function (exports) {
         "email": "averyknox@scentric.com",
         "phone": "(851) 582-2204",
         "color": "rgb(122,179,117)"
-    }, {
+    },
+    {
         "index": 71,
         "name": "Ratliff Kline",
         "first": "Cathryn",
@@ -1660,7 +1798,8 @@ define('data/data',["exports"], function (exports) {
         "email": "cathrynrodgers@scentric.com",
         "phone": "(819) 482-2099",
         "color": "rgb(177,117,238)"
-    }, {
+    },
+    {
         "index": 72,
         "name": "Burgess Mcconnell",
         "first": "Head",
@@ -1681,7 +1820,8 @@ define('data/data',["exports"], function (exports) {
         "email": "headcohen@scentric.com",
         "phone": "(930) 570-3544",
         "color": "rgb(151,112,173)"
-    }, {
+    },
+    {
         "index": 73,
         "name": "Roberta Bond",
         "first": "Simone",
@@ -1702,7 +1842,8 @@ define('data/data',["exports"], function (exports) {
         "email": "simonewhitfield@scentric.com",
         "phone": "(959) 575-3680",
         "color": "rgb(205,221,178)"
-    }, {
+    },
+    {
         "index": 74,
         "name": "Sara Mckay",
         "first": "Sue",
@@ -1723,7 +1864,8 @@ define('data/data',["exports"], function (exports) {
         "email": "suecotton@scentric.com",
         "phone": "(816) 520-2774",
         "color": "rgb(241,214,199)"
-    }, {
+    },
+    {
         "index": 75,
         "name": "Coleman Cook",
         "first": "Olson",
@@ -1744,7 +1886,8 @@ define('data/data',["exports"], function (exports) {
         "email": "olsonburch@scentric.com",
         "phone": "(995) 590-2366",
         "color": "rgb(91,252,80)"
-    }, {
+    },
+    {
         "index": 76,
         "name": "Walton Wagner",
         "first": "Powell",
@@ -1765,7 +1908,8 @@ define('data/data',["exports"], function (exports) {
         "email": "powellnunez@scentric.com",
         "phone": "(992) 548-3878",
         "color": "rgb(95,253,239)"
-    }, {
+    },
+    {
         "index": 77,
         "name": "Harris Ewing",
         "first": "Orr",
@@ -1786,7 +1930,8 @@ define('data/data',["exports"], function (exports) {
         "email": "orrbuchanan@scentric.com",
         "phone": "(861) 535-2683",
         "color": "rgb(162,149,148)"
-    }, {
+    },
+    {
         "index": 78,
         "name": "Kerr Briggs",
         "first": "Helena",
@@ -1807,7 +1952,8 @@ define('data/data',["exports"], function (exports) {
         "email": "helenalynch@scentric.com",
         "phone": "(880) 590-3786",
         "color": "rgb(192,101,57)"
-    }, {
+    },
+    {
         "index": 79,
         "name": "Genevieve Mooney",
         "first": "Beatriz",
@@ -1828,7 +1974,8 @@ define('data/data',["exports"], function (exports) {
         "email": "beatrizcase@scentric.com",
         "phone": "(868) 586-2207",
         "color": "rgb(127,85,140)"
-    }, {
+    },
+    {
         "index": 80,
         "name": "Heidi Dillon",
         "first": "Jenifer",
@@ -1849,7 +1996,8 @@ define('data/data',["exports"], function (exports) {
         "email": "jenifercontreras@scentric.com",
         "phone": "(886) 401-2897",
         "color": "rgb(103,86,175)"
-    }, {
+    },
+    {
         "index": 81,
         "name": "Morrow Hendrix",
         "first": "Pittman",
@@ -1870,7 +2018,8 @@ define('data/data',["exports"], function (exports) {
         "email": "pittmanpowers@scentric.com",
         "phone": "(814) 551-2487",
         "color": "rgb(194,148,221)"
-    }, {
+    },
+    {
         "index": 82,
         "name": "Cook Espinoza",
         "first": "Kelli",
@@ -1891,7 +2040,8 @@ define('data/data',["exports"], function (exports) {
         "email": "kelligallagher@scentric.com",
         "phone": "(865) 413-3195",
         "color": "rgb(105,173,239)"
-    }, {
+    },
+    {
         "index": 83,
         "name": "Mari Nguyen",
         "first": "Moss",
@@ -1912,7 +2062,8 @@ define('data/data',["exports"], function (exports) {
         "email": "mossenglish@scentric.com",
         "phone": "(823) 570-2457",
         "color": "rgb(97,59,63)"
-    }, {
+    },
+    {
         "index": 84,
         "name": "Bauer Ruiz",
         "first": "Marcia",
@@ -1933,7 +2084,8 @@ define('data/data',["exports"], function (exports) {
         "email": "marciafarmer@scentric.com",
         "phone": "(836) 524-2616",
         "color": "rgb(169,63,64)"
-    }, {
+    },
+    {
         "index": 85,
         "name": "Ollie Melton",
         "first": "Dennis",
@@ -1954,7 +2106,8 @@ define('data/data',["exports"], function (exports) {
         "email": "dennishill@scentric.com",
         "phone": "(974) 511-2460",
         "color": "rgb(208,193,99)"
-    }, {
+    },
+    {
         "index": 86,
         "name": "Carlson Petty",
         "first": "Miranda",
@@ -1975,7 +2128,8 @@ define('data/data',["exports"], function (exports) {
         "email": "mirandagarner@scentric.com",
         "phone": "(989) 558-3766",
         "color": "rgb(201,116,189)"
-    }, {
+    },
+    {
         "index": 87,
         "name": "Randolph Lewis",
         "first": "Isabella",
@@ -1996,7 +2150,8 @@ define('data/data',["exports"], function (exports) {
         "email": "isabellafry@scentric.com",
         "phone": "(974) 558-2625",
         "color": "rgb(220,182,202)"
-    }, {
+    },
+    {
         "index": 88,
         "name": "Daniel Foley",
         "first": "Stephens",
@@ -2017,7 +2172,8 @@ define('data/data',["exports"], function (exports) {
         "email": "stephensbender@scentric.com",
         "phone": "(929) 559-3077",
         "color": "rgb(214,117,159)"
-    }, {
+    },
+    {
         "index": 89,
         "name": "Morales Mays",
         "first": "Tracie",
@@ -2038,7 +2194,8 @@ define('data/data',["exports"], function (exports) {
         "email": "traciepate@scentric.com",
         "phone": "(967) 595-3876",
         "color": "rgb(140,217,62)"
-    }, {
+    },
+    {
         "index": 90,
         "name": "Christie Cobb",
         "first": "Georgina",
@@ -2059,7 +2216,8 @@ define('data/data',["exports"], function (exports) {
         "email": "georginacardenas@scentric.com",
         "phone": "(917) 515-3962",
         "color": "rgb(108,88,246)"
-    }, {
+    },
+    {
         "index": 91,
         "name": "Kellie Cummings",
         "first": "Carissa",
@@ -2080,7 +2238,8 @@ define('data/data',["exports"], function (exports) {
         "email": "carissacastillo@scentric.com",
         "phone": "(902) 528-2051",
         "color": "rgb(116,122,170)"
-    }, {
+    },
+    {
         "index": 92,
         "name": "Hooper Acosta",
         "first": "Delacruz",
@@ -2101,7 +2260,8 @@ define('data/data',["exports"], function (exports) {
         "email": "delacruzhunt@scentric.com",
         "phone": "(928) 557-3052",
         "color": "rgb(207,106,189)"
-    }, {
+    },
+    {
         "index": 93,
         "name": "Leonor Rogers",
         "first": "Claudette",
@@ -2122,7 +2282,8 @@ define('data/data',["exports"], function (exports) {
         "email": "claudettewalters@scentric.com",
         "phone": "(942) 474-3822",
         "color": "rgb(90,63,99)"
-    }, {
+    },
+    {
         "index": 94,
         "name": "Cote Guerra",
         "first": "Trisha",
@@ -2143,7 +2304,8 @@ define('data/data',["exports"], function (exports) {
         "email": "trishachavez@scentric.com",
         "phone": "(986) 580-3064",
         "color": "rgb(252,141,100)"
-    }, {
+    },
+    {
         "index": 95,
         "name": "Stewart Bradley",
         "first": "Desiree",
@@ -2164,7 +2326,8 @@ define('data/data',["exports"], function (exports) {
         "email": "desireesullivan@scentric.com",
         "phone": "(955) 561-2349",
         "color": "rgb(67,224,233)"
-    }, {
+    },
+    {
         "index": 96,
         "name": "Corinne Farley",
         "first": "Guthrie",
@@ -2185,7 +2348,8 @@ define('data/data',["exports"], function (exports) {
         "email": "guthriemay@scentric.com",
         "phone": "(952) 423-2212",
         "color": "rgb(207,250,179)"
-    }, {
+    },
+    {
         "index": 97,
         "name": "Heather Martinez",
         "first": "Althea",
@@ -2206,7 +2370,8 @@ define('data/data',["exports"], function (exports) {
         "email": "altheaquinn@scentric.com",
         "phone": "(997) 529-2688",
         "color": "rgb(175,88,98)"
-    }, {
+    },
+    {
         "index": 98,
         "name": "Good Mathis",
         "first": "Hester",
@@ -2227,7 +2392,8 @@ define('data/data',["exports"], function (exports) {
         "email": "hestersantana@scentric.com",
         "phone": "(802) 512-3640",
         "color": "rgb(253,247,138)"
-    }, {
+    },
+    {
         "index": 99,
         "name": "Hurley Eaton",
         "first": "Garner",
@@ -2248,7 +2414,8 @@ define('data/data',["exports"], function (exports) {
         "email": "garnerkirk@scentric.com",
         "phone": "(901) 504-3233",
         "color": "rgb(141,220,214)"
-    }, {
+    },
+    {
         "index": 100,
         "name": "Ruby Schroeder",
         "first": "Julianne",
@@ -2269,7 +2436,8 @@ define('data/data',["exports"], function (exports) {
         "email": "juliannehurst@scentric.com",
         "phone": "(867) 576-3002",
         "color": "rgb(191,56,212)"
-    }, {
+    },
+    {
         "index": 101,
         "name": "Alana Wise",
         "first": "Edith",
@@ -2290,7 +2458,8 @@ define('data/data',["exports"], function (exports) {
         "email": "edithsuarez@scentric.com",
         "phone": "(920) 452-3377",
         "color": "rgb(69,58,250)"
-    }, {
+    },
+    {
         "index": 102,
         "name": "Kristen Wheeler",
         "first": "Burke",
@@ -2311,7 +2480,8 @@ define('data/data',["exports"], function (exports) {
         "email": "burkebarnes@scentric.com",
         "phone": "(843) 586-2743",
         "color": "rgb(221,72,113)"
-    }, {
+    },
+    {
         "index": 103,
         "name": "Clark Powell",
         "first": "Hahn",
@@ -2332,7 +2502,8 @@ define('data/data',["exports"], function (exports) {
         "email": "hahnlancaster@scentric.com",
         "phone": "(901) 537-3991",
         "color": "rgb(225,104,190)"
-    }, {
+    },
+    {
         "index": 104,
         "name": "Tamra Cox",
         "first": "Acevedo",
@@ -2353,7 +2524,8 @@ define('data/data',["exports"], function (exports) {
         "email": "acevedobell@scentric.com",
         "phone": "(813) 503-2649",
         "color": "rgb(84,124,140)"
-    }, {
+    },
+    {
         "index": 105,
         "name": "Barr Higgins",
         "first": "Tonia",
@@ -2374,7 +2546,8 @@ define('data/data',["exports"], function (exports) {
         "email": "toniawalton@scentric.com",
         "phone": "(889) 461-2741",
         "color": "rgb(116,194,59)"
-    }, {
+    },
+    {
         "index": 106,
         "name": "Hickman Copeland",
         "first": "Ross",
@@ -2395,7 +2568,8 @@ define('data/data',["exports"], function (exports) {
         "email": "rossratliff@scentric.com",
         "phone": "(917) 466-2566",
         "color": "rgb(245,137,240)"
-    }, {
+    },
+    {
         "index": 107,
         "name": "Cervantes Mckee",
         "first": "Vasquez",
@@ -2416,7 +2590,8 @@ define('data/data',["exports"], function (exports) {
         "email": "vasquezknapp@scentric.com",
         "phone": "(889) 408-3991",
         "color": "rgb(212,58,71)"
-    }, {
+    },
+    {
         "index": 108,
         "name": "Juana Melendez",
         "first": "Ford",
@@ -2437,7 +2612,8 @@ define('data/data',["exports"], function (exports) {
         "email": "fordgreer@scentric.com",
         "phone": "(816) 454-3618",
         "color": "rgb(249,251,66)"
-    }, {
+    },
+    {
         "index": 109,
         "name": "Morin Franks",
         "first": "Olive",
@@ -2458,7 +2634,8 @@ define('data/data',["exports"], function (exports) {
         "email": "olivebernard@scentric.com",
         "phone": "(980) 446-2496",
         "color": "rgb(250,59,84)"
-    }, {
+    },
+    {
         "index": 110,
         "name": "Le Frank",
         "first": "Ada",
@@ -2479,7 +2656,8 @@ define('data/data',["exports"], function (exports) {
         "email": "adalove@scentric.com",
         "phone": "(895) 541-3397",
         "color": "rgb(133,191,68)"
-    }, {
+    },
+    {
         "index": 111,
         "name": "Joseph Hooper",
         "first": "Sally",
@@ -2500,7 +2678,8 @@ define('data/data',["exports"], function (exports) {
         "email": "sallyblackwell@scentric.com",
         "phone": "(883) 597-2036",
         "color": "rgb(213,146,224)"
-    }, {
+    },
+    {
         "index": 112,
         "name": "Shepherd Burt",
         "first": "Pansy",
@@ -2521,7 +2700,8 @@ define('data/data',["exports"], function (exports) {
         "email": "pansyyoung@scentric.com",
         "phone": "(938) 478-3164",
         "color": "rgb(190,139,243)"
-    }, {
+    },
+    {
         "index": 113,
         "name": "Brianna Peterson",
         "first": "Carla",
@@ -2542,7 +2722,8 @@ define('data/data',["exports"], function (exports) {
         "email": "carladavidson@scentric.com",
         "phone": "(995) 595-3974",
         "color": "rgb(179,161,85)"
-    }, {
+    },
+    {
         "index": 114,
         "name": "Erica Campbell",
         "first": "Emilia",
@@ -2563,7 +2744,8 @@ define('data/data',["exports"], function (exports) {
         "email": "emiliahernandez@scentric.com",
         "phone": "(922) 599-3995",
         "color": "rgb(101,247,162)"
-    }, {
+    },
+    {
         "index": 115,
         "name": "Sheryl Waller",
         "first": "Martina",
@@ -2584,7 +2766,8 @@ define('data/data',["exports"], function (exports) {
         "email": "martinahebert@scentric.com",
         "phone": "(814) 523-3612",
         "color": "rgb(240,55,85)"
-    }, {
+    },
+    {
         "index": 116,
         "name": "Frances Dalton",
         "first": "Virgie",
@@ -2605,7 +2788,8 @@ define('data/data',["exports"], function (exports) {
         "email": "virgiefuller@scentric.com",
         "phone": "(958) 511-3488",
         "color": "rgb(151,135,52)"
-    }, {
+    },
+    {
         "index": 117,
         "name": "Charity Hall",
         "first": "Mitchell",
@@ -2626,7 +2810,8 @@ define('data/data',["exports"], function (exports) {
         "email": "mitchellwilliamson@scentric.com",
         "phone": "(871) 435-3743",
         "color": "rgb(243,134,198)"
-    }, {
+    },
+    {
         "index": 118,
         "name": "Rodriquez Ferguson",
         "first": "Shannon",
@@ -2647,7 +2832,8 @@ define('data/data',["exports"], function (exports) {
         "email": "shannonmorrow@scentric.com",
         "phone": "(926) 593-2505",
         "color": "rgb(161,59,65)"
-    }, {
+    },
+    {
         "index": 119,
         "name": "Lee Dejesus",
         "first": "Yang",
@@ -2668,7 +2854,8 @@ define('data/data',["exports"], function (exports) {
         "email": "yangwalter@scentric.com",
         "phone": "(821) 518-2276",
         "color": "rgb(56,241,182)"
-    }, {
+    },
+    {
         "index": 120,
         "name": "Wise Cannon",
         "first": "Cobb",
@@ -2689,7 +2876,8 @@ define('data/data',["exports"], function (exports) {
         "email": "cobbfigueroa@scentric.com",
         "phone": "(901) 579-2803",
         "color": "rgb(243,138,133)"
-    }, {
+    },
+    {
         "index": 121,
         "name": "Albert Benjamin",
         "first": "French",
@@ -2710,7 +2898,8 @@ define('data/data',["exports"], function (exports) {
         "email": "frenchhays@scentric.com",
         "phone": "(819) 408-2182",
         "color": "rgb(238,191,114)"
-    }, {
+    },
+    {
         "index": 122,
         "name": "Nona Salinas",
         "first": "Lacey",
@@ -2731,7 +2920,8 @@ define('data/data',["exports"], function (exports) {
         "email": "laceydonaldson@scentric.com",
         "phone": "(977) 552-3200",
         "color": "rgb(51,183,113)"
-    }, {
+    },
+    {
         "index": 123,
         "name": "Karla Downs",
         "first": "Cruz",
@@ -2752,7 +2942,8 @@ define('data/data',["exports"], function (exports) {
         "email": "cruzcolon@scentric.com",
         "phone": "(900) 475-3785",
         "color": "rgb(165,150,188)"
-    }, {
+    },
+    {
         "index": 124,
         "name": "Candace Gonzalez",
         "first": "Debbie",
@@ -2773,7 +2964,8 @@ define('data/data',["exports"], function (exports) {
         "email": "debbiemoody@scentric.com",
         "phone": "(816) 429-3615",
         "color": "rgb(209,130,75)"
-    }, {
+    },
+    {
         "index": 125,
         "name": "Ayers Finley",
         "first": "Janna",
@@ -2794,7 +2986,8 @@ define('data/data',["exports"], function (exports) {
         "email": "jannadonovan@scentric.com",
         "phone": "(953) 514-3535",
         "color": "rgb(140,207,218)"
-    }, {
+    },
+    {
         "index": 126,
         "name": "Winifred Patel",
         "first": "Mckenzie",
@@ -2815,7 +3008,8 @@ define('data/data',["exports"], function (exports) {
         "email": "mckenziesaunders@scentric.com",
         "phone": "(997) 545-3802",
         "color": "rgb(62,238,78)"
-    }, {
+    },
+    {
         "index": 127,
         "name": "Connie Conner",
         "first": "Tracy",
@@ -2836,7 +3030,8 @@ define('data/data',["exports"], function (exports) {
         "email": "tracyyork@scentric.com",
         "phone": "(880) 459-2370",
         "color": "rgb(219,127,211)"
-    }, {
+    },
+    {
         "index": 128,
         "name": "Ladonna Sheppard",
         "first": "Jennie",
@@ -2857,7 +3052,8 @@ define('data/data',["exports"], function (exports) {
         "email": "jennieglenn@scentric.com",
         "phone": "(875) 496-3782",
         "color": "rgb(60,201,252)"
-    }, {
+    },
+    {
         "index": 129,
         "name": "Hancock Justice",
         "first": "Jana",
@@ -2878,7 +3074,8 @@ define('data/data',["exports"], function (exports) {
         "email": "janadaugherty@scentric.com",
         "phone": "(966) 582-2529",
         "color": "rgb(210,84,143)"
-    }, {
+    },
+    {
         "index": 130,
         "name": "Gilda Henry",
         "first": "Graham",
@@ -2899,7 +3096,8 @@ define('data/data',["exports"], function (exports) {
         "email": "grahammoore@scentric.com",
         "phone": "(991) 514-3925",
         "color": "rgb(199,144,145)"
-    }, {
+    },
+    {
         "index": 131,
         "name": "Bates Clements",
         "first": "Hatfield",
@@ -2920,7 +3118,8 @@ define('data/data',["exports"], function (exports) {
         "email": "hatfieldhayden@scentric.com",
         "phone": "(907) 440-2113",
         "color": "rgb(252,242,253)"
-    }, {
+    },
+    {
         "index": 132,
         "name": "Bell Leonard",
         "first": "Leticia",
@@ -2941,7 +3140,8 @@ define('data/data',["exports"], function (exports) {
         "email": "leticiahickman@scentric.com",
         "phone": "(986) 415-3367",
         "color": "rgb(161,161,217)"
-    }, {
+    },
+    {
         "index": 133,
         "name": "Logan Wyatt",
         "first": "Bray",
@@ -2962,7 +3162,8 @@ define('data/data',["exports"], function (exports) {
         "email": "braymathews@scentric.com",
         "phone": "(945) 538-3851",
         "color": "rgb(223,145,248)"
-    }, {
+    },
+    {
         "index": 134,
         "name": "Elva Beard",
         "first": "Riley",
@@ -2983,7 +3184,8 @@ define('data/data',["exports"], function (exports) {
         "email": "rileywallace@scentric.com",
         "phone": "(908) 527-2510",
         "color": "rgb(150,183,57)"
-    }, {
+    },
+    {
         "index": 135,
         "name": "Jeanne Walker",
         "first": "Noemi",
@@ -3004,7 +3206,8 @@ define('data/data',["exports"], function (exports) {
         "email": "noemicastaneda@scentric.com",
         "phone": "(867) 475-2648",
         "color": "rgb(130,190,155)"
-    }, {
+    },
+    {
         "index": 136,
         "name": "Jasmine Talley",
         "first": "Debra",
@@ -3025,7 +3228,8 @@ define('data/data',["exports"], function (exports) {
         "email": "debradunn@scentric.com",
         "phone": "(815) 574-3583",
         "color": "rgb(79,212,186)"
-    }, {
+    },
+    {
         "index": 137,
         "name": "Marquez Stark",
         "first": "Gallegos",
@@ -3046,7 +3250,8 @@ define('data/data',["exports"], function (exports) {
         "email": "gallegosharris@scentric.com",
         "phone": "(994) 597-2534",
         "color": "rgb(67,106,191)"
-    }, {
+    },
+    {
         "index": 138,
         "name": "James Gregory",
         "first": "Davis",
@@ -3067,7 +3272,8 @@ define('data/data',["exports"], function (exports) {
         "email": "davisburton@scentric.com",
         "phone": "(916) 551-3269",
         "color": "rgb(215,141,197)"
-    }, {
+    },
+    {
         "index": 139,
         "name": "Thomas Lowery",
         "first": "Hutchinson",
@@ -3088,7 +3294,8 @@ define('data/data',["exports"], function (exports) {
         "email": "hutchinsonweeks@scentric.com",
         "phone": "(930) 418-3265",
         "color": "rgb(120,254,136)"
-    }, {
+    },
+    {
         "index": 140,
         "name": "Adkins Hanson",
         "first": "Gibson",
@@ -3109,7 +3316,8 @@ define('data/data',["exports"], function (exports) {
         "email": "gibsonchaney@scentric.com",
         "phone": "(973) 550-3569",
         "color": "rgb(147,126,185)"
-    }, {
+    },
+    {
         "index": 141,
         "name": "Catalina Rojas",
         "first": "Angie",
@@ -3130,7 +3338,8 @@ define('data/data',["exports"], function (exports) {
         "email": "angiemcknight@scentric.com",
         "phone": "(852) 571-3576",
         "color": "rgb(180,187,55)"
-    }, {
+    },
+    {
         "index": 142,
         "name": "Waller Rios",
         "first": "Sherri",
@@ -3151,7 +3360,8 @@ define('data/data',["exports"], function (exports) {
         "email": "sherrijones@scentric.com",
         "phone": "(905) 514-2725",
         "color": "rgb(167,172,139)"
-    }, {
+    },
+    {
         "index": 143,
         "name": "Fulton Richmond",
         "first": "Nannie",
@@ -3172,7 +3382,8 @@ define('data/data',["exports"], function (exports) {
         "email": "nanniepreston@scentric.com",
         "phone": "(801) 531-2586",
         "color": "rgb(58,230,86)"
-    }, {
+    },
+    {
         "index": 144,
         "name": "Juanita Mcfadden",
         "first": "Preston",
@@ -3193,7 +3404,8 @@ define('data/data',["exports"], function (exports) {
         "email": "prestonkoch@scentric.com",
         "phone": "(824) 598-3313",
         "color": "rgb(188,204,126)"
-    }, {
+    },
+    {
         "index": 145,
         "name": "Hunter Morin",
         "first": "Aguilar",
@@ -3214,7 +3426,8 @@ define('data/data',["exports"], function (exports) {
         "email": "aguilarwillis@scentric.com",
         "phone": "(878) 446-2425",
         "color": "rgb(137,240,219)"
-    }, {
+    },
+    {
         "index": 146,
         "name": "Kathy Sutton",
         "first": "Kendra",
@@ -3235,7 +3448,8 @@ define('data/data',["exports"], function (exports) {
         "email": "kendrablevins@scentric.com",
         "phone": "(956) 553-2050",
         "color": "rgb(224,79,174)"
-    }, {
+    },
+    {
         "index": 147,
         "name": "Noel Morrison",
         "first": "Puckett",
@@ -3256,7 +3470,8 @@ define('data/data',["exports"], function (exports) {
         "email": "puckettshannon@scentric.com",
         "phone": "(963) 414-2787",
         "color": "rgb(74,128,154)"
-    }, {
+    },
+    {
         "index": 148,
         "name": "Reeves Combs",
         "first": "Trudy",
@@ -3277,7 +3492,8 @@ define('data/data',["exports"], function (exports) {
         "email": "trudynewton@scentric.com",
         "phone": "(873) 577-2869",
         "color": "rgb(219,169,181)"
-    }, {
+    },
+    {
         "index": 149,
         "name": "Oconnor Chan",
         "first": "Beasley",
@@ -3298,7 +3514,8 @@ define('data/data',["exports"], function (exports) {
         "email": "beasleylarson@scentric.com",
         "phone": "(816) 493-2742",
         "color": "rgb(72,189,192)"
-    }, {
+    },
+    {
         "index": 150,
         "name": "Cherry Barrett",
         "first": "Jodie",
@@ -3319,7 +3536,8 @@ define('data/data',["exports"], function (exports) {
         "email": "jodielogan@scentric.com",
         "phone": "(804) 506-3585",
         "color": "rgb(200,139,149)"
-    }, {
+    },
+    {
         "index": 151,
         "name": "Pennington Mccormick",
         "first": "Georgette",
@@ -3340,7 +3558,8 @@ define('data/data',["exports"], function (exports) {
         "email": "georgetteclay@scentric.com",
         "phone": "(941) 573-3108",
         "color": "rgb(166,137,160)"
-    }, {
+    },
+    {
         "index": 152,
         "name": "Freda Coffey",
         "first": "Rice",
@@ -3361,7 +3580,8 @@ define('data/data',["exports"], function (exports) {
         "email": "ricesavage@scentric.com",
         "phone": "(885) 508-3868",
         "color": "rgb(209,117,128)"
-    }, {
+    },
+    {
         "index": 153,
         "name": "Robin Merrill",
         "first": "Harrington",
@@ -3382,7 +3602,8 @@ define('data/data',["exports"], function (exports) {
         "email": "harringtonsimpson@scentric.com",
         "phone": "(920) 448-3636",
         "color": "rgb(166,121,227)"
-    }, {
+    },
+    {
         "index": 154,
         "name": "Petty Olsen",
         "first": "Mcleod",
@@ -3403,7 +3624,8 @@ define('data/data',["exports"], function (exports) {
         "email": "mcleodoliver@scentric.com",
         "phone": "(805) 533-2119",
         "color": "rgb(190,184,203)"
-    }, {
+    },
+    {
         "index": 155,
         "name": "Misty Hardy",
         "first": "Barber",
@@ -3424,7 +3646,8 @@ define('data/data',["exports"], function (exports) {
         "email": "barberboone@scentric.com",
         "phone": "(828) 457-2049",
         "color": "rgb(233,144,205)"
-    }, {
+    },
+    {
         "index": 156,
         "name": "Tessa Ward",
         "first": "Janie",
@@ -3445,7 +3668,8 @@ define('data/data',["exports"], function (exports) {
         "email": "janiebailey@scentric.com",
         "phone": "(949) 462-3512",
         "color": "rgb(159,233,70)"
-    }, {
+    },
+    {
         "index": 157,
         "name": "Wilda Booker",
         "first": "Ramsey",
@@ -3466,7 +3690,8 @@ define('data/data',["exports"], function (exports) {
         "email": "ramseykemp@scentric.com",
         "phone": "(856) 582-2727",
         "color": "rgb(83,54,244)"
-    }, {
+    },
+    {
         "index": 158,
         "name": "Owens Bowman",
         "first": "Tyson",
@@ -3487,7 +3712,8 @@ define('data/data',["exports"], function (exports) {
         "email": "tysonbowers@scentric.com",
         "phone": "(951) 408-3515",
         "color": "rgb(163,140,145)"
-    }, {
+    },
+    {
         "index": 159,
         "name": "Violet Salazar",
         "first": "Roy",
@@ -3508,7 +3734,8 @@ define('data/data',["exports"], function (exports) {
         "email": "royrosa@scentric.com",
         "phone": "(805) 581-2201",
         "color": "rgb(150,213,255)"
-    }, {
+    },
+    {
         "index": 160,
         "name": "Laurel Harvey",
         "first": "Yvonne",
@@ -3529,7 +3756,8 @@ define('data/data',["exports"], function (exports) {
         "email": "yvonnefoster@scentric.com",
         "phone": "(981) 600-2987",
         "color": "rgb(131,169,121)"
-    }, {
+    },
+    {
         "index": 161,
         "name": "Mills Cruz",
         "first": "Lydia",
@@ -3550,7 +3778,8 @@ define('data/data',["exports"], function (exports) {
         "email": "lydiatrevino@scentric.com",
         "phone": "(958) 545-3599",
         "color": "rgb(58,191,253)"
-    }, {
+    },
+    {
         "index": 162,
         "name": "Craft Gould",
         "first": "Simon",
@@ -3571,7 +3800,8 @@ define('data/data',["exports"], function (exports) {
         "email": "simondurham@scentric.com",
         "phone": "(934) 533-3438",
         "color": "rgb(168,60,232)"
-    }, {
+    },
+    {
         "index": 163,
         "name": "Michelle Thomas",
         "first": "Gretchen",
@@ -3592,7 +3822,8 @@ define('data/data',["exports"], function (exports) {
         "email": "gretchencarson@scentric.com",
         "phone": "(963) 572-3829",
         "color": "rgb(206,131,97)"
-    }, {
+    },
+    {
         "index": 164,
         "name": "Fowler Kirby",
         "first": "Christi",
@@ -3613,7 +3844,8 @@ define('data/data',["exports"], function (exports) {
         "email": "christirivas@scentric.com",
         "phone": "(934) 580-3784",
         "color": "rgb(163,213,79)"
-    }, {
+    },
+    {
         "index": 165,
         "name": "Coleen Alford",
         "first": "Bobbie",
@@ -3634,7 +3866,8 @@ define('data/data',["exports"], function (exports) {
         "email": "bobbiewells@scentric.com",
         "phone": "(968) 545-3385",
         "color": "rgb(144,250,135)"
-    }, {
+    },
+    {
         "index": 166,
         "name": "Victoria Hull",
         "first": "Velasquez",
@@ -3655,7 +3888,8 @@ define('data/data',["exports"], function (exports) {
         "email": "velasquezbuck@scentric.com",
         "phone": "(872) 448-3197",
         "color": "rgb(113,227,172)"
-    }, {
+    },
+    {
         "index": 167,
         "name": "Kimberly Allen",
         "first": "Valencia",
@@ -3676,7 +3910,8 @@ define('data/data',["exports"], function (exports) {
         "email": "valenciaduran@scentric.com",
         "phone": "(933) 441-3632",
         "color": "rgb(160,71,158)"
-    }, {
+    },
+    {
         "index": 168,
         "name": "Gill Meadows",
         "first": "Diann",
@@ -3697,7 +3932,8 @@ define('data/data',["exports"], function (exports) {
         "email": "diannfox@scentric.com",
         "phone": "(862) 462-3513",
         "color": "rgb(115,148,158)"
-    }, {
+    },
+    {
         "index": 169,
         "name": "Peggy Sandoval",
         "first": "Kathleen",
@@ -3718,7 +3954,8 @@ define('data/data',["exports"], function (exports) {
         "email": "kathleenryan@scentric.com",
         "phone": "(868) 529-3500",
         "color": "rgb(213,148,139)"
-    }, {
+    },
+    {
         "index": 170,
         "name": "Julia Palmer",
         "first": "Harrell",
@@ -3739,7 +3976,8 @@ define('data/data',["exports"], function (exports) {
         "email": "harrellgalloway@scentric.com",
         "phone": "(824) 588-3680",
         "color": "rgb(122,79,220)"
-    }, {
+    },
+    {
         "index": 171,
         "name": "Luann Gates",
         "first": "Gwendolyn",
@@ -3760,7 +3998,8 @@ define('data/data',["exports"], function (exports) {
         "email": "gwendolynweaver@scentric.com",
         "phone": "(926) 595-3032",
         "color": "rgb(170,147,167)"
-    }, {
+    },
+    {
         "index": 172,
         "name": "Tyler Gardner",
         "first": "Collins",
@@ -3781,7 +4020,8 @@ define('data/data',["exports"], function (exports) {
         "email": "collinswarner@scentric.com",
         "phone": "(803) 510-3885",
         "color": "rgb(192,229,65)"
-    }, {
+    },
+    {
         "index": 173,
         "name": "Ruthie Mcintyre",
         "first": "Rowena",
@@ -3802,7 +4042,8 @@ define('data/data',["exports"], function (exports) {
         "email": "rowenasellers@scentric.com",
         "phone": "(969) 592-2871",
         "color": "rgb(181,199,125)"
-    }, {
+    },
+    {
         "index": 174,
         "name": "Nguyen Stewart",
         "first": "Robert",
@@ -3823,7 +4064,8 @@ define('data/data',["exports"], function (exports) {
         "email": "robertrussell@scentric.com",
         "phone": "(833) 512-2279",
         "color": "rgb(198,215,99)"
-    }, {
+    },
+    {
         "index": 175,
         "name": "Acosta Herman",
         "first": "Becker",
@@ -3844,7 +4086,8 @@ define('data/data',["exports"], function (exports) {
         "email": "beckerle@scentric.com",
         "phone": "(968) 520-2781",
         "color": "rgb(220,63,86)"
-    }, {
+    },
+    {
         "index": 176,
         "name": "Lucy England",
         "first": "Wilma",
@@ -3865,7 +4108,8 @@ define('data/data',["exports"], function (exports) {
         "email": "wilmaspencer@scentric.com",
         "phone": "(850) 473-3863",
         "color": "rgb(73,237,50)"
-    }, {
+    },
+    {
         "index": 177,
         "name": "Selena Beach",
         "first": "Florence",
@@ -3886,7 +4130,8 @@ define('data/data',["exports"], function (exports) {
         "email": "florencecharles@scentric.com",
         "phone": "(854) 538-2605",
         "color": "rgb(142,199,175)"
-    }, {
+    },
+    {
         "index": 178,
         "name": "Leon Reilly",
         "first": "Trevino",
@@ -3907,7 +4152,8 @@ define('data/data',["exports"], function (exports) {
         "email": "trevinoschneider@scentric.com",
         "phone": "(919) 571-3870",
         "color": "rgb(199,207,59)"
-    }, {
+    },
+    {
         "index": 179,
         "name": "Margie Caldwell",
         "first": "Drake",
@@ -3928,7 +4174,8 @@ define('data/data',["exports"], function (exports) {
         "email": "drakefrost@scentric.com",
         "phone": "(993) 559-2273",
         "color": "rgb(240,117,178)"
-    }, {
+    },
+    {
         "index": 180,
         "name": "Floyd Whitehead",
         "first": "Monique",
@@ -3949,7 +4196,8 @@ define('data/data',["exports"], function (exports) {
         "email": "moniquebarron@scentric.com",
         "phone": "(944) 573-3509",
         "color": "rgb(215,200,175)"
-    }, {
+    },
+    {
         "index": 181,
         "name": "Langley Kidd",
         "first": "Lowe",
@@ -3970,7 +4218,8 @@ define('data/data',["exports"], function (exports) {
         "email": "loweluna@scentric.com",
         "phone": "(996) 562-3285",
         "color": "rgb(206,231,90)"
-    }, {
+    },
+    {
         "index": 182,
         "name": "Eunice Pace",
         "first": "Margaret",
@@ -3991,7 +4240,8 @@ define('data/data',["exports"], function (exports) {
         "email": "margaretmueller@scentric.com",
         "phone": "(881) 442-3317",
         "color": "rgb(248,53,68)"
-    }, {
+    },
+    {
         "index": 183,
         "name": "Hess Ross",
         "first": "Knowles",
@@ -4012,7 +4262,8 @@ define('data/data',["exports"], function (exports) {
         "email": "knowlesdrake@scentric.com",
         "phone": "(995) 490-2638",
         "color": "rgb(50,148,194)"
-    }, {
+    },
+    {
         "index": 184,
         "name": "Terri Mayo",
         "first": "Rachael",
@@ -4033,7 +4284,8 @@ define('data/data',["exports"], function (exports) {
         "email": "rachaelsharp@scentric.com",
         "phone": "(920) 458-2923",
         "color": "rgb(224,219,109)"
-    }, {
+    },
+    {
         "index": 185,
         "name": "Lorie Stephenson",
         "first": "Vaughan",
@@ -4054,7 +4306,8 @@ define('data/data',["exports"], function (exports) {
         "email": "vaughanhardin@scentric.com",
         "phone": "(954) 576-2820",
         "color": "rgb(76,217,135)"
-    }, {
+    },
+    {
         "index": 186,
         "name": "Jacqueline Estes",
         "first": "Gale",
@@ -4075,7 +4328,8 @@ define('data/data',["exports"], function (exports) {
         "email": "galehutchinson@scentric.com",
         "phone": "(853) 433-2272",
         "color": "rgb(234,208,240)"
-    }, {
+    },
+    {
         "index": 187,
         "name": "Linda Steele",
         "first": "Weber",
@@ -4096,7 +4350,8 @@ define('data/data',["exports"], function (exports) {
         "email": "weberbarlow@scentric.com",
         "phone": "(816) 478-3071",
         "color": "rgb(253,113,243)"
-    }, {
+    },
+    {
         "index": 188,
         "name": "Humphrey Rocha",
         "first": "Watson",
@@ -4117,7 +4372,8 @@ define('data/data',["exports"], function (exports) {
         "email": "watsonmartin@scentric.com",
         "phone": "(870) 511-2367",
         "color": "rgb(180,100,61)"
-    }, {
+    },
+    {
         "index": 189,
         "name": "Carter Berry",
         "first": "Copeland",
@@ -4138,7 +4394,8 @@ define('data/data',["exports"], function (exports) {
         "email": "copelandfernandez@scentric.com",
         "phone": "(916) 428-2390",
         "color": "rgb(225,220,78)"
-    }, {
+    },
+    {
         "index": 190,
         "name": "Mcgee Price",
         "first": "Christian",
@@ -4159,7 +4416,8 @@ define('data/data',["exports"], function (exports) {
         "email": "christianbrown@scentric.com",
         "phone": "(981) 586-2200",
         "color": "rgb(211,68,198)"
-    }, {
+    },
+    {
         "index": 191,
         "name": "Browning Harrison",
         "first": "Wanda",
@@ -4180,7 +4438,8 @@ define('data/data',["exports"], function (exports) {
         "email": "wandadorsey@scentric.com",
         "phone": "(857) 473-2997",
         "color": "rgb(188,149,116)"
-    }, {
+    },
+    {
         "index": 192,
         "name": "Beth Clark",
         "first": "Stuart",
@@ -4201,7 +4460,8 @@ define('data/data',["exports"], function (exports) {
         "email": "stuartpotter@scentric.com",
         "phone": "(868) 542-3034",
         "color": "rgb(93,172,196)"
-    }, {
+    },
+    {
         "index": 193,
         "name": "Neal Mcgee",
         "first": "Daisy",
@@ -4222,7 +4482,8 @@ define('data/data',["exports"], function (exports) {
         "email": "daisylucas@scentric.com",
         "phone": "(922) 417-2649",
         "color": "rgb(242,147,241)"
-    }, {
+    },
+    {
         "index": 194,
         "name": "Wall Vasquez",
         "first": "Kara",
@@ -4243,7 +4504,8 @@ define('data/data',["exports"], function (exports) {
         "email": "karaavery@scentric.com",
         "phone": "(870) 572-3252",
         "color": "rgb(192,119,159)"
-    }, {
+    },
+    {
         "index": 195,
         "name": "Booker Mcgowan",
         "first": "Olga",
@@ -4264,7 +4526,8 @@ define('data/data',["exports"], function (exports) {
         "email": "olgatucker@scentric.com",
         "phone": "(902) 400-3059",
         "color": "rgb(136,215,127)"
-    }, {
+    },
+    {
         "index": 196,
         "name": "Blankenship Henson",
         "first": "Staci",
@@ -4285,7 +4548,8 @@ define('data/data',["exports"], function (exports) {
         "email": "staciking@scentric.com",
         "phone": "(964) 422-3068",
         "color": "rgb(123,169,84)"
-    }, {
+    },
+    {
         "index": 197,
         "name": "Essie Hoover",
         "first": "Lourdes",
@@ -4306,7 +4570,8 @@ define('data/data',["exports"], function (exports) {
         "email": "lourdesmayer@scentric.com",
         "phone": "(844) 447-3638",
         "color": "rgb(56,235,218)"
-    }, {
+    },
+    {
         "index": 198,
         "name": "Bridget Wilcox",
         "first": "Danielle",
@@ -4327,7 +4592,8 @@ define('data/data',["exports"], function (exports) {
         "email": "danielledelacruz@scentric.com",
         "phone": "(952) 548-3787",
         "color": "rgb(168,148,116)"
-    }, {
+    },
+    {
         "index": 199,
         "name": "Mccarthy Fletcher",
         "first": "Janis",
@@ -4348,7 +4614,8 @@ define('data/data',["exports"], function (exports) {
         "email": "janisfischer@scentric.com",
         "phone": "(860) 405-3588",
         "color": "rgb(113,69,223)"
-    }, {
+    },
+    {
         "index": 200,
         "name": "Judy Whitley",
         "first": "Webster",
@@ -4369,7 +4636,8 @@ define('data/data',["exports"], function (exports) {
         "email": "websterdoyle@scentric.com",
         "phone": "(891) 436-2016",
         "color": "rgb(129,172,59)"
-    }, {
+    },
+    {
         "index": 201,
         "name": "Ware Harding",
         "first": "Phyllis",
@@ -4390,7 +4658,8 @@ define('data/data',["exports"], function (exports) {
         "email": "phyllisholcomb@scentric.com",
         "phone": "(874) 534-3124",
         "color": "rgb(210,230,76)"
-    }, {
+    },
+    {
         "index": 202,
         "name": "Blanche Sears",
         "first": "Peck",
@@ -4411,7 +4680,8 @@ define('data/data',["exports"], function (exports) {
         "email": "peckdean@scentric.com",
         "phone": "(994) 522-3068",
         "color": "rgb(199,252,214)"
-    }, {
+    },
+    {
         "index": 203,
         "name": "Conway Kelley",
         "first": "Virginia",
@@ -4432,7 +4702,8 @@ define('data/data',["exports"], function (exports) {
         "email": "virginiapollard@scentric.com",
         "phone": "(911) 563-3668",
         "color": "rgb(120,253,100)"
-    }, {
+    },
+    {
         "index": 204,
         "name": "Little Griffin",
         "first": "Murray",
@@ -4453,7 +4724,8 @@ define('data/data',["exports"], function (exports) {
         "email": "murraydavid@scentric.com",
         "phone": "(994) 477-3415",
         "color": "rgb(185,246,198)"
-    }, {
+    },
+    {
         "index": 205,
         "name": "Goff Benton",
         "first": "Mclean",
@@ -4474,7 +4746,8 @@ define('data/data',["exports"], function (exports) {
         "email": "mcleanpennington@scentric.com",
         "phone": "(882) 499-2242",
         "color": "rgb(107,133,242)"
-    }, {
+    },
+    {
         "index": 206,
         "name": "Hale Wilkinson",
         "first": "Franks",
@@ -4495,7 +4768,8 @@ define('data/data',["exports"], function (exports) {
         "email": "frankshoward@scentric.com",
         "phone": "(893) 417-2654",
         "color": "rgb(186,174,80)"
-    }, {
+    },
+    {
         "index": 207,
         "name": "Betty Huff",
         "first": "Mona",
@@ -4516,7 +4790,8 @@ define('data/data',["exports"], function (exports) {
         "email": "monafulton@scentric.com",
         "phone": "(946) 414-3557",
         "color": "rgb(128,193,66)"
-    }, {
+    },
+    {
         "index": 208,
         "name": "Emily Davis",
         "first": "Sharon",
@@ -4537,7 +4812,8 @@ define('data/data',["exports"], function (exports) {
         "email": "sharongreen@scentric.com",
         "phone": "(832) 403-3692",
         "color": "rgb(208,118,108)"
-    }, {
+    },
+    {
         "index": 209,
         "name": "Shelly Payne",
         "first": "Doyle",
@@ -4558,7 +4834,8 @@ define('data/data',["exports"], function (exports) {
         "email": "doylevazquez@scentric.com",
         "phone": "(946) 513-2799",
         "color": "rgb(255,190,226)"
-    }, {
+    },
+    {
         "index": 210,
         "name": "Angela Mcmahon",
         "first": "Rosalyn",
@@ -4579,7 +4856,8 @@ define('data/data',["exports"], function (exports) {
         "email": "rosalynbridges@scentric.com",
         "phone": "(813) 440-3063",
         "color": "rgb(184,249,205)"
-    }, {
+    },
+    {
         "index": 211,
         "name": "Maryellen Ramos",
         "first": "Rogers",
@@ -4600,7 +4878,8 @@ define('data/data',["exports"], function (exports) {
         "email": "rogerssilva@scentric.com",
         "phone": "(944) 540-3499",
         "color": "rgb(88,243,243)"
-    }, {
+    },
+    {
         "index": 212,
         "name": "Alvarado Abbott",
         "first": "Jordan",
@@ -4621,7 +4900,8 @@ define('data/data',["exports"], function (exports) {
         "email": "jordanhyde@scentric.com",
         "phone": "(822) 530-2413",
         "color": "rgb(163,61,149)"
-    }, {
+    },
+    {
         "index": 213,
         "name": "Caldwell Mckinney",
         "first": "Melody",
@@ -4642,7 +4922,8 @@ define('data/data',["exports"], function (exports) {
         "email": "melodyfisher@scentric.com",
         "phone": "(979) 487-2773",
         "color": "rgb(71,205,213)"
-    }, {
+    },
+    {
         "index": 214,
         "name": "Eloise Avila",
         "first": "Gay",
@@ -4663,7 +4944,8 @@ define('data/data',["exports"], function (exports) {
         "email": "gayyang@scentric.com",
         "phone": "(951) 538-3316",
         "color": "rgb(75,210,111)"
-    }, {
+    },
+    {
         "index": 215,
         "name": "Christine Strong",
         "first": "Sofia",
@@ -4684,7 +4966,8 @@ define('data/data',["exports"], function (exports) {
         "email": "sofiaalvarez@scentric.com",
         "phone": "(990) 470-3077",
         "color": "rgb(250,51,175)"
-    }, {
+    },
+    {
         "index": 216,
         "name": "Love Baldwin",
         "first": "Rivers",
@@ -4705,7 +4988,8 @@ define('data/data',["exports"], function (exports) {
         "email": "riversrosales@scentric.com",
         "phone": "(929) 466-3166",
         "color": "rgb(255,204,95)"
-    }, {
+    },
+    {
         "index": 217,
         "name": "Louisa Lang",
         "first": "Jenna",
@@ -4726,7 +5010,8 @@ define('data/data',["exports"], function (exports) {
         "email": "jennaroberson@scentric.com",
         "phone": "(943) 474-3085",
         "color": "rgb(143,132,181)"
-    }, {
+    },
+    {
         "index": 218,
         "name": "Snyder Cortez",
         "first": "Ronda",
@@ -4747,7 +5032,8 @@ define('data/data',["exports"], function (exports) {
         "email": "rondanielsen@scentric.com",
         "phone": "(819) 547-2703",
         "color": "rgb(69,55,248)"
-    }, {
+    },
+    {
         "index": 219,
         "name": "Michael Nixon",
         "first": "Paul",
@@ -4768,7 +5054,8 @@ define('data/data',["exports"], function (exports) {
         "email": "paulhuber@scentric.com",
         "phone": "(822) 531-2515",
         "color": "rgb(213,114,213)"
-    }, {
+    },
+    {
         "index": 220,
         "name": "Erna Collier",
         "first": "Brady",
@@ -4789,7 +5076,8 @@ define('data/data',["exports"], function (exports) {
         "email": "bradyhaney@scentric.com",
         "phone": "(933) 464-2281",
         "color": "rgb(61,84,220)"
-    }, {
+    },
+    {
         "index": 221,
         "name": "Serena Holden",
         "first": "Dorsey",
@@ -4810,7 +5098,8 @@ define('data/data',["exports"], function (exports) {
         "email": "dorseyjames@scentric.com",
         "phone": "(856) 447-3354",
         "color": "rgb(81,131,93)"
-    }, {
+    },
+    {
         "index": 222,
         "name": "Tabitha Alvarado",
         "first": "Grant",
@@ -4831,7 +5120,8 @@ define('data/data',["exports"], function (exports) {
         "email": "grantbauer@scentric.com",
         "phone": "(985) 414-2281",
         "color": "rgb(61,94,134)"
-    }, {
+    },
+    {
         "index": 223,
         "name": "Tami Berger",
         "first": "Rocha",
@@ -4852,7 +5142,8 @@ define('data/data',["exports"], function (exports) {
         "email": "rochaayers@scentric.com",
         "phone": "(912) 557-3383",
         "color": "rgb(237,77,56)"
-    }, {
+    },
+    {
         "index": 224,
         "name": "Toni Hubbard",
         "first": "Manuela",
@@ -4873,7 +5164,8 @@ define('data/data',["exports"], function (exports) {
         "email": "manuelamatthews@scentric.com",
         "phone": "(802) 454-3368",
         "color": "rgb(190,58,156)"
-    }, {
+    },
+    {
         "index": 225,
         "name": "Mcmillan Burris",
         "first": "Tisha",
@@ -4894,7 +5186,8 @@ define('data/data',["exports"], function (exports) {
         "email": "tishareese@scentric.com",
         "phone": "(886) 572-2143",
         "color": "rgb(148,208,184)"
-    }, {
+    },
+    {
         "index": 226,
         "name": "Conrad Holder",
         "first": "Rebecca",
@@ -4915,7 +5208,8 @@ define('data/data',["exports"], function (exports) {
         "email": "rebeccacole@scentric.com",
         "phone": "(863) 438-3293",
         "color": "rgb(252,113,153)"
-    }, {
+    },
+    {
         "index": 227,
         "name": "Finley Norman",
         "first": "Kemp",
@@ -4936,7 +5230,8 @@ define('data/data',["exports"], function (exports) {
         "email": "kempramsey@scentric.com",
         "phone": "(983) 496-2931",
         "color": "rgb(56,255,141)"
-    }, {
+    },
+    {
         "index": 228,
         "name": "Tara Campos",
         "first": "Roach",
@@ -4957,7 +5252,8 @@ define('data/data',["exports"], function (exports) {
         "email": "roachdodson@scentric.com",
         "phone": "(878) 581-2211",
         "color": "rgb(224,94,95)"
-    }, {
+    },
+    {
         "index": 229,
         "name": "Glass Navarro",
         "first": "Potter",
@@ -4978,7 +5274,8 @@ define('data/data',["exports"], function (exports) {
         "email": "potterlowe@scentric.com",
         "phone": "(987) 576-3068",
         "color": "rgb(171,255,82)"
-    }, {
+    },
+    {
         "index": 230,
         "name": "Amparo Pope",
         "first": "Maribel",
@@ -4999,7 +5296,8 @@ define('data/data',["exports"], function (exports) {
         "email": "maribelburks@scentric.com",
         "phone": "(843) 435-2675",
         "color": "rgb(79,131,175)"
-    }, {
+    },
+    {
         "index": 231,
         "name": "Dillard Johns",
         "first": "Viola",
@@ -5020,7 +5318,8 @@ define('data/data',["exports"], function (exports) {
         "email": "violapruitt@scentric.com",
         "phone": "(908) 451-2708",
         "color": "rgb(144,170,102)"
-    }, {
+    },
+    {
         "index": 232,
         "name": "Jeanie Huffman",
         "first": "Karyn",
@@ -5041,7 +5340,8 @@ define('data/data',["exports"], function (exports) {
         "email": "karynedwards@scentric.com",
         "phone": "(877) 447-2061",
         "color": "rgb(177,244,78)"
-    }, {
+    },
+    {
         "index": 233,
         "name": "Alfreda Neal",
         "first": "Dunlap",
@@ -5062,7 +5362,8 @@ define('data/data',["exports"], function (exports) {
         "email": "dunlapmcclure@scentric.com",
         "phone": "(913) 592-3075",
         "color": "rgb(208,154,61)"
-    }, {
+    },
+    {
         "index": 234,
         "name": "Livingston Osborn",
         "first": "Mathis",
@@ -5083,7 +5384,8 @@ define('data/data',["exports"], function (exports) {
         "email": "mathiswebster@scentric.com",
         "phone": "(862) 466-2481",
         "color": "rgb(99,84,116)"
-    }, {
+    },
+    {
         "index": 235,
         "name": "Stephenson Blanchard",
         "first": "Kirkland",
@@ -5104,7 +5406,8 @@ define('data/data',["exports"], function (exports) {
         "email": "kirklandwashington@scentric.com",
         "phone": "(927) 536-3348",
         "color": "rgb(161,139,176)"
-    }, {
+    },
+    {
         "index": 236,
         "name": "Mary Bolton",
         "first": "Shawn",
@@ -5125,7 +5428,8 @@ define('data/data',["exports"], function (exports) {
         "email": "shawnbean@scentric.com",
         "phone": "(881) 597-2110",
         "color": "rgb(52,77,146)"
-    }, {
+    },
+    {
         "index": 237,
         "name": "Jaime Horn",
         "first": "Nina",
@@ -5146,7 +5450,8 @@ define('data/data',["exports"], function (exports) {
         "email": "ninalarsen@scentric.com",
         "phone": "(833) 427-3141",
         "color": "rgb(238,80,95)"
-    }, {
+    },
+    {
         "index": 238,
         "name": "Ewing Prince",
         "first": "Burch",
@@ -5167,7 +5472,8 @@ define('data/data',["exports"], function (exports) {
         "email": "burchhinton@scentric.com",
         "phone": "(876) 448-2187",
         "color": "rgb(251,248,74)"
-    }, {
+    },
+    {
         "index": 239,
         "name": "Sharlene Bryan",
         "first": "Celina",
@@ -5188,7 +5494,8 @@ define('data/data',["exports"], function (exports) {
         "email": "celinajimenez@scentric.com",
         "phone": "(853) 562-3172",
         "color": "rgb(187,177,206)"
-    }, {
+    },
+    {
         "index": 240,
         "name": "Anastasia Marquez",
         "first": "Mcdonald",
@@ -5209,7 +5516,8 @@ define('data/data',["exports"], function (exports) {
         "email": "mcdonaldgoff@scentric.com",
         "phone": "(891) 532-3564",
         "color": "rgb(165,152,170)"
-    }, {
+    },
+    {
         "index": 241,
         "name": "Faith Hayes",
         "first": "Lessie",
@@ -5230,7 +5538,8 @@ define('data/data',["exports"], function (exports) {
         "email": "lessiegarza@scentric.com",
         "phone": "(853) 436-2778",
         "color": "rgb(129,67,86)"
-    }, {
+    },
+    {
         "index": 242,
         "name": "Berg Ray",
         "first": "Greer",
@@ -5251,7 +5560,8 @@ define('data/data',["exports"], function (exports) {
         "email": "greerturner@scentric.com",
         "phone": "(962) 538-2574",
         "color": "rgb(215,92,57)"
-    }, {
+    },
+    {
         "index": 243,
         "name": "Gates Bush",
         "first": "Cohen",
@@ -5272,7 +5582,8 @@ define('data/data',["exports"], function (exports) {
         "email": "cohensweet@scentric.com",
         "phone": "(961) 506-3669",
         "color": "rgb(223,99,51)"
-    }, {
+    },
+    {
         "index": 244,
         "name": "Rosella Sharpe",
         "first": "Hilary",
@@ -5293,7 +5604,8 @@ define('data/data',["exports"], function (exports) {
         "email": "hilaryjacobs@scentric.com",
         "phone": "(850) 481-3931",
         "color": "rgb(175,197,147)"
-    }, {
+    },
+    {
         "index": 245,
         "name": "Ballard Mason",
         "first": "Nell",
@@ -5314,7 +5626,8 @@ define('data/data',["exports"], function (exports) {
         "email": "nellharper@scentric.com",
         "phone": "(978) 583-3962",
         "color": "rgb(114,234,175)"
-    }, {
+    },
+    {
         "index": 246,
         "name": "Alexis Kramer",
         "first": "Koch",
@@ -5335,7 +5648,8 @@ define('data/data',["exports"], function (exports) {
         "email": "kochcarpenter@scentric.com",
         "phone": "(912) 523-3269",
         "color": "rgb(254,230,133)"
-    }, {
+    },
+    {
         "index": 247,
         "name": "Larson Mcguire",
         "first": "Earnestine",
@@ -5356,7 +5670,8 @@ define('data/data',["exports"], function (exports) {
         "email": "earnestinecurry@scentric.com",
         "phone": "(947) 457-2441",
         "color": "rgb(192,84,251)"
-    }, {
+    },
+    {
         "index": 248,
         "name": "Elisa Gilbert",
         "first": "Opal",
@@ -5377,7 +5692,8 @@ define('data/data',["exports"], function (exports) {
         "email": "opalrush@scentric.com",
         "phone": "(944) 429-3751",
         "color": "rgb(73,188,227)"
-    }, {
+    },
+    {
         "index": 249,
         "name": "Richardson Pena",
         "first": "Lauri",
@@ -5398,7 +5714,8 @@ define('data/data',["exports"], function (exports) {
         "email": "laurimacias@scentric.com",
         "phone": "(889) 487-2711",
         "color": "rgb(140,77,221)"
-    }, {
+    },
+    {
         "index": 250,
         "name": "James Christensen",
         "first": "Atkinson",
@@ -5419,7 +5736,8 @@ define('data/data',["exports"], function (exports) {
         "email": "atkinsonwhite@scentric.com",
         "phone": "(912) 432-3782",
         "color": "rgb(177,214,156)"
-    }, {
+    },
+    {
         "index": 251,
         "name": "Berry Greene",
         "first": "Carey",
@@ -5440,7 +5758,8 @@ define('data/data',["exports"], function (exports) {
         "email": "careyhawkins@scentric.com",
         "phone": "(868) 519-2817",
         "color": "rgb(74,226,202)"
-    }, {
+    },
+    {
         "index": 252,
         "name": "Melva Frederick",
         "first": "Haley",
@@ -5461,7 +5780,8 @@ define('data/data',["exports"], function (exports) {
         "email": "haleymorris@scentric.com",
         "phone": "(914) 569-3745",
         "color": "rgb(77,218,207)"
-    }, {
+    },
+    {
         "index": 253,
         "name": "Moses Leach",
         "first": "Margret",
@@ -5482,7 +5802,8 @@ define('data/data',["exports"], function (exports) {
         "email": "margretbaird@scentric.com",
         "phone": "(991) 577-2455",
         "color": "rgb(212,247,87)"
-    }, {
+    },
+    {
         "index": 254,
         "name": "Mindy Mendoza",
         "first": "Valdez",
@@ -5503,7 +5824,8 @@ define('data/data',["exports"], function (exports) {
         "email": "valdezmack@scentric.com",
         "phone": "(831) 594-3993",
         "color": "rgb(223,79,247)"
-    }, {
+    },
+    {
         "index": 255,
         "name": "Charles Sosa",
         "first": "Ashley",
@@ -5524,7 +5846,8 @@ define('data/data',["exports"], function (exports) {
         "email": "ashleyadams@scentric.com",
         "phone": "(903) 572-3575",
         "color": "rgb(125,107,131)"
-    }, {
+    },
+    {
         "index": 256,
         "name": "Turner Franco",
         "first": "Norman",
@@ -5545,7 +5868,8 @@ define('data/data',["exports"], function (exports) {
         "email": "normangeorge@scentric.com",
         "phone": "(909) 404-3929",
         "color": "rgb(236,187,197)"
-    }, {
+    },
+    {
         "index": 257,
         "name": "Mandy Mann",
         "first": "Mccoy",
@@ -5566,7 +5890,8 @@ define('data/data',["exports"], function (exports) {
         "email": "mccoydaniels@scentric.com",
         "phone": "(912) 520-2618",
         "color": "rgb(135,249,131)"
-    }, {
+    },
+    {
         "index": 258,
         "name": "Arlene Dominguez",
         "first": "Felecia",
@@ -5587,7 +5912,8 @@ define('data/data',["exports"], function (exports) {
         "email": "feleciahines@scentric.com",
         "phone": "(800) 422-3688",
         "color": "rgb(143,174,64)"
-    }, {
+    },
+    {
         "index": 259,
         "name": "Hollie Boyer",
         "first": "Steele",
@@ -5608,7 +5934,8 @@ define('data/data',["exports"], function (exports) {
         "email": "steeleschwartz@scentric.com",
         "phone": "(951) 401-2034",
         "color": "rgb(203,161,146)"
-    }, {
+    },
+    {
         "index": 260,
         "name": "Maxwell Levine",
         "first": "Rutledge",
@@ -5629,7 +5956,8 @@ define('data/data',["exports"], function (exports) {
         "email": "rutledgevang@scentric.com",
         "phone": "(827) 440-2145",
         "color": "rgb(207,158,249)"
-    }, {
+    },
+    {
         "index": 261,
         "name": "Jimenez Mullins",
         "first": "Hines",
@@ -5650,7 +5978,8 @@ define('data/data',["exports"], function (exports) {
         "email": "hinescooley@scentric.com",
         "phone": "(871) 552-3958",
         "color": "rgb(236,51,80)"
-    }, {
+    },
+    {
         "index": 262,
         "name": "Lesley Ashley",
         "first": "Williamson",
@@ -5671,7 +6000,8 @@ define('data/data',["exports"], function (exports) {
         "email": "williamsonglass@scentric.com",
         "phone": "(915) 505-2620",
         "color": "rgb(119,251,208)"
-    }, {
+    },
+    {
         "index": 263,
         "name": "Robertson Mcintosh",
         "first": "Constance",
@@ -5692,7 +6022,8 @@ define('data/data',["exports"], function (exports) {
         "email": "constancesexton@scentric.com",
         "phone": "(923) 433-2666",
         "color": "rgb(246,200,148)"
-    }, {
+    },
+    {
         "index": 264,
         "name": "Audra Ortega",
         "first": "Anne",
@@ -5713,7 +6044,8 @@ define('data/data',["exports"], function (exports) {
         "email": "annecrawford@scentric.com",
         "phone": "(986) 502-2226",
         "color": "rgb(235,169,166)"
-    }, {
+    },
+    {
         "index": 265,
         "name": "Francis Carver",
         "first": "Gallagher",
@@ -5734,7 +6066,8 @@ define('data/data',["exports"], function (exports) {
         "email": "gallagherbritt@scentric.com",
         "phone": "(835) 444-3138",
         "color": "rgb(204,219,96)"
-    }, {
+    },
+    {
         "index": 266,
         "name": "Fischer Simmons",
         "first": "Gertrude",
@@ -5755,7 +6088,8 @@ define('data/data',["exports"], function (exports) {
         "email": "gertrudestephens@scentric.com",
         "phone": "(940) 497-2705",
         "color": "rgb(171,153,217)"
-    }, {
+    },
+    {
         "index": 267,
         "name": "Boyd Blake",
         "first": "Delaney",
@@ -5776,7 +6110,8 @@ define('data/data',["exports"], function (exports) {
         "email": "delaneyanderson@scentric.com",
         "phone": "(879) 508-2698",
         "color": "rgb(181,108,214)"
-    }, {
+    },
+    {
         "index": 268,
         "name": "Foreman Jennings",
         "first": "Nieves",
@@ -5797,7 +6132,8 @@ define('data/data',["exports"], function (exports) {
         "email": "nievesbrowning@scentric.com",
         "phone": "(876) 426-2122",
         "color": "rgb(247,203,76)"
-    }, {
+    },
+    {
         "index": 269,
         "name": "Corine Woodard",
         "first": "Santana",
@@ -5818,7 +6154,8 @@ define('data/data',["exports"], function (exports) {
         "email": "santanaeverett@scentric.com",
         "phone": "(993) 537-2899",
         "color": "rgb(144,158,112)"
-    }, {
+    },
+    {
         "index": 270,
         "name": "Maria Stokes",
         "first": "Chambers",
@@ -5839,7 +6176,8 @@ define('data/data',["exports"], function (exports) {
         "email": "chambersriggs@scentric.com",
         "phone": "(825) 422-3231",
         "color": "rgb(211,239,230)"
-    }, {
+    },
+    {
         "index": 271,
         "name": "Montoya Battle",
         "first": "Susanne",
@@ -5860,7 +6198,8 @@ define('data/data',["exports"], function (exports) {
         "email": "susannestein@scentric.com",
         "phone": "(972) 556-2548",
         "color": "rgb(176,88,163)"
-    }, {
+    },
+    {
         "index": 272,
         "name": "Antoinette Cooper",
         "first": "Stout",
@@ -5881,7 +6220,8 @@ define('data/data',["exports"], function (exports) {
         "email": "stoutferrell@scentric.com",
         "phone": "(884) 588-3785",
         "color": "rgb(207,67,59)"
-    }, {
+    },
+    {
         "index": 273,
         "name": "Chavez Rhodes",
         "first": "Jennifer",
@@ -5902,7 +6242,8 @@ define('data/data',["exports"], function (exports) {
         "email": "jennifersolomon@scentric.com",
         "phone": "(852) 542-2938",
         "color": "rgb(234,125,93)"
-    }, {
+    },
+    {
         "index": 274,
         "name": "Sanchez Summers",
         "first": "Osborne",
@@ -5923,7 +6264,8 @@ define('data/data',["exports"], function (exports) {
         "email": "osbornebuckley@scentric.com",
         "phone": "(930) 530-3501",
         "color": "rgb(53,175,123)"
-    }, {
+    },
+    {
         "index": 275,
         "name": "Melinda Herrera",
         "first": "Paula",
@@ -5944,7 +6286,8 @@ define('data/data',["exports"], function (exports) {
         "email": "paulaclemons@scentric.com",
         "phone": "(807) 420-2457",
         "color": "rgb(173,67,66)"
-    }, {
+    },
+    {
         "index": 276,
         "name": "Mara Ortiz",
         "first": "Pace",
@@ -5965,7 +6308,8 @@ define('data/data',["exports"], function (exports) {
         "email": "pacehunter@scentric.com",
         "phone": "(929) 573-3129",
         "color": "rgb(228,124,211)"
-    }, {
+    },
+    {
         "index": 277,
         "name": "Hannah Mercado",
         "first": "Velazquez",
@@ -5986,7 +6330,8 @@ define('data/data',["exports"], function (exports) {
         "email": "velazquezsnider@scentric.com",
         "phone": "(948) 461-3658",
         "color": "rgb(146,114,59)"
-    }, {
+    },
+    {
         "index": 278,
         "name": "King Murray",
         "first": "Lawrence",
@@ -6007,7 +6352,8 @@ define('data/data',["exports"], function (exports) {
         "email": "lawrencefloyd@scentric.com",
         "phone": "(813) 569-3499",
         "color": "rgb(116,205,80)"
-    }, {
+    },
+    {
         "index": 279,
         "name": "Camille Massey",
         "first": "Short",
@@ -6028,7 +6374,8 @@ define('data/data',["exports"], function (exports) {
         "email": "shorthensley@scentric.com",
         "phone": "(959) 437-3887",
         "color": "rgb(61,124,231)"
-    }, {
+    },
+    {
         "index": 280,
         "name": "Etta Nicholson",
         "first": "Sadie",
@@ -6049,7 +6396,8 @@ define('data/data',["exports"], function (exports) {
         "email": "sadiejohnson@scentric.com",
         "phone": "(929) 469-3200",
         "color": "rgb(61,210,234)"
-    }, {
+    },
+    {
         "index": 281,
         "name": "Roxanne Munoz",
         "first": "Marguerite",
@@ -6070,7 +6418,8 @@ define('data/data',["exports"], function (exports) {
         "email": "margueriterodriguez@scentric.com",
         "phone": "(975) 555-3617",
         "color": "rgb(217,168,93)"
-    }, {
+    },
+    {
         "index": 282,
         "name": "Chandler Mclean",
         "first": "Olsen",
@@ -6091,7 +6440,8 @@ define('data/data',["exports"], function (exports) {
         "email": "olsenrollins@scentric.com",
         "phone": "(936) 437-3569",
         "color": "rgb(163,129,119)"
-    }, {
+    },
+    {
         "index": 283,
         "name": "Clements Wynn",
         "first": "Dollie",
@@ -6112,7 +6462,8 @@ define('data/data',["exports"], function (exports) {
         "email": "dollierowland@scentric.com",
         "phone": "(992) 594-3916",
         "color": "rgb(197,160,174)"
-    }, {
+    },
+    {
         "index": 284,
         "name": "Cotton Newman",
         "first": "Mccullough",
@@ -6133,7 +6484,8 @@ define('data/data',["exports"], function (exports) {
         "email": "mcculloughoneil@scentric.com",
         "phone": "(823) 420-3250",
         "color": "rgb(251,198,94)"
-    }, {
+    },
+    {
         "index": 285,
         "name": "Gentry Ellis",
         "first": "Bessie",
@@ -6154,7 +6506,8 @@ define('data/data',["exports"], function (exports) {
         "email": "bessiemccarty@scentric.com",
         "phone": "(873) 427-3409",
         "color": "rgb(81,159,158)"
-    }, {
+    },
+    {
         "index": 286,
         "name": "Walsh Joyce",
         "first": "Antonia",
@@ -6175,7 +6528,8 @@ define('data/data',["exports"], function (exports) {
         "email": "antoniawilder@scentric.com",
         "phone": "(871) 452-2870",
         "color": "rgb(215,69,234)"
-    }, {
+    },
+    {
         "index": 287,
         "name": "Espinoza Sargent",
         "first": "Lee",
@@ -6196,7 +6550,8 @@ define('data/data',["exports"], function (exports) {
         "email": "leemccray@scentric.com",
         "phone": "(948) 512-3677",
         "color": "rgb(124,117,105)"
-    }, {
+    },
+    {
         "index": 288,
         "name": "Lillie Hewitt",
         "first": "Cecelia",
@@ -6217,7 +6572,8 @@ define('data/data',["exports"], function (exports) {
         "email": "ceceliaroman@scentric.com",
         "phone": "(989) 468-2742",
         "color": "rgb(136,244,245)"
-    }, {
+    },
+    {
         "index": 289,
         "name": "Travis Ballard",
         "first": "Georgia",
@@ -6238,7 +6594,8 @@ define('data/data',["exports"], function (exports) {
         "email": "georgiahorne@scentric.com",
         "phone": "(862) 588-3110",
         "color": "rgb(87,132,165)"
-    }, {
+    },
+    {
         "index": 290,
         "name": "Natalie Mclaughlin",
         "first": "Christa",
@@ -6259,7 +6616,8 @@ define('data/data',["exports"], function (exports) {
         "email": "christawhitney@scentric.com",
         "phone": "(882) 546-3928",
         "color": "rgb(211,106,204)"
-    }, {
+    },
+    {
         "index": 291,
         "name": "Sexton Phillips",
         "first": "Ebony",
@@ -6280,7 +6638,8 @@ define('data/data',["exports"], function (exports) {
         "email": "ebonyriley@scentric.com",
         "phone": "(930) 448-2157",
         "color": "rgb(79,135,188)"
-    }, {
+    },
+    {
         "index": 292,
         "name": "Lynn Joyner",
         "first": "Willis",
@@ -6301,7 +6660,8 @@ define('data/data',["exports"], function (exports) {
         "email": "williswall@scentric.com",
         "phone": "(927) 481-2476",
         "color": "rgb(59,194,92)"
-    }, {
+    },
+    {
         "index": 293,
         "name": "Ursula Pearson",
         "first": "Miriam",
@@ -6322,7 +6682,8 @@ define('data/data',["exports"], function (exports) {
         "email": "miriambeck@scentric.com",
         "phone": "(829) 585-3891",
         "color": "rgb(168,101,180)"
-    }, {
+    },
+    {
         "index": 294,
         "name": "Hill Aguirre",
         "first": "Kelley",
@@ -6343,7 +6704,8 @@ define('data/data',["exports"], function (exports) {
         "email": "kelleymyers@scentric.com",
         "phone": "(843) 584-2383",
         "color": "rgb(122,201,168)"
-    }, {
+    },
+    {
         "index": 295,
         "name": "Roseann Bryant",
         "first": "Jerry",
@@ -6364,7 +6726,8 @@ define('data/data',["exports"], function (exports) {
         "email": "jerryhester@scentric.com",
         "phone": "(890) 533-3064",
         "color": "rgb(137,53,240)"
-    }, {
+    },
+    {
         "index": 296,
         "name": "Darlene Brady",
         "first": "Cindy",
@@ -6385,7 +6748,8 @@ define('data/data',["exports"], function (exports) {
         "email": "cindyaguilar@scentric.com",
         "phone": "(812) 401-3316",
         "color": "rgb(232,141,62)"
-    }, {
+    },
+    {
         "index": 297,
         "name": "Patty Barr",
         "first": "Ferguson",
@@ -6406,7 +6770,8 @@ define('data/data',["exports"], function (exports) {
         "email": "fergusonestrada@scentric.com",
         "phone": "(896) 548-2171",
         "color": "rgb(100,112,105)"
-    }, {
+    },
+    {
         "index": 298,
         "name": "Cunningham Flores",
         "first": "Barbra",
@@ -6427,7 +6792,8 @@ define('data/data',["exports"], function (exports) {
         "email": "barbraweiss@scentric.com",
         "phone": "(828) 488-2896",
         "color": "rgb(86,115,171)"
-    }, {
+    },
+    {
         "index": 299,
         "name": "Bobbi Salas",
         "first": "Ines",
@@ -6448,7 +6814,8 @@ define('data/data',["exports"], function (exports) {
         "email": "ineshowell@scentric.com",
         "phone": "(959) 501-3404",
         "color": "rgb(139,215,118)"
-    }, {
+    },
+    {
         "index": 300,
         "name": "Alice Cooke",
         "first": "Dillon",
@@ -6469,7 +6836,8 @@ define('data/data',["exports"], function (exports) {
         "email": "dillongoodwin@scentric.com",
         "phone": "(884) 433-3460",
         "color": "rgb(218,70,51)"
-    }, {
+    },
+    {
         "index": 301,
         "name": "Bianca Miles",
         "first": "Eddie",
@@ -6490,7 +6858,8 @@ define('data/data',["exports"], function (exports) {
         "email": "eddielambert@scentric.com",
         "phone": "(946) 553-2155",
         "color": "rgb(90,142,67)"
-    }, {
+    },
+    {
         "index": 302,
         "name": "Gracie Fuentes",
         "first": "Cecilia",
@@ -6511,7 +6880,8 @@ define('data/data',["exports"], function (exports) {
         "email": "ceciliapage@scentric.com",
         "phone": "(834) 596-3524",
         "color": "rgb(96,136,83)"
-    }, {
+    },
+    {
         "index": 303,
         "name": "Marion Mcleod",
         "first": "Valerie",
@@ -6532,7 +6902,8 @@ define('data/data',["exports"], function (exports) {
         "email": "valeriesnow@scentric.com",
         "phone": "(998) 544-3267",
         "color": "rgb(187,108,144)"
-    }, {
+    },
+    {
         "index": 304,
         "name": "Jimmie Rutledge",
         "first": "Robbie",
@@ -6553,7 +6924,8 @@ define('data/data',["exports"], function (exports) {
         "email": "robbiemorton@scentric.com",
         "phone": "(980) 409-3469",
         "color": "rgb(235,114,85)"
-    }, {
+    },
+    {
         "index": 305,
         "name": "Sweet Humphrey",
         "first": "Duke",
@@ -6574,7 +6946,8 @@ define('data/data',["exports"], function (exports) {
         "email": "dukevargas@scentric.com",
         "phone": "(978) 506-3898",
         "color": "rgb(226,72,213)"
-    }, {
+    },
+    {
         "index": 306,
         "name": "Rivas Mcmillan",
         "first": "Kelley",
@@ -6595,7 +6968,8 @@ define('data/data',["exports"], function (exports) {
         "email": "kelleygamble@scentric.com",
         "phone": "(880) 406-2442",
         "color": "rgb(60,94,167)"
-    }, {
+    },
+    {
         "index": 307,
         "name": "Arline Cantrell",
         "first": "Maldonado",
@@ -6616,7 +6990,8 @@ define('data/data',["exports"], function (exports) {
         "email": "maldonadokaufman@scentric.com",
         "phone": "(902) 553-3658",
         "color": "rgb(87,176,75)"
-    }, {
+    },
+    {
         "index": 308,
         "name": "Ortega Terry",
         "first": "Muriel",
@@ -6637,7 +7012,8 @@ define('data/data',["exports"], function (exports) {
         "email": "murielpickett@scentric.com",
         "phone": "(848) 468-2790",
         "color": "rgb(99,60,211)"
-    }, {
+    },
+    {
         "index": 309,
         "name": "Rosie Beasley",
         "first": "Cora",
@@ -6658,7 +7034,8 @@ define('data/data',["exports"], function (exports) {
         "email": "coravaughan@scentric.com",
         "phone": "(961) 557-2273",
         "color": "rgb(111,160,125)"
-    }, {
+    },
+    {
         "index": 310,
         "name": "Olivia Becker",
         "first": "Wyatt",
@@ -6679,7 +7056,8 @@ define('data/data',["exports"], function (exports) {
         "email": "wyattmcneil@scentric.com",
         "phone": "(888) 600-2767",
         "color": "rgb(65,51,174)"
-    }, {
+    },
+    {
         "index": 311,
         "name": "Aguirre Mendez",
         "first": "Dona",
@@ -6700,7 +7078,8 @@ define('data/data',["exports"], function (exports) {
         "email": "donakane@scentric.com",
         "phone": "(876) 594-2112",
         "color": "rgb(134,128,159)"
-    }, {
+    },
+    {
         "index": 312,
         "name": "Holden Shaffer",
         "first": "Dana",
@@ -6721,7 +7100,8 @@ define('data/data',["exports"], function (exports) {
         "email": "danaraymond@scentric.com",
         "phone": "(836) 540-2790",
         "color": "rgb(187,110,242)"
-    }, {
+    },
+    {
         "index": 313,
         "name": "Cherie Lynn",
         "first": "Johnston",
@@ -6742,7 +7122,8 @@ define('data/data',["exports"], function (exports) {
         "email": "johnstonhead@scentric.com",
         "phone": "(925) 538-2973",
         "color": "rgb(59,239,155)"
-    }, {
+    },
+    {
         "index": 314,
         "name": "Alvarez Byrd",
         "first": "Cristina",
@@ -6763,7 +7144,8 @@ define('data/data',["exports"], function (exports) {
         "email": "cristinabullock@scentric.com",
         "phone": "(847) 528-3630",
         "color": "rgb(146,84,109)"
-    }, {
+    },
+    {
         "index": 315,
         "name": "Gonzalez Freeman",
         "first": "Sampson",
@@ -6784,7 +7166,8 @@ define('data/data',["exports"], function (exports) {
         "email": "sampsonsmith@scentric.com",
         "phone": "(829) 445-2244",
         "color": "rgb(246,63,201)"
-    }, {
+    },
+    {
         "index": 316,
         "name": "Wheeler Zamora",
         "first": "Bush",
@@ -6805,7 +7188,8 @@ define('data/data',["exports"], function (exports) {
         "email": "bushdickerson@scentric.com",
         "phone": "(914) 557-2160",
         "color": "rgb(106,245,89)"
-    }, {
+    },
+    {
         "index": 317,
         "name": "Nadine Heath",
         "first": "Dee",
@@ -6826,7 +7210,8 @@ define('data/data',["exports"], function (exports) {
         "email": "deeburnett@scentric.com",
         "phone": "(995) 481-3920",
         "color": "rgb(158,55,147)"
-    }, {
+    },
+    {
         "index": 318,
         "name": "Cash Baker",
         "first": "Tanya",
@@ -6847,7 +7232,8 @@ define('data/data',["exports"], function (exports) {
         "email": "tanyapatton@scentric.com",
         "phone": "(912) 427-3358",
         "color": "rgb(122,127,173)"
-    }, {
+    },
+    {
         "index": 319,
         "name": "Sears Conley",
         "first": "Boyle",
@@ -6868,7 +7254,8 @@ define('data/data',["exports"], function (exports) {
         "email": "boyleschmidt@scentric.com",
         "phone": "(938) 529-3967",
         "color": "rgb(238,104,187)"
-    }, {
+    },
+    {
         "index": 320,
         "name": "Regina Duke",
         "first": "Pacheco",
@@ -6889,7 +7276,8 @@ define('data/data',["exports"], function (exports) {
         "email": "pachecofinch@scentric.com",
         "phone": "(935) 574-3165",
         "color": "rgb(231,59,64)"
-    }, {
+    },
+    {
         "index": 321,
         "name": "Watts Forbes",
         "first": "Crystal",
@@ -6910,7 +7298,8 @@ define('data/data',["exports"], function (exports) {
         "email": "crystalholman@scentric.com",
         "phone": "(886) 454-2038",
         "color": "rgb(212,198,57)"
-    }, {
+    },
+    {
         "index": 322,
         "name": "Janelle Leblanc",
         "first": "Velma",
@@ -6931,7 +7320,8 @@ define('data/data',["exports"], function (exports) {
         "email": "velmastone@scentric.com",
         "phone": "(910) 600-2666",
         "color": "rgb(84,227,83)"
-    }, {
+    },
+    {
         "index": 323,
         "name": "Holman Atkinson",
         "first": "Myra",
@@ -6952,7 +7342,8 @@ define('data/data',["exports"], function (exports) {
         "email": "myraellison@scentric.com",
         "phone": "(892) 546-2971",
         "color": "rgb(252,153,180)"
-    }, {
+    },
+    {
         "index": 324,
         "name": "Carson Glover",
         "first": "Annabelle",
@@ -6973,7 +7364,8 @@ define('data/data',["exports"], function (exports) {
         "email": "annabellereid@scentric.com",
         "phone": "(833) 494-3476",
         "color": "rgb(56,217,233)"
-    }, {
+    },
+    {
         "index": 325,
         "name": "Gibbs Good",
         "first": "Hendrix",
@@ -6994,7 +7386,8 @@ define('data/data',["exports"], function (exports) {
         "email": "hendrixlyons@scentric.com",
         "phone": "(884) 521-3084",
         "color": "rgb(234,55,208)"
-    }, {
+    },
+    {
         "index": 326,
         "name": "Reba Horton",
         "first": "Ochoa",
@@ -7015,7 +7408,8 @@ define('data/data',["exports"], function (exports) {
         "email": "ochoareed@scentric.com",
         "phone": "(873) 450-2072",
         "color": "rgb(87,106,105)"
-    }, {
+    },
+    {
         "index": 327,
         "name": "Newton Townsend",
         "first": "Cara",
@@ -7036,7 +7430,8 @@ define('data/data',["exports"], function (exports) {
         "email": "caraarmstrong@scentric.com",
         "phone": "(824) 554-2497",
         "color": "rgb(82,224,190)"
-    }, {
+    },
+    {
         "index": 328,
         "name": "Jenkins Short",
         "first": "Castaneda",
@@ -7057,7 +7452,8 @@ define('data/data',["exports"], function (exports) {
         "email": "castanedapadilla@scentric.com",
         "phone": "(911) 571-2320",
         "color": "rgb(80,137,178)"
-    }, {
+    },
+    {
         "index": 329,
         "name": "Deborah Klein",
         "first": "Sandoval",
@@ -7078,7 +7474,8 @@ define('data/data',["exports"], function (exports) {
         "email": "sandovalmiranda@scentric.com",
         "phone": "(808) 578-2445",
         "color": "rgb(234,209,129)"
-    }, {
+    },
+    {
         "index": 330,
         "name": "Tricia Moss",
         "first": "Dickson",
@@ -7099,7 +7496,8 @@ define('data/data',["exports"], function (exports) {
         "email": "dicksonhouston@scentric.com",
         "phone": "(904) 444-3745",
         "color": "rgb(237,192,112)"
-    }, {
+    },
+    {
         "index": 331,
         "name": "Mclaughlin Spence",
         "first": "Vicky",
@@ -7120,7 +7518,8 @@ define('data/data',["exports"], function (exports) {
         "email": "vickymontoya@scentric.com",
         "phone": "(808) 516-2094",
         "color": "rgb(156,150,201)"
-    }, {
+    },
+    {
         "index": 332,
         "name": "Montgomery Farrell",
         "first": "Hayden",
@@ -7141,7 +7540,8 @@ define('data/data',["exports"], function (exports) {
         "email": "haydenmaldonado@scentric.com",
         "phone": "(891) 403-3020",
         "color": "rgb(131,136,141)"
-    }, {
+    },
+    {
         "index": 333,
         "name": "Mavis Sanchez",
         "first": "Ginger",
@@ -7162,7 +7562,8 @@ define('data/data',["exports"], function (exports) {
         "email": "gingerdale@scentric.com",
         "phone": "(883) 563-2014",
         "color": "rgb(163,218,120)"
-    }, {
+    },
+    {
         "index": 334,
         "name": "Terrie Peters",
         "first": "Adeline",
@@ -7183,7 +7584,8 @@ define('data/data',["exports"], function (exports) {
         "email": "adelinefranklin@scentric.com",
         "phone": "(814) 430-3138",
         "color": "rgb(186,245,118)"
-    }, {
+    },
+    {
         "index": 335,
         "name": "Reed Banks",
         "first": "Frost",
@@ -7204,7 +7606,8 @@ define('data/data',["exports"], function (exports) {
         "email": "frostvelez@scentric.com",
         "phone": "(805) 408-3874",
         "color": "rgb(61,142,146)"
-    }, {
+    },
+    {
         "index": 336,
         "name": "Horton Howe",
         "first": "Loretta",
@@ -7225,7 +7628,8 @@ define('data/data',["exports"], function (exports) {
         "email": "lorettahudson@scentric.com",
         "phone": "(969) 542-2613",
         "color": "rgb(245,143,237)"
-    }, {
+    },
+    {
         "index": 337,
         "name": "Byrd Hopkins",
         "first": "Charmaine",
@@ -7246,7 +7650,8 @@ define('data/data',["exports"], function (exports) {
         "email": "charmainegibbs@scentric.com",
         "phone": "(882) 485-2815",
         "color": "rgb(52,73,103)"
-    }, {
+    },
+    {
         "index": 338,
         "name": "Walter Hoffman",
         "first": "John",
@@ -7267,7 +7672,8 @@ define('data/data',["exports"], function (exports) {
         "email": "johnarnold@scentric.com",
         "phone": "(832) 506-2961",
         "color": "rgb(124,211,144)"
-    }, {
+    },
+    {
         "index": 339,
         "name": "Conner Santiago",
         "first": "Geneva",
@@ -7288,7 +7694,8 @@ define('data/data',["exports"], function (exports) {
         "email": "genevacline@scentric.com",
         "phone": "(945) 577-3780",
         "color": "rgb(88,84,180)"
-    }, {
+    },
+    {
         "index": 340,
         "name": "Rosales Cain",
         "first": "Lucille",
@@ -7309,7 +7716,8 @@ define('data/data',["exports"], function (exports) {
         "email": "lucillesims@scentric.com",
         "phone": "(881) 438-3457",
         "color": "rgb(57,64,85)"
-    }, {
+    },
+    {
         "index": 341,
         "name": "Jillian Puckett",
         "first": "Bean",
@@ -7330,7 +7738,8 @@ define('data/data',["exports"], function (exports) {
         "email": "beandyer@scentric.com",
         "phone": "(996) 420-2363",
         "color": "rgb(127,126,117)"
-    }, {
+    },
+    {
         "index": 342,
         "name": "Imelda Barrera",
         "first": "Ramos",
@@ -7351,7 +7760,8 @@ define('data/data',["exports"], function (exports) {
         "email": "ramosburke@scentric.com",
         "phone": "(800) 574-2091",
         "color": "rgb(187,50,171)"
-    }, {
+    },
+    {
         "index": 343,
         "name": "Witt Tyson",
         "first": "Rebekah",
@@ -7372,7 +7782,8 @@ define('data/data',["exports"], function (exports) {
         "email": "rebekahkelly@scentric.com",
         "phone": "(941) 590-3874",
         "color": "rgb(228,211,182)"
-    }, {
+    },
+    {
         "index": 344,
         "name": "Daphne Murphy",
         "first": "Solis",
@@ -7393,7 +7804,8 @@ define('data/data',["exports"], function (exports) {
         "email": "solisnorris@scentric.com",
         "phone": "(926) 567-2180",
         "color": "rgb(195,76,204)"
-    }, {
+    },
+    {
         "index": 345,
         "name": "Summer Sawyer",
         "first": "Cheri",
@@ -7414,7 +7826,8 @@ define('data/data',["exports"], function (exports) {
         "email": "cheriwatts@scentric.com",
         "phone": "(854) 438-3356",
         "color": "rgb(90,88,182)"
-    }, {
+    },
+    {
         "index": 346,
         "name": "Anita Jacobson",
         "first": "Lucile",
@@ -7435,7 +7848,8 @@ define('data/data',["exports"], function (exports) {
         "email": "lucileroberts@scentric.com",
         "phone": "(826) 522-3183",
         "color": "rgb(114,159,181)"
-    }, {
+    },
+    {
         "index": 347,
         "name": "Beverly Ayala",
         "first": "Teresa",
@@ -7456,7 +7870,8 @@ define('data/data',["exports"], function (exports) {
         "email": "teresaserrano@scentric.com",
         "phone": "(898) 426-2065",
         "color": "rgb(110,156,140)"
-    }, {
+    },
+    {
         "index": 348,
         "name": "Golden Zimmerman",
         "first": "Greta",
@@ -7477,7 +7892,8 @@ define('data/data',["exports"], function (exports) {
         "email": "gretagillespie@scentric.com",
         "phone": "(907) 597-3902",
         "color": "rgb(54,207,230)"
-    }, {
+    },
+    {
         "index": 349,
         "name": "Sandra Taylor",
         "first": "Schroeder",
@@ -7498,7 +7914,8 @@ define('data/data',["exports"], function (exports) {
         "email": "schroedernoel@scentric.com",
         "phone": "(982) 532-3421",
         "color": "rgb(240,238,143)"
-    }, {
+    },
+    {
         "index": 350,
         "name": "Shelby Lott",
         "first": "Maryanne",
@@ -7519,7 +7936,8 @@ define('data/data',["exports"], function (exports) {
         "email": "maryannedixon@scentric.com",
         "phone": "(808) 502-2314",
         "color": "rgb(150,72,230)"
-    }, {
+    },
+    {
         "index": 351,
         "name": "Buck Reyes",
         "first": "Meredith",
@@ -7540,7 +7958,8 @@ define('data/data',["exports"], function (exports) {
         "email": "meredithkennedy@scentric.com",
         "phone": "(805) 554-3669",
         "color": "rgb(179,239,148)"
-    }, {
+    },
+    {
         "index": 352,
         "name": "Wooten Sloan",
         "first": "Allen",
@@ -7561,7 +7980,8 @@ define('data/data',["exports"], function (exports) {
         "email": "allenwade@scentric.com",
         "phone": "(971) 515-2074",
         "color": "rgb(55,67,137)"
-    }, {
+    },
+    {
         "index": 353,
         "name": "Luella Hogan",
         "first": "Flores",
@@ -7582,7 +8002,8 @@ define('data/data',["exports"], function (exports) {
         "email": "floreswolfe@scentric.com",
         "phone": "(961) 502-3921",
         "color": "rgb(81,99,101)"
-    }, {
+    },
+    {
         "index": 354,
         "name": "Mckee Tillman",
         "first": "Patsy",
@@ -7603,7 +8024,8 @@ define('data/data',["exports"], function (exports) {
         "email": "patsyodonnell@scentric.com",
         "phone": "(991) 576-3320",
         "color": "rgb(151,157,82)"
-    }, {
+    },
+    {
         "index": 355,
         "name": "Tammy Mckenzie",
         "first": "Araceli",
@@ -7624,7 +8046,8 @@ define('data/data',["exports"], function (exports) {
         "email": "aracelivillarreal@scentric.com",
         "phone": "(922) 535-2085",
         "color": "rgb(123,74,237)"
-    }, {
+    },
+    {
         "index": 356,
         "name": "Joyce Carney",
         "first": "Vance",
@@ -7645,7 +8068,8 @@ define('data/data',["exports"], function (exports) {
         "email": "vanceboyd@scentric.com",
         "phone": "(950) 499-2028",
         "color": "rgb(151,255,141)"
-    }, {
+    },
+    {
         "index": 357,
         "name": "Briggs Cash",
         "first": "Mason",
@@ -7666,7 +8090,8 @@ define('data/data',["exports"], function (exports) {
         "email": "masonnorton@scentric.com",
         "phone": "(988) 478-3734",
         "color": "rgb(122,225,185)"
-    }, {
+    },
+    {
         "index": 358,
         "name": "Frank Vance",
         "first": "Eva",
@@ -7687,7 +8112,8 @@ define('data/data',["exports"], function (exports) {
         "email": "evachristian@scentric.com",
         "phone": "(933) 555-3019",
         "color": "rgb(65,246,66)"
-    }, {
+    },
+    {
         "index": 359,
         "name": "Bennett Fitzgerald",
         "first": "Alyce",
@@ -7708,7 +8134,8 @@ define('data/data',["exports"], function (exports) {
         "email": "alyceroth@scentric.com",
         "phone": "(930) 449-2969",
         "color": "rgb(122,168,204)"
-    }, {
+    },
+    {
         "index": 360,
         "name": "Garrett Lawson",
         "first": "Marlene",
@@ -7729,7 +8156,8 @@ define('data/data',["exports"], function (exports) {
         "email": "marlenehatfield@scentric.com",
         "phone": "(944) 414-3916",
         "color": "rgb(156,157,84)"
-    }, {
+    },
+    {
         "index": 361,
         "name": "Rosalinda Barber",
         "first": "Rosalind",
@@ -7750,7 +8178,8 @@ define('data/data',["exports"], function (exports) {
         "email": "rosalindlittle@scentric.com",
         "phone": "(912) 415-2087",
         "color": "rgb(158,187,61)"
-    }, {
+    },
+    {
         "index": 362,
         "name": "Krystal Lane",
         "first": "Kitty",
@@ -7771,7 +8200,8 @@ define('data/data',["exports"], function (exports) {
         "email": "kittyhodge@scentric.com",
         "phone": "(994) 498-3202",
         "color": "rgb(139,225,83)"
-    }, {
+    },
+    {
         "index": 363,
         "name": "Lorrie Carey",
         "first": "Moran",
@@ -7792,7 +8222,8 @@ define('data/data',["exports"], function (exports) {
         "email": "moranbradshaw@scentric.com",
         "phone": "(807) 537-3271",
         "color": "rgb(54,143,210)"
-    }, {
+    },
+    {
         "index": 364,
         "name": "Kirk Richard",
         "first": "Delia",
@@ -7813,7 +8244,8 @@ define('data/data',["exports"], function (exports) {
         "email": "deliacervantes@scentric.com",
         "phone": "(829) 471-3065",
         "color": "rgb(94,71,106)"
-    }, {
+    },
+    {
         "index": 365,
         "name": "Tate Mcdowell",
         "first": "Adrian",
@@ -7834,7 +8266,8 @@ define('data/data',["exports"], function (exports) {
         "email": "adrianmccullough@scentric.com",
         "phone": "(810) 599-3339",
         "color": "rgb(178,126,71)"
-    }, {
+    },
+    {
         "index": 366,
         "name": "Terry Romero",
         "first": "Barrett",
@@ -7855,7 +8288,8 @@ define('data/data',["exports"], function (exports) {
         "email": "barrettburgess@scentric.com",
         "phone": "(946) 534-2498",
         "color": "rgb(219,133,212)"
-    }, {
+    },
+    {
         "index": 367,
         "name": "Karen Collins",
         "first": "Barton",
@@ -7876,7 +8310,8 @@ define('data/data',["exports"], function (exports) {
         "email": "bartondiaz@scentric.com",
         "phone": "(915) 446-2455",
         "color": "rgb(198,214,168)"
-    }, {
+    },
+    {
         "index": 368,
         "name": "Carly Kirkland",
         "first": "Malone",
@@ -7897,7 +8332,8 @@ define('data/data',["exports"], function (exports) {
         "email": "malonewest@scentric.com",
         "phone": "(884) 560-3387",
         "color": "rgb(203,128,144)"
-    }, {
+    },
+    {
         "index": 369,
         "name": "Cline Porter",
         "first": "Villarreal",
@@ -7918,7 +8354,8 @@ define('data/data',["exports"], function (exports) {
         "email": "villarrealberg@scentric.com",
         "phone": "(934) 457-2444",
         "color": "rgb(128,225,98)"
-    }, {
+    },
+    {
         "index": 370,
         "name": "Davidson Parker",
         "first": "George",
@@ -7939,7 +8376,8 @@ define('data/data',["exports"], function (exports) {
         "email": "georgepittman@scentric.com",
         "phone": "(812) 518-3391",
         "color": "rgb(128,255,152)"
-    }, {
+    },
+    {
         "index": 371,
         "name": "Ingram Ware",
         "first": "Caitlin",
@@ -7960,7 +8398,8 @@ define('data/data',["exports"], function (exports) {
         "email": "caitlinhart@scentric.com",
         "phone": "(802) 458-3217",
         "color": "rgb(245,222,100)"
-    }, {
+    },
+    {
         "index": 372,
         "name": "Rodriguez Herring",
         "first": "Blevins",
@@ -7981,7 +8420,8 @@ define('data/data',["exports"], function (exports) {
         "email": "blevinsrichards@scentric.com",
         "phone": "(880) 569-2358",
         "color": "rgb(141,69,176)"
-    }, {
+    },
+    {
         "index": 373,
         "name": "Larsen Petersen",
         "first": "Kayla",
@@ -8002,7 +8442,8 @@ define('data/data',["exports"], function (exports) {
         "email": "kaylawolf@scentric.com",
         "phone": "(905) 565-3468",
         "color": "rgb(60,235,69)"
-    }, {
+    },
+    {
         "index": 374,
         "name": "Holt Oconnor",
         "first": "Newman",
@@ -8023,7 +8464,8 @@ define('data/data',["exports"], function (exports) {
         "email": "newmanskinner@scentric.com",
         "phone": "(895) 579-2625",
         "color": "rgb(213,132,55)"
-    }, {
+    },
+    {
         "index": 375,
         "name": "Ray Mcdonald",
         "first": "Gladys",
@@ -8044,7 +8486,8 @@ define('data/data',["exports"], function (exports) {
         "email": "gladyshamilton@scentric.com",
         "phone": "(966) 483-3351",
         "color": "rgb(155,104,148)"
-    }, {
+    },
+    {
         "index": 376,
         "name": "Clay Langley",
         "first": "Burris",
@@ -8065,7 +8508,8 @@ define('data/data',["exports"], function (exports) {
         "email": "burrisrandall@scentric.com",
         "phone": "(844) 495-2795",
         "color": "rgb(161,56,157)"
-    }, {
+    },
+    {
         "index": 377,
         "name": "Whitaker Duffy",
         "first": "Consuelo",
@@ -8086,7 +8530,8 @@ define('data/data',["exports"], function (exports) {
         "email": "consuelovaughn@scentric.com",
         "phone": "(820) 453-3820",
         "color": "rgb(211,124,127)"
-    }, {
+    },
+    {
         "index": 378,
         "name": "Millicent Brewer",
         "first": "Carpenter",
@@ -8107,7 +8552,8 @@ define('data/data',["exports"], function (exports) {
         "email": "carpenterfrench@scentric.com",
         "phone": "(981) 464-3639",
         "color": "rgb(116,120,98)"
-    }, {
+    },
+    {
         "index": 379,
         "name": "Blanchard Solis",
         "first": "Kristie",
@@ -8128,7 +8574,8 @@ define('data/data',["exports"], function (exports) {
         "email": "kristiecabrera@scentric.com",
         "phone": "(870) 486-2499",
         "color": "rgb(60,117,146)"
-    }, {
+    },
+    {
         "index": 380,
         "name": "Armstrong Leon",
         "first": "Wolfe",
@@ -8149,7 +8596,8 @@ define('data/data',["exports"], function (exports) {
         "email": "wolfehansen@scentric.com",
         "phone": "(834) 587-3684",
         "color": "rgb(135,161,252)"
-    }, {
+    },
+    {
         "index": 381,
         "name": "Kerry Emerson",
         "first": "Hurst",
@@ -8170,7 +8618,8 @@ define('data/data',["exports"], function (exports) {
         "email": "hurstgilliam@scentric.com",
         "phone": "(883) 509-3820",
         "color": "rgb(92,147,218)"
-    }, {
+    },
+    {
         "index": 382,
         "name": "Rosanna Mercer",
         "first": "Jeannie",
@@ -8191,7 +8640,8 @@ define('data/data',["exports"], function (exports) {
         "email": "jeannieharrington@scentric.com",
         "phone": "(869) 440-3471",
         "color": "rgb(54,179,184)"
-    }, {
+    },
+    {
         "index": 383,
         "name": "Hudson Gill",
         "first": "Erma",
@@ -8212,7 +8662,8 @@ define('data/data',["exports"], function (exports) {
         "email": "ermamedina@scentric.com",
         "phone": "(806) 595-3481",
         "color": "rgb(144,140,116)"
-    }, {
+    },
+    {
         "index": 384,
         "name": "Dominique Valenzuela",
         "first": "Stacey",
@@ -8233,7 +8684,8 @@ define('data/data',["exports"], function (exports) {
         "email": "staceyforeman@scentric.com",
         "phone": "(829) 412-3655",
         "color": "rgb(214,140,189)"
-    }, {
+    },
+    {
         "index": 385,
         "name": "Dolores Morgan",
         "first": "Gaines",
@@ -8254,7 +8706,8 @@ define('data/data',["exports"], function (exports) {
         "email": "gainesmullen@scentric.com",
         "phone": "(832) 562-2069",
         "color": "rgb(177,196,203)"
-    }, {
+    },
+    {
         "index": 386,
         "name": "Washington Bates",
         "first": "Mccray",
@@ -8275,7 +8728,8 @@ define('data/data',["exports"], function (exports) {
         "email": "mccraydavenport@scentric.com",
         "phone": "(970) 600-2028",
         "color": "rgb(55,74,60)"
-    }, {
+    },
+    {
         "index": 387,
         "name": "Estela Dotson",
         "first": "Brewer",
@@ -8296,7 +8750,8 @@ define('data/data',["exports"], function (exports) {
         "email": "brewerbarnett@scentric.com",
         "phone": "(824) 468-3108",
         "color": "rgb(251,142,227)"
-    }, {
+    },
+    {
         "index": 388,
         "name": "Griffith Calhoun",
         "first": "Elma",
@@ -8317,7 +8772,8 @@ define('data/data',["exports"], function (exports) {
         "email": "elmadelaney@scentric.com",
         "phone": "(820) 569-3637",
         "color": "rgb(73,159,77)"
-    }, {
+    },
+    {
         "index": 389,
         "name": "Delgado Brennan",
         "first": "Mercedes",
@@ -8338,7 +8794,8 @@ define('data/data',["exports"], function (exports) {
         "email": "mercedeslivingston@scentric.com",
         "phone": "(982) 574-2165",
         "color": "rgb(166,233,208)"
-    }, {
+    },
+    {
         "index": 390,
         "name": "Melanie Gilmore",
         "first": "Michael",
@@ -8359,7 +8816,8 @@ define('data/data',["exports"], function (exports) {
         "email": "michaelrodriquez@scentric.com",
         "phone": "(870) 537-3435",
         "color": "rgb(69,106,81)"
-    }, {
+    },
+    {
         "index": 391,
         "name": "Hamilton Sanford",
         "first": "Quinn",
@@ -8380,7 +8838,8 @@ define('data/data',["exports"], function (exports) {
         "email": "quinndeleon@scentric.com",
         "phone": "(843) 402-3938",
         "color": "rgb(178,174,101)"
-    }, {
+    },
+    {
         "index": 392,
         "name": "Williams Wiggins",
         "first": "Brooke",
@@ -8401,7 +8860,8 @@ define('data/data',["exports"], function (exports) {
         "email": "brookepitts@scentric.com",
         "phone": "(951) 474-2640",
         "color": "rgb(210,98,96)"
-    }, {
+    },
+    {
         "index": 393,
         "name": "Lucia Maynard",
         "first": "Moore",
@@ -8422,7 +8882,8 @@ define('data/data',["exports"], function (exports) {
         "email": "moorebass@scentric.com",
         "phone": "(913) 577-3866",
         "color": "rgb(103,233,105)"
-    }, {
+    },
+    {
         "index": 394,
         "name": "Walker Workman",
         "first": "Howard",
@@ -8443,7 +8904,8 @@ define('data/data',["exports"], function (exports) {
         "email": "howardfleming@scentric.com",
         "phone": "(844) 545-2412",
         "color": "rgb(126,110,68)"
-    }, {
+    },
+    {
         "index": 395,
         "name": "Harper Chase",
         "first": "Glenda",
@@ -8464,7 +8926,8 @@ define('data/data',["exports"], function (exports) {
         "email": "glendaburns@scentric.com",
         "phone": "(856) 471-3316",
         "color": "rgb(157,180,79)"
-    }, {
+    },
+    {
         "index": 396,
         "name": "Lynch Dillard",
         "first": "Marta",
@@ -8485,7 +8948,8 @@ define('data/data',["exports"], function (exports) {
         "email": "martatrujillo@scentric.com",
         "phone": "(867) 559-3000",
         "color": "rgb(184,176,151)"
-    }, {
+    },
+    {
         "index": 397,
         "name": "Blake Wilkins",
         "first": "Lara",
@@ -8506,7 +8970,8 @@ define('data/data',["exports"], function (exports) {
         "email": "laragentry@scentric.com",
         "phone": "(909) 447-3849",
         "color": "rgb(209,112,163)"
-    }, {
+    },
+    {
         "index": 398,
         "name": "Lawson Peck",
         "first": "Mullen",
@@ -8527,7 +8992,8 @@ define('data/data',["exports"], function (exports) {
         "email": "mullenkeller@scentric.com",
         "phone": "(964) 598-3707",
         "color": "rgb(210,88,176)"
-    }, {
+    },
+    {
         "index": 399,
         "name": "Rosario Camacho",
         "first": "Trina",
@@ -8548,7 +9014,8 @@ define('data/data',["exports"], function (exports) {
         "email": "trinaperez@scentric.com",
         "phone": "(848) 593-3474",
         "color": "rgb(121,115,73)"
-    }, {
+    },
+    {
         "index": 400,
         "name": "Savannah Nieves",
         "first": "Sutton",
@@ -8569,7 +9036,8 @@ define('data/data',["exports"], function (exports) {
         "email": "suttononeill@scentric.com",
         "phone": "(957) 407-3116",
         "color": "rgb(163,237,93)"
-    }, {
+    },
+    {
         "index": 401,
         "name": "Faye Graves",
         "first": "Mildred",
@@ -8590,7 +9058,8 @@ define('data/data',["exports"], function (exports) {
         "email": "mildredbranch@scentric.com",
         "phone": "(888) 489-2923",
         "color": "rgb(206,181,98)"
-    }, {
+    },
+    {
         "index": 402,
         "name": "England Cameron",
         "first": "Heath",
@@ -8611,7 +9080,8 @@ define('data/data',["exports"], function (exports) {
         "email": "heathroach@scentric.com",
         "phone": "(947) 435-3218",
         "color": "rgb(247,200,211)"
-    }, {
+    },
+    {
         "index": 403,
         "name": "Michele Reynolds",
         "first": "Mayo",
@@ -8632,7 +9102,8 @@ define('data/data',["exports"], function (exports) {
         "email": "mayogray@scentric.com",
         "phone": "(992) 459-3031",
         "color": "rgb(215,198,143)"
-    }, {
+    },
+    {
         "index": 404,
         "name": "Dorthy Simon",
         "first": "Gena",
@@ -8653,7 +9124,8 @@ define('data/data',["exports"], function (exports) {
         "email": "genacalderon@scentric.com",
         "phone": "(888) 431-2447",
         "color": "rgb(169,113,77)"
-    }, {
+    },
+    {
         "index": 405,
         "name": "Estella Bird",
         "first": "Candice",
@@ -8674,7 +9146,8 @@ define('data/data',["exports"], function (exports) {
         "email": "candicegrant@scentric.com",
         "phone": "(991) 536-3705",
         "color": "rgb(157,106,60)"
-    }, {
+    },
+    {
         "index": 406,
         "name": "Clarissa Bray",
         "first": "Rojas",
@@ -8695,7 +9168,8 @@ define('data/data',["exports"], function (exports) {
         "email": "rojasrobles@scentric.com",
         "phone": "(829) 530-3596",
         "color": "rgb(58,225,142)"
-    }, {
+    },
+    {
         "index": 407,
         "name": "Jody Schultz",
         "first": "Baird",
@@ -8716,7 +9190,8 @@ define('data/data',["exports"], function (exports) {
         "email": "bairdrobinson@scentric.com",
         "phone": "(881) 497-3274",
         "color": "rgb(109,107,114)"
-    }, {
+    },
+    {
         "index": 408,
         "name": "Sullivan Singleton",
         "first": "Lupe",
@@ -8737,7 +9212,8 @@ define('data/data',["exports"], function (exports) {
         "email": "lupeshields@scentric.com",
         "phone": "(945) 571-2010",
         "color": "rgb(61,207,100)"
-    }, {
+    },
+    {
         "index": 409,
         "name": "Bullock Harrell",
         "first": "Morse",
@@ -8758,7 +9234,8 @@ define('data/data',["exports"], function (exports) {
         "email": "morsehaynes@scentric.com",
         "phone": "(933) 478-3987",
         "color": "rgb(127,118,223)"
-    }, {
+    },
+    {
         "index": 410,
         "name": "Tammi Gordon",
         "first": "Cooke",
@@ -8779,7 +9256,8 @@ define('data/data',["exports"], function (exports) {
         "email": "cookechandler@scentric.com",
         "phone": "(975) 467-3292",
         "color": "rgb(138,124,136)"
-    }, {
+    },
+    {
         "index": 411,
         "name": "Jeanine Shaw",
         "first": "Kasey",
@@ -8800,7 +9278,8 @@ define('data/data',["exports"], function (exports) {
         "email": "kaseyguerrero@scentric.com",
         "phone": "(807) 548-3703",
         "color": "rgb(77,230,193)"
-    }, {
+    },
+    {
         "index": 412,
         "name": "Mcmahon Reeves",
         "first": "Amanda",
@@ -8821,7 +9300,8 @@ define('data/data',["exports"], function (exports) {
         "email": "amandaholloway@scentric.com",
         "phone": "(818) 520-3833",
         "color": "rgb(198,210,85)"
-    }, {
+    },
+    {
         "index": 413,
         "name": "Fox Patterson",
         "first": "Samantha",
@@ -8842,7 +9322,8 @@ define('data/data',["exports"], function (exports) {
         "email": "samanthafrazier@scentric.com",
         "phone": "(831) 425-2424",
         "color": "rgb(239,229,222)"
-    }, {
+    },
+    {
         "index": 414,
         "name": "Gloria Mcclain",
         "first": "Marisol",
@@ -8863,7 +9344,8 @@ define('data/data',["exports"], function (exports) {
         "email": "marisolmarshall@scentric.com",
         "phone": "(850) 423-2670",
         "color": "rgb(179,133,229)"
-    }, {
+    },
+    {
         "index": 415,
         "name": "Mcintyre Cochran",
         "first": "Courtney",
@@ -8884,7 +9366,8 @@ define('data/data',["exports"], function (exports) {
         "email": "courtneyfaulkner@scentric.com",
         "phone": "(861) 587-3003",
         "color": "rgb(87,119,212)"
-    }, {
+    },
+    {
         "index": 416,
         "name": "Sheppard Pacheco",
         "first": "Shepard",
@@ -8905,7 +9388,8 @@ define('data/data',["exports"], function (exports) {
         "email": "shepardhopper@scentric.com",
         "phone": "(985) 565-3301",
         "color": "rgb(103,234,218)"
-    }, {
+    },
+    {
         "index": 417,
         "name": "Hobbs Chapman",
         "first": "Byers",
@@ -8926,7 +9410,8 @@ define('data/data',["exports"], function (exports) {
         "email": "byerscraig@scentric.com",
         "phone": "(830) 519-3986",
         "color": "rgb(189,244,220)"
-    }, {
+    },
+    {
         "index": 418,
         "name": "Lisa Yates",
         "first": "Lea",
@@ -8947,7 +9432,8 @@ define('data/data',["exports"], function (exports) {
         "email": "leaunderwood@scentric.com",
         "phone": "(828) 506-3671",
         "color": "rgb(157,198,63)"
-    }, {
+    },
+    {
         "index": 419,
         "name": "Casey Long",
         "first": "Ella",
@@ -8968,7 +9454,8 @@ define('data/data',["exports"], function (exports) {
         "email": "ellaingram@scentric.com",
         "phone": "(939) 546-2501",
         "color": "rgb(50,99,109)"
-    }, {
+    },
+    {
         "index": 420,
         "name": "Kent Fitzpatrick",
         "first": "Lara",
@@ -8989,7 +9476,8 @@ define('data/data',["exports"], function (exports) {
         "email": "laravinson@scentric.com",
         "phone": "(965) 578-3210",
         "color": "rgb(152,231,185)"
-    }, {
+    },
+    {
         "index": 421,
         "name": "Claudia Ochoa",
         "first": "Maynard",
@@ -9010,7 +9498,8 @@ define('data/data',["exports"], function (exports) {
         "email": "maynardgiles@scentric.com",
         "phone": "(868) 426-2611",
         "color": "rgb(82,210,230)"
-    }, {
+    },
+    {
         "index": 422,
         "name": "Deleon Madden",
         "first": "Jeri",
@@ -9031,7 +9520,8 @@ define('data/data',["exports"], function (exports) {
         "email": "jeriroy@scentric.com",
         "phone": "(840) 457-2791",
         "color": "rgb(127,95,131)"
-    }, {
+    },
+    {
         "index": 423,
         "name": "Alexander Carroll",
         "first": "Spears",
@@ -9052,7 +9542,8 @@ define('data/data',["exports"], function (exports) {
         "email": "spearsobrien@scentric.com",
         "phone": "(832) 502-3659",
         "color": "rgb(138,211,151)"
-    }, {
+    },
+    {
         "index": 424,
         "name": "Debora Gibson",
         "first": "Crane",
@@ -9073,7 +9564,8 @@ define('data/data',["exports"], function (exports) {
         "email": "cranelawrence@scentric.com",
         "phone": "(871) 449-2232",
         "color": "rgb(249,221,142)"
-    }, {
+    },
+    {
         "index": 425,
         "name": "Effie Witt",
         "first": "Tamika",
@@ -9094,7 +9586,8 @@ define('data/data',["exports"], function (exports) {
         "email": "tamikamcfarland@scentric.com",
         "phone": "(822) 428-3372",
         "color": "rgb(123,143,247)"
-    }, {
+    },
+    {
         "index": 426,
         "name": "Marissa Winters",
         "first": "Bradford",
@@ -9115,7 +9608,8 @@ define('data/data',["exports"], function (exports) {
         "email": "bradfordtate@scentric.com",
         "phone": "(895) 532-2566",
         "color": "rgb(254,114,222)"
-    }, {
+    },
+    {
         "index": 427,
         "name": "Keri Holt",
         "first": "Pate",
@@ -9136,7 +9630,8 @@ define('data/data',["exports"], function (exports) {
         "email": "pateford@scentric.com",
         "phone": "(933) 513-2608",
         "color": "rgb(74,250,221)"
-    }, {
+    },
+    {
         "index": 428,
         "name": "Billie Dennis",
         "first": "Noreen",
@@ -9157,7 +9652,8 @@ define('data/data',["exports"], function (exports) {
         "email": "noreenchambers@scentric.com",
         "phone": "(921) 600-2756",
         "color": "rgb(240,228,68)"
-    }, {
+    },
+    {
         "index": 429,
         "name": "Norris Henderson",
         "first": "Rhea",
@@ -9178,7 +9674,8 @@ define('data/data',["exports"], function (exports) {
         "email": "rheavelasquez@scentric.com",
         "phone": "(801) 444-3966",
         "color": "rgb(186,114,65)"
-    }, {
+    },
+    {
         "index": 430,
         "name": "Carrillo Park",
         "first": "Ola",
@@ -9199,7 +9696,8 @@ define('data/data',["exports"], function (exports) {
         "email": "olaallison@scentric.com",
         "phone": "(813) 560-2883",
         "color": "rgb(206,102,76)"
-    }, {
+    },
+    {
         "index": 431,
         "name": "Aileen Manning",
         "first": "Sophia",
@@ -9220,7 +9718,8 @@ define('data/data',["exports"], function (exports) {
         "email": "sophiahouse@scentric.com",
         "phone": "(829) 411-2721",
         "color": "rgb(188,234,157)"
-    }, {
+    },
+    {
         "index": 432,
         "name": "Angeline Welch",
         "first": "Riggs",
@@ -9241,7 +9740,8 @@ define('data/data',["exports"], function (exports) {
         "email": "riggsalbert@scentric.com",
         "phone": "(964) 471-3289",
         "color": "rgb(143,144,152)"
-    }, {
+    },
+    {
         "index": 433,
         "name": "Wilder Parks",
         "first": "Guzman",
@@ -9262,7 +9762,8 @@ define('data/data',["exports"], function (exports) {
         "email": "guzmangay@scentric.com",
         "phone": "(995) 459-2856",
         "color": "rgb(54,118,212)"
-    }, {
+    },
+    {
         "index": 434,
         "name": "Nash Valencia",
         "first": "Leanne",
@@ -9283,7 +9784,8 @@ define('data/data',["exports"], function (exports) {
         "email": "leannestafford@scentric.com",
         "phone": "(976) 400-2448",
         "color": "rgb(172,121,148)"
-    }, {
+    },
+    {
         "index": 435,
         "name": "Mann Lindsey",
         "first": "Angelita",
@@ -9304,7 +9806,8 @@ define('data/data',["exports"], function (exports) {
         "email": "angelitaholland@scentric.com",
         "phone": "(939) 494-2894",
         "color": "rgb(245,81,217)"
-    }, {
+    },
+    {
         "index": 436,
         "name": "Herring Barry",
         "first": "Fanny",
@@ -9325,7 +9828,8 @@ define('data/data',["exports"], function (exports) {
         "email": "fannymills@scentric.com",
         "phone": "(961) 418-2958",
         "color": "rgb(207,161,63)"
-    }, {
+    },
+    {
         "index": 437,
         "name": "Davenport Knowles",
         "first": "Carol",
@@ -9346,7 +9850,8 @@ define('data/data',["exports"], function (exports) {
         "email": "carolacevedo@scentric.com",
         "phone": "(873) 489-2712",
         "color": "rgb(215,231,234)"
-    }, {
+    },
+    {
         "index": 438,
         "name": "Sonia Moses",
         "first": "Patel",
@@ -9367,7 +9872,8 @@ define('data/data',["exports"], function (exports) {
         "email": "patelthompson@scentric.com",
         "phone": "(883) 472-3011",
         "color": "rgb(207,132,88)"
-    }, {
+    },
+    {
         "index": 439,
         "name": "Gabrielle Black",
         "first": "Holmes",
@@ -9388,7 +9894,8 @@ define('data/data',["exports"], function (exports) {
         "email": "holmesvalentine@scentric.com",
         "phone": "(990) 581-2101",
         "color": "rgb(140,238,67)"
-    }, {
+    },
+    {
         "index": 440,
         "name": "Lakisha Cross",
         "first": "Pena",
@@ -9409,7 +9916,8 @@ define('data/data',["exports"], function (exports) {
         "email": "penacompton@scentric.com",
         "phone": "(979) 573-3861",
         "color": "rgb(191,149,118)"
-    }, {
+    },
+    {
         "index": 441,
         "name": "Concetta Whitaker",
         "first": "Lora",
@@ -9430,7 +9938,8 @@ define('data/data',["exports"], function (exports) {
         "email": "loramccarthy@scentric.com",
         "phone": "(878) 505-2614",
         "color": "rgb(124,101,157)"
-    }, {
+    },
+    {
         "index": 442,
         "name": "Tammie Juarez",
         "first": "Liza",
@@ -9451,7 +9960,8 @@ define('data/data',["exports"], function (exports) {
         "email": "lizadaniel@scentric.com",
         "phone": "(837) 444-2117",
         "color": "rgb(169,145,105)"
-    }, {
+    },
+    {
         "index": 443,
         "name": "Bettie Osborne",
         "first": "Daugherty",
@@ -9472,7 +9982,8 @@ define('data/data',["exports"], function (exports) {
         "email": "daughertyrandolph@scentric.com",
         "phone": "(978) 484-3479",
         "color": "rgb(158,76,101)"
-    }, {
+    },
+    {
         "index": 444,
         "name": "Valenzuela Swanson",
         "first": "Buckner",
@@ -9493,7 +10004,8 @@ define('data/data',["exports"], function (exports) {
         "email": "bucknerdawson@scentric.com",
         "phone": "(822) 533-3432",
         "color": "rgb(72,149,99)"
-    }, {
+    },
+    {
         "index": 445,
         "name": "Bernice Hood",
         "first": "Dionne",
@@ -9514,7 +10026,8 @@ define('data/data',["exports"], function (exports) {
         "email": "dionnerusso@scentric.com",
         "phone": "(890) 461-3250",
         "color": "rgb(229,252,247)"
-    }, {
+    },
+    {
         "index": 446,
         "name": "Schneider Small",
         "first": "West",
@@ -9535,7 +10048,8 @@ define('data/data',["exports"], function (exports) {
         "email": "westbuckner@scentric.com",
         "phone": "(972) 592-3400",
         "color": "rgb(90,160,183)"
-    }, {
+    },
+    {
         "index": 447,
         "name": "Jones Fields",
         "first": "Trujillo",
@@ -9556,7 +10070,8 @@ define('data/data',["exports"], function (exports) {
         "email": "trujillomorales@scentric.com",
         "phone": "(908) 595-3540",
         "color": "rgb(252,248,234)"
-    }, {
+    },
+    {
         "index": 448,
         "name": "Ester Weber",
         "first": "Eve",
@@ -9577,7 +10092,8 @@ define('data/data',["exports"], function (exports) {
         "email": "evebonner@scentric.com",
         "phone": "(993) 461-3721",
         "color": "rgb(220,194,238)"
-    }, {
+    },
+    {
         "index": 449,
         "name": "Jaclyn Bright",
         "first": "Christy",
@@ -9598,7 +10114,8 @@ define('data/data',["exports"], function (exports) {
         "email": "christygraham@scentric.com",
         "phone": "(943) 493-3287",
         "color": "rgb(201,124,187)"
-    }, {
+    },
+    {
         "index": 450,
         "name": "Burton Valdez",
         "first": "Aurora",
@@ -9619,7 +10136,8 @@ define('data/data',["exports"], function (exports) {
         "email": "auroramorse@scentric.com",
         "phone": "(866) 493-3254",
         "color": "rgb(60,132,78)"
-    }, {
+    },
+    {
         "index": 451,
         "name": "Sharpe Mccall",
         "first": "Leanna",
@@ -9640,7 +10158,8 @@ define('data/data',["exports"], function (exports) {
         "email": "leannaday@scentric.com",
         "phone": "(926) 463-2373",
         "color": "rgb(219,81,203)"
-    }, {
+    },
+    {
         "index": 452,
         "name": "Richmond Clayton",
         "first": "Sherrie",
@@ -9661,7 +10180,8 @@ define('data/data',["exports"], function (exports) {
         "email": "sherrierobertson@scentric.com",
         "phone": "(950) 518-2372",
         "color": "rgb(116,89,161)"
-    }, {
+    },
+    {
         "index": 453,
         "name": "Small Church",
         "first": "Sylvia",
@@ -9682,7 +10202,8 @@ define('data/data',["exports"], function (exports) {
         "email": "sylviaterrell@scentric.com",
         "phone": "(823) 424-2163",
         "color": "rgb(216,232,199)"
-    }, {
+    },
+    {
         "index": 454,
         "name": "Alyson Dudley",
         "first": "Mckay",
@@ -9703,7 +10224,8 @@ define('data/data',["exports"], function (exports) {
         "email": "mckayholmes@scentric.com",
         "phone": "(951) 589-2723",
         "color": "rgb(163,183,107)"
-    }, {
+    },
+    {
         "index": 455,
         "name": "Curry Webb",
         "first": "Sheena",
@@ -9724,7 +10246,8 @@ define('data/data',["exports"], function (exports) {
         "email": "sheenawilkerson@scentric.com",
         "phone": "(879) 403-2513",
         "color": "rgb(118,194,142)"
-    }, {
+    },
+    {
         "index": 456,
         "name": "Christian Snyder",
         "first": "Lawanda",
@@ -9745,7 +10268,8 @@ define('data/data',["exports"], function (exports) {
         "email": "lawandabradford@scentric.com",
         "phone": "(888) 481-3858",
         "color": "rgb(247,122,60)"
-    }, {
+    },
+    {
         "index": 457,
         "name": "Contreras Jenkins",
         "first": "Lester",
@@ -9766,7 +10290,8 @@ define('data/data',["exports"], function (exports) {
         "email": "lestergarrett@scentric.com",
         "phone": "(972) 517-3113",
         "color": "rgb(239,120,56)"
-    }, {
+    },
+    {
         "index": 458,
         "name": "Holly Jackson",
         "first": "Susie",
@@ -9787,7 +10312,8 @@ define('data/data',["exports"], function (exports) {
         "email": "susiewatkins@scentric.com",
         "phone": "(837) 537-2963",
         "color": "rgb(172,67,201)"
-    }, {
+    },
+    {
         "index": 459,
         "name": "Josefina Gonzales",
         "first": "Erickson",
@@ -9808,7 +10334,8 @@ define('data/data',["exports"], function (exports) {
         "email": "ericksonbennett@scentric.com",
         "phone": "(937) 528-2434",
         "color": "rgb(132,110,89)"
-    }, {
+    },
+    {
         "index": 460,
         "name": "Sybil Boyle",
         "first": "Rosetta",
@@ -9829,7 +10356,8 @@ define('data/data',["exports"], function (exports) {
         "email": "rosettajoseph@scentric.com",
         "phone": "(981) 470-3813",
         "color": "rgb(209,237,158)"
-    }, {
+    },
+    {
         "index": 461,
         "name": "Case Decker",
         "first": "Santos",
@@ -9850,7 +10378,8 @@ define('data/data',["exports"], function (exports) {
         "email": "santosrice@scentric.com",
         "phone": "(890) 599-3600",
         "color": "rgb(95,54,177)"
-    }, {
+    },
+    {
         "index": 462,
         "name": "Snider Monroe",
         "first": "Jensen",
@@ -9871,7 +10400,8 @@ define('data/data',["exports"], function (exports) {
         "email": "jensenatkins@scentric.com",
         "phone": "(839) 445-3763",
         "color": "rgb(116,98,175)"
-    }, {
+    },
+    {
         "index": 463,
         "name": "Calderon Pugh",
         "first": "Monroe",
@@ -9892,7 +10422,8 @@ define('data/data',["exports"], function (exports) {
         "email": "monroetravis@scentric.com",
         "phone": "(806) 479-3754",
         "color": "rgb(93,63,172)"
-    }, {
+    },
+    {
         "index": 464,
         "name": "Colleen Haley",
         "first": "Conley",
@@ -9913,7 +10444,8 @@ define('data/data',["exports"], function (exports) {
         "email": "conleystanley@scentric.com",
         "phone": "(887) 439-2117",
         "color": "rgb(90,231,64)"
-    }, {
+    },
+    {
         "index": 465,
         "name": "Barry Andrews",
         "first": "Leona",
@@ -9934,7 +10466,8 @@ define('data/data',["exports"], function (exports) {
         "email": "leonanash@scentric.com",
         "phone": "(892) 484-3082",
         "color": "rgb(232,187,145)"
-    }, {
+    },
+    {
         "index": 466,
         "name": "Lynette Shepard",
         "first": "Walls",
@@ -9955,7 +10488,8 @@ define('data/data',["exports"], function (exports) {
         "email": "wallsbaxter@scentric.com",
         "phone": "(910) 431-2449",
         "color": "rgb(74,195,121)"
-    }, {
+    },
+    {
         "index": 467,
         "name": "Vega Dickson",
         "first": "Bishop",
@@ -9976,7 +10510,8 @@ define('data/data',["exports"], function (exports) {
         "email": "bishopstout@scentric.com",
         "phone": "(988) 498-2056",
         "color": "rgb(228,157,219)"
-    }, {
+    },
+    {
         "index": 468,
         "name": "Noelle Mosley",
         "first": "Barnes",
@@ -9997,7 +10532,8 @@ define('data/data',["exports"], function (exports) {
         "email": "barnesbowen@scentric.com",
         "phone": "(874) 465-2581",
         "color": "rgb(201,251,62)"
-    }, {
+    },
+    {
         "index": 469,
         "name": "Parrish Fowler",
         "first": "Glenna",
@@ -10018,7 +10554,8 @@ define('data/data',["exports"], function (exports) {
         "email": "glennagaines@scentric.com",
         "phone": "(819) 430-2612",
         "color": "rgb(196,125,143)"
-    }, {
+    },
+    {
         "index": 470,
         "name": "Booth Goodman",
         "first": "Kathrine",
@@ -10039,7 +10576,8 @@ define('data/data',["exports"], function (exports) {
         "email": "kathrinecurtis@scentric.com",
         "phone": "(857) 508-2561",
         "color": "rgb(174,52,167)"
-    }, {
+    },
+    {
         "index": 471,
         "name": "Benton Waters",
         "first": "Marietta",
@@ -10060,7 +10598,8 @@ define('data/data',["exports"], function (exports) {
         "email": "mariettacantu@scentric.com",
         "phone": "(932) 598-2276",
         "color": "rgb(156,114,200)"
-    }, {
+    },
+    {
         "index": 472,
         "name": "Lambert Spears",
         "first": "Harding",
@@ -10081,7 +10620,8 @@ define('data/data',["exports"], function (exports) {
         "email": "hardingwoodward@scentric.com",
         "phone": "(852) 477-3706",
         "color": "rgb(148,78,220)"
-    }, {
+    },
+    {
         "index": 473,
         "name": "Ferrell Gallegos",
         "first": "Marie",
@@ -10102,7 +10642,8 @@ define('data/data',["exports"], function (exports) {
         "email": "marieflowers@scentric.com",
         "phone": "(867) 463-2219",
         "color": "rgb(245,149,165)"
-    }, {
+    },
+    {
         "index": 474,
         "name": "Elena Hale",
         "first": "Leola",
@@ -10123,7 +10664,8 @@ define('data/data',["exports"], function (exports) {
         "email": "leolabyers@scentric.com",
         "phone": "(800) 419-2994",
         "color": "rgb(62,183,119)"
-    }, {
+    },
+    {
         "index": 475,
         "name": "Deloris Warren",
         "first": "Lacy",
@@ -10144,7 +10686,8 @@ define('data/data',["exports"], function (exports) {
         "email": "lacyelliott@scentric.com",
         "phone": "(927) 422-3415",
         "color": "rgb(69,169,92)"
-    }, {
+    },
+    {
         "index": 476,
         "name": "Young Lee",
         "first": "Kay",
@@ -10165,7 +10708,8 @@ define('data/data',["exports"], function (exports) {
         "email": "kaymontgomery@scentric.com",
         "phone": "(803) 429-2640",
         "color": "rgb(217,203,52)"
-    }, {
+    },
+    {
         "index": 477,
         "name": "Lynn Kim",
         "first": "Ericka",
@@ -10186,7 +10730,8 @@ define('data/data',["exports"], function (exports) {
         "email": "erickatodd@scentric.com",
         "phone": "(854) 460-2134",
         "color": "rgb(88,191,173)"
-    }, {
+    },
+    {
         "index": 478,
         "name": "Duran Rasmussen",
         "first": "Irene",
@@ -10207,7 +10752,8 @@ define('data/data',["exports"], function (exports) {
         "email": "ireneguy@scentric.com",
         "phone": "(895) 490-2069",
         "color": "rgb(65,241,108)"
-    }, {
+    },
+    {
         "index": 479,
         "name": "Gomez Kent",
         "first": "Beverley",
@@ -10228,7 +10774,8 @@ define('data/data',["exports"], function (exports) {
         "email": "beverleygarrison@scentric.com",
         "phone": "(923) 547-3876",
         "color": "rgb(69,99,135)"
-    }, {
+    },
+    {
         "index": 480,
         "name": "Bowers Benson",
         "first": "Cannon",
@@ -10249,7 +10796,8 @@ define('data/data',["exports"], function (exports) {
         "email": "cannoncunningham@scentric.com",
         "phone": "(922) 457-2557",
         "color": "rgb(214,152,137)"
-    }, {
+    },
+    {
         "index": 481,
         "name": "Duffy Moreno",
         "first": "Combs",
@@ -10270,7 +10818,8 @@ define('data/data',["exports"], function (exports) {
         "email": "combslamb@scentric.com",
         "phone": "(880) 495-3320",
         "color": "rgb(104,242,253)"
-    }, {
+    },
+    {
         "index": 482,
         "name": "Leach Middleton",
         "first": "Molina",
@@ -10291,7 +10840,8 @@ define('data/data',["exports"], function (exports) {
         "email": "molinaparsons@scentric.com",
         "phone": "(825) 403-3345",
         "color": "rgb(74,223,146)"
-    }, {
+    },
+    {
         "index": 483,
         "name": "Della Gomez",
         "first": "Lamb",
@@ -10312,7 +10862,8 @@ define('data/data',["exports"], function (exports) {
         "email": "lambpierce@scentric.com",
         "phone": "(996) 559-3096",
         "color": "rgb(154,210,165)"
-    }, {
+    },
+    {
         "index": 484,
         "name": "Holder Barker",
         "first": "Patrick",
@@ -10333,7 +10884,8 @@ define('data/data',["exports"], function (exports) {
         "email": "patrickbest@scentric.com",
         "phone": "(824) 579-3730",
         "color": "rgb(171,74,141)"
-    }, {
+    },
+    {
         "index": 485,
         "name": "Pitts Soto",
         "first": "Vincent",
@@ -10354,7 +10906,8 @@ define('data/data',["exports"], function (exports) {
         "email": "vincenthughes@scentric.com",
         "phone": "(947) 521-2627",
         "color": "rgb(241,60,119)"
-    }, {
+    },
+    {
         "index": 486,
         "name": "Morrison Frye",
         "first": "Mae",
@@ -10375,7 +10928,8 @@ define('data/data',["exports"], function (exports) {
         "email": "maeramirez@scentric.com",
         "phone": "(866) 481-3384",
         "color": "rgb(104,176,225)"
-    }, {
+    },
+    {
         "index": 487,
         "name": "Diane Patrick",
         "first": "Esperanza",
@@ -10396,7 +10950,8 @@ define('data/data',["exports"], function (exports) {
         "email": "esperanzarivera@scentric.com",
         "phone": "(909) 486-2560",
         "color": "rgb(164,161,80)"
-    }, {
+    },
+    {
         "index": 488,
         "name": "Ellen Rich",
         "first": "Chandra",
@@ -10417,7 +10972,8 @@ define('data/data',["exports"], function (exports) {
         "email": "chandracote@scentric.com",
         "phone": "(964) 526-3818",
         "color": "rgb(172,172,60)"
-    }, {
+    },
+    {
         "index": 489,
         "name": "Adele Stanton",
         "first": "Allison",
@@ -10438,7 +10994,8 @@ define('data/data',["exports"], function (exports) {
         "email": "allisonmaxwell@scentric.com",
         "phone": "(899) 448-3606",
         "color": "rgb(240,230,119)"
-    }, {
+    },
+    {
         "index": 490,
         "name": "Ilene Alston",
         "first": "Cecile",
@@ -10459,7 +11016,8 @@ define('data/data',["exports"], function (exports) {
         "email": "cecilewoods@scentric.com",
         "phone": "(937) 412-3586",
         "color": "rgb(218,151,77)"
-    }, {
+    },
+    {
         "index": 491,
         "name": "Page Marsh",
         "first": "Medina",
@@ -10480,7 +11038,8 @@ define('data/data',["exports"], function (exports) {
         "email": "medinawilson@scentric.com",
         "phone": "(915) 547-2479",
         "color": "rgb(97,200,182)"
-    }, {
+    },
+    {
         "index": 492,
         "name": "Raquel Torres",
         "first": "Winters",
@@ -10501,7 +11060,8 @@ define('data/data',["exports"], function (exports) {
         "email": "wintersmoon@scentric.com",
         "phone": "(812) 514-3427",
         "color": "rgb(129,103,138)"
-    }, {
+    },
+    {
         "index": 493,
         "name": "Sasha Kinney",
         "first": "Nielsen",
@@ -10522,7 +11082,8 @@ define('data/data',["exports"], function (exports) {
         "email": "nielsencallahan@scentric.com",
         "phone": "(897) 548-2921",
         "color": "rgb(58,212,98)"
-    }, {
+    },
+    {
         "index": 494,
         "name": "Justice Johnston",
         "first": "Francis",
@@ -10543,7 +11104,8 @@ define('data/data',["exports"], function (exports) {
         "email": "franciswalsh@scentric.com",
         "phone": "(922) 539-3195",
         "color": "rgb(80,154,75)"
-    }, {
+    },
+    {
         "index": 495,
         "name": "Leonard Hess",
         "first": "Kate",
@@ -10564,7 +11126,8 @@ define('data/data',["exports"], function (exports) {
         "email": "katemccoy@scentric.com",
         "phone": "(843) 483-2519",
         "color": "rgb(132,225,73)"
-    }, {
+    },
+    {
         "index": 496,
         "name": "Weiss Malone",
         "first": "Buchanan",
@@ -10585,7 +11148,8 @@ define('data/data',["exports"], function (exports) {
         "email": "buchananaustin@scentric.com",
         "phone": "(875) 459-2571",
         "color": "rgb(115,116,180)"
-    }, {
+    },
+    {
         "index": 497,
         "name": "Hawkins Parrish",
         "first": "Sandy",
@@ -10606,7 +11170,8 @@ define('data/data',["exports"], function (exports) {
         "email": "sandypoole@scentric.com",
         "phone": "(945) 488-2696",
         "color": "rgb(79,165,87)"
-    }, {
+    },
+    {
         "index": 498,
         "name": "Dena Sweeney",
         "first": "Kaitlin",
@@ -10627,7 +11192,8 @@ define('data/data',["exports"], function (exports) {
         "email": "kaitlinbrooks@scentric.com",
         "phone": "(894) 591-3716",
         "color": "rgb(131,63,152)"
-    }, {
+    },
+    {
         "index": 499,
         "name": "Saundra Mcbride",
         "first": "Rosemary",
@@ -10648,2753 +11214,85 @@ define('data/data',["exports"], function (exports) {
         "email": "rosemarygrimes@scentric.com",
         "phone": "(923) 453-2279",
         "color": "rgb(171,145,136)"
-    }];
-});
-define('data/dummyDataGenerator',['exports', './data'], function (exports, _data) {
-  'use strict';
-
-  Object.defineProperty(exports, "__esModule", {
-    value: true
-  });
-  exports.DummyDataGenerator = undefined;
-
-  function _classCallCheck(instance, Constructor) {
-    if (!(instance instanceof Constructor)) {
-      throw new TypeError("Cannot call a class as a function");
     }
-  }
-
-  var DummyDataGenerator = exports.DummyDataGenerator = function () {
-    function DummyDataGenerator() {
-      _classCallCheck(this, DummyDataGenerator);
-
-      this.totalGenerated = 0;
-
-      this.internalDataArray = _data.data;
-
-      this.index = [];
-      this.name = [];
-      this.first = [];
-      this.last = [];
-      this.images = [];
-      this.expanded = [];
-      this.guid = [];
-      this.integer = [];
-      this.shortText = [];
-      this.expanded = [];
-      this.date = [];
-      this.shortText = [];
-      this.mediumText = [];
-      this.longText = [];
-      this.address = [];
-      this.guid = [];
-      this.city = [];
-      this.state = [];
-      this.zip = [];
-      this.country = [];
-      this.email = [];
-      this.phone = [];
-      this.color = [];
-      this.number = [];
-      this.bool = [];
-
-      for (var i = 0; i < this.internalDataArray.length; i++) {
-        this.index.push(this.internalDataArray[i].index);
-        this.name.push(this.internalDataArray[i].name);
-        this.first.push(this.internalDataArray[i].first);
-        this.last.push(this.internalDataArray[i].last);
-        this.images.push(this.internalDataArray[i].image);
-        this.expanded.push(this.internalDataArray[i].expanded);
-        this.guid.push(this.internalDataArray[i].guid);
-        this.integer.push(this.internalDataArray[i].integer);
-        this.shortText.push(this.internalDataArray[i].shortText);
-        this.expanded.push(this.internalDataArray[i].expanded);
-        this.date.push(new Date(this.internalDataArray[i].date));
-        this.shortText.push(this.internalDataArray[i].shortText);
-        this.mediumText.push(this.internalDataArray[i].mediumText);
-        this.longText.push(this.internalDataArray[i].longText);
-        this.address.push(this.internalDataArray[i].address);
-        this.guid.push(this.internalDataArray[i].guid);
-        this.city.push(this.internalDataArray[i].city);
-        this.state.push(this.internalDataArray[i].state);
-        this.zip.push(this.internalDataArray[i].zip);
-        this.country.push(this.internalDataArray[i].country);
-        this.email.push(this.internalDataArray[i].email);
-        this.phone.push(this.internalDataArray[i].phone);
-        this.color.push(this.internalDataArray[i].color);
-        this.number.push(1 * (Math.floor(Math.random() * 500) + 0 + "." + (Math.floor(Math.random() * 500) + 0)));
-      }
-    }
-
-    DummyDataGenerator.prototype.reset = function reset() {
-      this.totalGenerated = 0;
-    };
-
-    DummyDataGenerator.prototype.generateData = function generateData(number, callback) {
-
-      var dummyArray = [];
-      for (var i = 0; i < number; i++) {
-        this.totalGenerated++;
-        var random1 = Math.floor(Math.random() * 500) + 0;
-        var random2 = Math.floor(Math.random() * 500) + 0;
-        var random3 = Math.floor(Math.random() * 500) + 0;
-        var random4 = Math.floor(Math.random() * 500) + 0;
-        var random5 = Math.floor(Math.random() * 500) + 0;
-
-        var x = 'high';
-        if (random2 > 50) {
-          x = 'very low';
-        }
-        if (random2 > 100) {
-          x = 'low';
-        }
-        if (random2 > 250) {
-          x = 'normal';
-        }
-        if (random2 > 400) {
-          x = 'high';
-        }
-
-        dummyArray.push({
-          "index": this.totalGenerated,
-          "name": this.first[random2] + " " + this.last[random3],
-          "first": this.first[random2],
-          "last": this.last[random3],
-          "images": this.images[random4],
-          "expanded": this.expanded[random5],
-          "guid": this.guid[random1],
-          "integer": this.integer[random2],
-          "date": this.date[random3],
-          "shortText": this.shortText[random4],
-          "mediumText": this.mediumText[random5],
-          "longText": this.longText[random1],
-          "address": this.address[random2],
-          "city": this.city[random3],
-          "state": this.state[random4],
-          "zip": this.zip[random5],
-          "country": this.country[random1],
-          "email": this.email[random2],
-          "phone": this.phone[random3],
-          "color": this.color[random4],
-          "number": this.number[random4],
-          'bool': random1 % 3 ? true : false,
-          'gender': random1 % 2 === 0 ? 'male' : 'female',
-          'high': x
-        });
-      }
-
-      callback(dummyArray);
-    };
-
-    return DummyDataGenerator;
-  }();
+];
+//# sourceMappingURL=data.js.map
 });
-define('resources/index',["exports"], function (exports) {
-  "use strict";
+___scope___.file("resources/index.js", function(exports, require, module, __filename, __dirname){
 
-  Object.defineProperty(exports, "__esModule", {
-    value: true
-  });
-  exports.configure = configure;
-  function configure(config) {}
+Object.defineProperty(exports, "__esModule", { value: true });
+function configure(config) {
+}
+exports.configure = configure;
+//# sourceMappingURL=index.js.map
 });
-define('resources/value-converters/index',['exports'], function (exports) {
-  'use strict';
+___scope___.file("resources/value-converters/index.js", function(exports, require, module, __filename, __dirname){
 
-  Object.defineProperty(exports, "__esModule", {
-    value: true
-  });
-
-  function _classCallCheck(instance, Constructor) {
-    if (!(instance instanceof Constructor)) {
-      throw new TypeError("Cannot call a class as a function");
-    }
-  }
-
-  var NumberFormatterValueConverter = exports.NumberFormatterValueConverter = function () {
+Object.defineProperty(exports, "__esModule", { value: true });
+var NumberFormatterValueConverter = (function () {
     function NumberFormatterValueConverter() {
-      _classCallCheck(this, NumberFormatterValueConverter);
     }
-
-    NumberFormatterValueConverter.prototype.toView = function toView(value) {
-      if (value) {
-        return value;
-      } else {
-        return value;
-      }
-    };
-
-    NumberFormatterValueConverter.prototype.fromView = function fromView(value) {
-      if (value) {
-        var check = value * 1;
-        if (isNaN(check)) {
-          return value;
-        } else {
-          return value * 1;
+    NumberFormatterValueConverter.prototype.toView = function (value) {
+        if (value) {
+            return value;
         }
-      } else {
-        return value;
-      }
+        else {
+            return value;
+        }
     };
-
+    NumberFormatterValueConverter.prototype.fromView = function (value) {
+        if (value) {
+            var check = value * 1;
+            if (isNaN(check)) {
+                return value;
+            }
+            else {
+                return value * 1;
+            }
+        }
+        else {
+            return value;
+        }
+    };
     return NumberFormatterValueConverter;
-  }();
-
-  var BooleanFormatterValueConverter = exports.BooleanFormatterValueConverter = function () {
+}());
+exports.NumberFormatterValueConverter = NumberFormatterValueConverter;
+var BooleanFormatterValueConverter = (function () {
     function BooleanFormatterValueConverter() {
-      _classCallCheck(this, BooleanFormatterValueConverter);
     }
-
-    BooleanFormatterValueConverter.prototype.toView = function toView(value) {
-      if (value) {
-        return value;
-      } else {
-        return value;
-      }
+    BooleanFormatterValueConverter.prototype.toView = function (value) {
+        if (value) {
+            return value;
+        }
+        else {
+            return value;
+        }
     };
-
-    BooleanFormatterValueConverter.prototype.fromView = function fromView(value) {
-
-      if (typeof value === 'string') {
-        value = value.toLowerCase();
-        switch (value) {
-          case 'true':
-            value = true;
-            break;
-          case 'false':
-            value = true;
-            break;
-          default:
-            value = false;
-        }
-      }
-
-      return value;
-    };
-
-    return BooleanFormatterValueConverter;
-  }();
-});
-define('aurelia-v-grid/grid/htmlCache',["require", "exports"], function (require, exports) {
-    var HtmlCache = (function () {
-        function HtmlCache(element) {
-            this.element = element;
-            this.avg_top_panel = null;
-            this.avg_header = null;
-            this.avg_header_left = null;
-            this.avg_header_main = null;
-            this.avg_header_main_scroll = null;
-            this.avg_header_right = null;
-            this.avg_content = null;
-            this.avg_content_left = null;
-            this.avg_content_left_scroll = null;
-            this.avg_content_main = null;
-            this.avg_content_main_scroll = null;
-            this.avg_content_right = null;
-            this.avg_content_right_scroll = null;
-            this.avg_footer = null;
-            this.avg_content_group = null;
-            this.avg_content_group_scroll = null;
-            this.avg_content_vhandle = null;
-            this.avg_content_vhandle_scroll = null;
-            this.avg_content_hhandle = null;
-            this.avg_content_hhandle_scroll = null;
-            this.avg_left_rows = null;
-            this.avg_main_rows = null;
-            this.avg_right_rows = null;
-            this.avg_group_rows = null;
-            this.rowCache = [];
-            this.headerCache = {
-                left: null,
-                main: null,
-                right: null,
-                group: null,
-                bindingContext: null,
-                overrideContext: null,
-                leftRowViewSlot: null,
-                mainRowViewSlot: null,
-                rightRowViewSlot: null,
-                groupRowViewSlot: null
-            };
-        }
-        HtmlCache.prototype.updateRowsMarkup = function () {
-            this.avg_left_rows = this.avg_content_left_scroll.getElementsByTagName('avg-row');
-            this.avg_main_rows = this.avg_content_main_scroll.getElementsByTagName('avg-row');
-            this.avg_right_rows = this.avg_content_right_scroll.getElementsByTagName('avg-row');
-            this.avg_group_rows = this.avg_content_group_scroll.getElementsByTagName('avg-row');
-        };
-        HtmlCache.prototype.updateMainMarkup = function () {
-            this.avg_top_panel = this.element.getElementsByTagName('avg-top-panel')[0];
-            this.avg_header = this.element.getElementsByTagName('avg-header')[0];
-            this.avg_header_left = this.element.getElementsByTagName('avg-header-left')[0];
-            this.avg_header_main = this.element.getElementsByTagName('avg-header-main')[0];
-            this.avg_header_main_scroll = this.element.getElementsByTagName('avg-header-main-scroll')[0];
-            this.avg_header_right = this.element.getElementsByTagName('avg-header-right')[0];
-            this.avg_content = this.element.getElementsByTagName('avg-content')[0];
-            this.avg_content_left = this.element.getElementsByTagName('avg-content-left')[0];
-            this.avg_content_left_scroll = this.element.getElementsByTagName('avg-content-left-scroll')[0];
-            this.avg_content_main = this.element.getElementsByTagName('avg-content-main')[0];
-            this.avg_content_main_scroll = this.element.getElementsByTagName('avg-content-main-scroll')[0];
-            this.avg_content_right = this.element.getElementsByTagName('avg-content-right')[0];
-            this.avg_content_right_scroll = this.element.getElementsByTagName('avg-content-right-scroll')[0];
-            this.avg_footer = this.element.getElementsByTagName('avg-footer')[0];
-            this.avg_content_group = this.element.getElementsByTagName('avg-content-group')[0];
-            this.avg_content_group_scroll = this.element.getElementsByTagName('avg-content-group-scroll')[0];
-            this.avg_content_vhandle = this.element.getElementsByTagName('avg-content-vhandle')[0];
-            this.avg_content_vhandle_scroll = this.element.getElementsByTagName('avg-content-vhandle-scroll')[0];
-            this.avg_content_hhandle = this.element.getElementsByTagName('avg-content-hhandle')[0];
-            this.avg_content_hhandle_scroll = this.element.getElementsByTagName('avg-content-hhandle-scroll')[0];
-        };
-        return HtmlCache;
-    }());
-    exports.HtmlCache = HtmlCache;
-});
-
-//# sourceMappingURL=htmlCache.js.map
-
-define('aurelia-v-grid/grid/controller',["require", "exports"], function (require, exports) {
-    var Controller = (function () {
-        function Controller(vGrid) {
-            this.vGrid = vGrid;
-            this.element = vGrid.element;
-        }
-        Controller.prototype.getContext = function () {
-            var c = this.vGrid;
-            this.colConfig = c.colConfig;
-            this.backupColConfig = c.backupColConfig;
-            this.colRepeater = c.colRepeater;
-            this.colGroupRow = c.colGroupRow;
-            this.colGroupElement = c.colGroupElement;
-            this.colRepeatRowTemplate = c.colRepeatRowTemplate;
-            this.colRepeatRowHeaderTemplate = c.colRepeatRowHeaderTemplate;
-            this.customMenuTemplates = c.customMenuTemplates;
-            this.loadingScreenTemplate = c.loadingScreenTemplate;
-            this.footerTemplate = c.footerTemplate;
-            this.viewCompiler = c.viewCompiler;
-            this.container = c.container;
-            this.viewResources = c.viewResources;
-            this.taskQueue = c.taskQueue;
-            this.htmlCache = c.htmlCache;
-            this.htmlHeightWidth = c.htmlHeightWidth;
-            this.viewSlots = c.viewSlots;
-            this.columnBindingContext = c.columnBindingContext;
-            this.rowDataBinder = c.rowDataBinder;
-            this.mainMarkup = c.mainMarkup;
-            this.mainScrollEvents = c.mainScrollEvents;
-            this.rowMarkup = c.rowMarkup;
-            this.rowScrollEvents = c.rowScrollEvents;
-            this.rowClickHandler = c.rowClickHandler;
-            this.htmlcolumnMarkupCache = c.columnMarkup;
-            this.columnMarkup = c.columnMarkup;
-            this.groupingElements = c.groupingElements;
-            this.loadingScreen = c.loadingScreen;
-            this.contextMenu = c.contextMenu;
-            this.footer = c.footer;
-            this.bindingContext = c.bindingContext;
-            this.overrideContext = c.overrideContext;
-            this.attRowHeight = c.attRowHeight;
-            this.attHeaderHeight = c.attHeaderHeight;
-            this.attFooterHeight = c.attFooterHeight;
-            this.attPanelHeight = c.attPanelHeight;
-            this.attMultiSelect = c.attMultiSelect;
-            this.attManualSelection = c.attManualSelection;
-            this.attGridConnector = c.attGridConnector;
-            this.attOnRowDraw = c.attOnRowDraw;
-            this.attI18N = c.attI18N;
-            this.attDataDelay = c.attDataDelay;
-        };
-        Controller.prototype.triggerI18N = function () {
-            var _this = this;
-            var keys = Object.keys({
-                close: 'Close',
-                pinLeft: 'Pin left',
-                pinRight: 'Pin Right',
-                groupBy: 'Group By',
-                sortAscending: 'Sort Ascending',
-                sortDescending: 'Sort Descending',
-                showAll: 'Show All',
-                clearCurrent: 'Clear Current',
-                clearAll: 'Clear All',
-                chooseOperator: 'Choose Operator',
-                back: 'Back',
-                equals: 'Equals',
-                lessThanOrEqual: 'Less than or equal',
-                greaterThanOrEqual: 'Greater than or equal',
-                lessThan: 'Less than',
-                greaterThan: 'Greater than',
-                contains: 'Contains',
-                notEqualTo: 'Not equal to',
-                doesNotContain: 'Does not contain',
-                beginsWith: 'Begins with',
-                endsWith: 'Ends with',
-                loading: 'loading'
-            });
-            if (this.attI18N) {
-                keys.forEach(function (key) {
-                    if (_this.vGrid.filterOperatorTranslationKeys[key]) {
-                        _this.vGrid.filterOperatorNames[_this.vGrid.filterOperatorTranslationKeys[key]] = _this.attI18N(key);
-                    }
-                    _this.contextMenu.updateMenuStrings(key, _this.attI18N(key));
-                });
-                this.raiseEvent('filterTranslation', {});
-                var loading = this.attI18N('loading') || keys.loading;
-                this.loadingScreen.updateLoadingDefaultLoadingMessage(loading);
-            }
-        };
-        Controller.prototype.createGrid = function () {
-            if (this.attI18N) {
-                this.triggerI18N();
-            }
-            this.htmlHeightWidth.addDefaultsAttributes(this.attHeaderHeight, this.attRowHeight, this.attFooterHeight, this.attPanelHeight);
-            this.mainMarkup.generateMainMarkup();
-            this.htmlCache.updateMainMarkup();
-            this.rowDataBinder.init();
-            this.mainScrollEvents.init();
-            this.rowMarkup.init(this.attRowHeight);
-            this.htmlCache.updateRowsMarkup();
-            this.rowScrollEvents.init(this.attRowHeight, this.attDataDelay);
-            this.columnMarkup.init(this.colConfig, this.overrideContext, this.colRepeater, this.colRepeatRowTemplate, this.colRepeatRowHeaderTemplate, this.colGroupRow);
-            this.htmlHeightWidth.setWidthFromColumnConfig(this.colConfig);
-            this.rowClickHandler.init(this.attMultiSelect, this.attManualSelection, this);
-            this.groupingElements.init(this, this.colGroupElement);
-            this.loadingScreen.init(this.overrideContext, this.loadingScreenTemplate);
-            this.footer.init(this.overrideContext, this.footerTemplate);
-            this.contextMenu.init(this.customMenuTemplates, this.overrideContext);
-        };
-        Controller.prototype.getElement = function (rowNumber, isDownScroll, callbackFN) {
-            var _this = this;
-            this.attGridConnector.getElement({
-                row: rowNumber,
-                isDown: isDownScroll,
-                callback: function (rowContext) {
-                    if (_this.attOnRowDraw) {
-                        _this.attOnRowDraw(rowContext);
-                    }
-                    callbackFN(rowContext);
-                }
-            });
-        };
-        Controller.prototype.expandGroup = function (id) {
-            this.attGridConnector.expandGroup(id);
-        };
-        Controller.prototype.collapseGroup = function (id) {
-            this.attGridConnector.collapseGroup(id);
-        };
-        Controller.prototype.select = function (row) {
-            this.attGridConnector.select(row);
-        };
-        Controller.prototype.addToGrouping = function (attribute) {
-            var currentGrouping = this.attGridConnector.getGrouping();
-            if (currentGrouping.indexOf(attribute) === -1) {
-                currentGrouping.push(attribute);
-                this.attGridConnector.group(currentGrouping, true);
-            }
-        };
-        Controller.prototype.removeFromGrouping = function (attribute) {
-            var currentGrouping = this.attGridConnector.getGrouping();
-            var index = currentGrouping.indexOf(attribute);
-            if (index !== -1) {
-                currentGrouping.splice(index, 1);
-                this.attGridConnector.group(currentGrouping, true);
-            }
-        };
-        Controller.prototype.getSelectionContext = function () {
-            var sel = this.attGridConnector.getSelection();
-            return sel;
-        };
-        Controller.prototype.raiseEvent = function (name, data) {
-            if (data === void 0) { data = {}; }
-            var event = new CustomEvent(name, {
-                detail: data,
-                bubbles: true
-            });
-            this.element.dispatchEvent(event);
-        };
-        Controller.prototype.setLoadingScreen = function (value, msg, collectionLength) {
-            if (value) {
-                return this.loadingScreen.enable(msg, collectionLength);
-            }
-            else {
-                return this.loadingScreen.disable();
-            }
-        };
-        Controller.prototype.updateHeights = function () {
-            var totalRowHeight = this.htmlHeightWidth.getNewHeight(this.attGridConnector.getDatasourceLength());
-            var bodyHeight = this.htmlCache.avg_content_main.clientHeight;
-            if (bodyHeight < totalRowHeight) {
-                this.htmlCache.avg_content_vhandle.style.display = 'block';
-            }
-            else {
-                this.htmlCache.avg_content_vhandle.style.display = 'none';
-            }
-            this.rowScrollEvents.setCollectionLength(this.attGridConnector.getDatasourceLength());
-            this.htmlHeightWidth.setCollectionLength(this.attGridConnector.getDatasourceLength(), bodyHeight < totalRowHeight);
-        };
-        Controller.prototype.udateHorizontalScroller = function () {
-            var bodyWidth = this.htmlCache.avg_content_main.clientWidth;
-            var scrollWidth = this.htmlHeightWidth.avgContentMainScroll_Width;
-            if (bodyWidth < scrollWidth) {
-                this.htmlCache.avg_content_hhandle.style.display = 'block';
-            }
-            else {
-                this.htmlCache.avg_content_hhandle.style.display = 'none';
-            }
-        };
-        Controller.prototype.updateHeaderGrouping = function (groups) {
-            var _this = this;
-            var length = groups.length;
-            this.columnBindingContext.setupgrouping = length;
-            if (length === 0) {
-                var groups_1 = this.groupingElements.getGroups();
-                groups_1.forEach(function (group) {
-                    _this.groupingElements.removeGroup(group);
-                });
-            }
-            this.htmlHeightWidth.adjustWidthsColumns(this.columnBindingContext, length);
-        };
-        Controller.prototype.collectionLength = function () {
-            return this.attGridConnector.getDatasourceLength();
-        };
-        Controller.prototype.triggerScroll = function (position) {
-            if (position === null || position === undefined) {
-                position = this.htmlCache.avg_content_vhandle.scrollTop;
-            }
-            else {
-                this.htmlCache.avg_content_vhandle.scrollTop = position;
-            }
-            this.raiseEvent('avg-scroll', {
-                isScrollBarScrolling: true,
-                isDown: true,
-                newTopPosition: position
-            });
-        };
-        Controller.prototype.getTopRow = function () {
-            var position = this.htmlCache.avg_content_vhandle.scrollTop;
-            return Math.floor(position / this.attRowHeight);
-        };
-        Controller.prototype.rebindAllRows = function () {
-            this.raiseEvent('avg-rebind-all-rows', {
-                rowCache: this.htmlCache.rowCache,
-                downScroll: true
-            });
-        };
-        Controller.prototype.getColumnConfig = function () {
-            var colContext = this.columnBindingContext;
-            var tempArray = [];
-            for (var i = 0; i < this.colConfig.length; i++) {
-                switch (true) {
-                    case colContext.setupleft[i].show:
-                        tempArray.push({
-                            no: i,
-                            set: 1,
-                            colPinLeft: true,
-                            colPinRight: false,
-                            left: colContext.setupleft[i].left - 10000,
-                            width: colContext.setupleft[i].width
-                        });
-                        break;
-                    case colContext.setupmain[i].show:
-                        tempArray.push({
-                            no: i,
-                            set: 2,
-                            colPinLeft: false,
-                            colPinRight: false,
-                            left: colContext.setupmain[i].left,
-                            width: colContext.setupmain[i].width
-                        });
-                        break;
-                    case colContext.setupright[i].show:
-                        tempArray.push({
-                            no: i,
-                            set: 3,
-                            colPinLeft: false,
-                            colPinRight: true,
-                            left: colContext.setupright[i].left + 10000,
-                            width: colContext.setupright[i].width
-                        });
-                        break;
-                    default:
-                }
-            }
-            var newColConfig = [];
-            this.colConfig.forEach(function (col, i) {
-                var temp = {
-                    colWidth: tempArray[i].width,
-                    colRowTemplate: col.colRowTemplate,
-                    colHeaderTemplate: col.colHeaderTemplate,
-                    colField: col.colField ? col.colField.replace('rowRef.', '') : col.colField,
-                    colPinLeft: tempArray[i].colPinLeft,
-                    colPinRight: tempArray[i].colPinRight,
-                    colHeaderName: col.colHeaderName,
-                    colAddLabelAttributes: col.colAddLabelAttributes,
-                    colAddFilterAttributes: col.colAddFilterAttributes,
-                    colAddRowAttributes: col.colAddRowAttributes,
-                    colSort: col.colSort,
-                    colFilter: col.colFilter,
-                    colFilterTop: col.colFilterTop,
-                    colCss: col.colCss,
-                    colType: col.colType,
-                    __colSortHelper: tempArray[i].left,
-                };
-                newColConfig.push(temp);
-            });
-            newColConfig.sort(function (a, b) {
-                return a.__colSortHelper - b.__colSortHelper;
-            });
-            return newColConfig;
-        };
-        Controller.prototype.setColumnConfig = function (colConfig) {
-            var length = this.columnBindingContext.setupgrouping;
-            this.viewSlots.unbindAndDetachColumns();
-            this.columnBindingContext.clear();
-            this.viewSlots.clear();
-            this.colConfig = colConfig || this.backupColConfig;
-            this.columnMarkup.init(this.colConfig, this.overrideContext, this.colRepeater, this.colRepeatRowTemplate, this.colRepeatRowHeaderTemplate, this.colGroupRow);
-            this.viewSlots.bindAndAttachColumns(this.overrideContext, this.columnBindingContext, this.attGridConnector.getSelection());
-            this.htmlHeightWidth.setWidthFromColumnConfig(this.colConfig);
-            this.columnBindingContext.setupgrouping = length;
-            this.htmlHeightWidth.adjustWidthsColumns(this.columnBindingContext, length);
-            this.udateHorizontalScroller();
-            this.rebindAllRows();
-        };
-        return Controller;
-    }());
-    exports.Controller = Controller;
-});
-
-//# sourceMappingURL=controller.js.map
-
-define('aurelia-v-grid/grid/mainMarkup',["require", "exports", "aurelia-framework", "./mainMarkupHtmlString"], function (require, exports, aurelia_framework_1, mainMarkupHtmlString_1) {
-    var MainMarkup = (function () {
-        function MainMarkup(element, viewCompiler, container, viewResources, htmlHeightWidth, viewSlots) {
-            this.element = element;
-            this.viewCompiler = viewCompiler;
-            this.container = container;
-            this.viewResources = viewResources;
-            this.htmlHeightWidth = htmlHeightWidth;
-            this.viewSlots = viewSlots;
-        }
-        MainMarkup.prototype.generateMainMarkup = function () {
-            this.viewFactory = this.viewCompiler.compile('<template>' + mainMarkupHtmlString_1.MainMarkupHtmlString + '</template>', this.viewResources);
-            this.view = this.viewFactory.create(this.container);
-            this.viewSlots.mainViewSlot = new aurelia_framework_1.ViewSlot(this.element, true);
-            this.viewSlots.mainViewSlot.add(this.view);
-            this.viewSlots.mainViewSlot.bind(this, {
-                bindingContext: this,
-                parentOverrideContext: this.htmlHeightWidth
-            });
-            this.viewSlots.mainViewSlot.attached();
-        };
-        return MainMarkup;
-    }());
-    exports.MainMarkup = MainMarkup;
-});
-
-//# sourceMappingURL=mainMarkup.js.map
-
-define('aurelia-v-grid/grid/mainMarkupHtmlString',["require", "exports"], function (require, exports) {
-    exports.MainMarkupHtmlString = "\n        <avg-top-panel v-drag-drop-col class=\"avg-top-panel\" css=\"height:$au{avgPanel_Height}px\">\n\n        </avg-top-panel>\n\n        <avg-header class=\"avg-header\" css=\"height:$au{avgHeader_Height}px;top:$au{avgHeader_Top}px\">\n\n          <avg-header-left class=\"avg-header-left\" css=\"width:$au{avgHeaderLeft_Width}px\">\n           </avg-header-left>  \n\n           <avg-header-main class=\"avg-header-main\" css=\"left:$au{avgHeaderMain_Left}px;right:$au{avgHeaderMain_Right}px\">\n             <avg-header-main-scroll css=\"width:$au{avgHeaderMainScroll_Width}px;height:$au{avgHeaderMainScroll_Height}px\"> \n             </avg-header-main-scroll> \n           </avg-header-main> \n\n           <avg-header-right class=\"avg-header-right\" css=\"right:$au{avgHeaderRight_Right}px;width:$au{avgHeaderRight_Width}px\">\n           </avg-header-right> \n\n        </avg-header>\n\n        <avg-content class=\"avg-content\" css=\"top:$au{avgContent_Top}px;bottom:$au{avgContent_Bottom}px\">\n           \n            <avg-content-left  class=\"avg-content-left\" css=\"width:$au{avgContentLeft_Width}px\">\n              <avg-content-left-scroll css=\"width:$au{avgContentLeftScroll_Width};height:$au{avgContentLeftScroll_Height}px\">  \n              </avg-content-left-scroll> \n            </avg-content-left>  \n\n            <avg-content-main  class=\"avg-content-main\" css=\"left:$au{avgContentMain_Left}px;right:$au{avgContentMain_Right}px\">\n              <avg-content-main-scroll css=\"min-width: 100%;width:$au{avgContentMainScroll_Width}px;height:$au{avgContentMainScroll_Height}px\"> \n              </avg-content-main-scroll> \n            </avg-content-main> \n\n            <avg-content-right  class=\"avg-content-right\" css=\"right:$au{avgContentRight_Right}px;width:$au{avgContentRight_Width}px\">\n              <avg-content-right-scroll css=\"width:$au{avgContentRightScroll_Width};height:$au{avgContentRightScroll_Height}px\">  \n              </avg-content-right-scroll> \n            </avg-content-right>  \n            \n        </avg-content>\n\n       <avg-footer class=\"avg-footer\" css=\"height:$au{avgFooter_Height}px\">\n       </avg-footer> \n\n       <avg-content-group css=\"left:0;right:0;top:$au{avgContentGroup_Top}px;bottom:$au{avgContentGroup_Bottom}px\">\n          <avg-content-group-scroll css=\"left:0;right:0;height:$au{avgContentGroup_Height}px\">  \n          </avg-content-group-scroll> \n        </avg-content-group> \n\n        <avg-content-vhandle css=\"right:0;bottom:$au{avgContentVhandle_Bottom}px;right:$au{avgContentVhandle_Right}px;left:$au{avgContentVhandle_Left}px;top:$au{avgContentVhandle_Top}px\">\n          <avg-content-vhandle-scroll css=\"width:5px;height:$au{avgContentVhandleScroll_Height}px\"> \n          </avg-content-vhandle-scroll> \n        </avg-content-vhandle> \n\n        <avg-content-hhandle css=\"bottom:$au{avgContentHhandle_Bottom}px;right:$au{avgContentHhandle_Right}px;left:$au{avgContentHhandle_Left}px;height:$au{avgContentHhandle_Height}px\">\n          <avg-content-hhandle-scroll css=\"height:7px;width:$au{avgContentHhandleScroll_Width}px\"> \n          </avg-content-hhandle-scroll> \n        </avg-content-hhandle> \n\n        ".replace(/\$(au{)/g, '${');
-});
-
-//# sourceMappingURL=mainMarkupHtmlString.js.map
-
-define('aurelia-v-grid/grid/mainScrollEvents',["require", "exports"], function (require, exports) {
-    var MainScrollEvents = (function () {
-        function MainScrollEvents(element, htmlCache) {
-            this.element = element;
-            this.htmlCache = htmlCache;
-            this.timerLeft = null;
-            this.timerMain = null;
-            this.timerRight = null;
-            this.timerVhandle = null;
-            this.timerHhandle = null;
-            this.timerWheel = null;
-            this.lastTopPosition = 0;
-            this.wheelEvent = 'onwheel';
-            this.isIE11 = !!window.MSInputMethodContext && !!document.documentMode;
-            if (this.isIE11) {
-                this.wheelEvent = 'onmousewheel';
-                console.warn('IE11, why!?!?!');
-            }
-        }
-        MainScrollEvents.prototype.init = function () {
-            this.updateInternalHtmlCache();
-            this.addScrollEvents('all');
-        };
-        MainScrollEvents.prototype.updateInternalHtmlCache = function () {
-            this.left = this.htmlCache.avg_content_left;
-            this.main = this.htmlCache.avg_content_main;
-            this.right = this.htmlCache.avg_content_right;
-            this.mainHead = this.htmlCache.avg_header_main_scroll;
-            this.vhandle = this.htmlCache.avg_content_vhandle;
-            this.hhandle = this.htmlCache.avg_content_hhandle;
-            this.group = this.htmlCache.avg_content_group;
-        };
-        MainScrollEvents.prototype.onWeel = function (event) {
-            var _this = this;
-            if (this.vhandle.scrollHeight === this.vhandle.parentNode.clientHeight) {
-                return false;
-            }
-            requestAnimationFrame(function () {
-                var deltaY = event.deltaY;
-                if (event.deltaMode) {
-                    deltaY = deltaY * 40;
-                }
-                if (!event.deltaY && !event.deltaMode) {
-                    if (event.wheelDelta < 0) {
-                        deltaY = 100;
-                    }
-                    else {
-                        deltaY = -100;
-                    }
-                }
-                _this.handleEventWheelScroll(deltaY);
-            });
-            event.preventDefault();
-            return false;
-        };
-        MainScrollEvents.prototype.addScrollEvents = function (type) {
-            switch (type) {
-                case 'all':
-                    this.right[this.wheelEvent] = this.onWeel.bind(this);
-                    this.main[this.wheelEvent] = this.onWeel.bind(this);
-                    this.left[this.wheelEvent] = this.onWeel.bind(this);
-                    this.group[this.wheelEvent] = this.onWeel.bind(this);
-                    this.vhandle.onscroll = this.handleEventVhandle.bind(this);
-                    this.hhandle.onscroll = this.handleEventHhandle.bind(this);
-                    this.htmlCache.element.addEventListener('touchmove', this.touchMove.bind(this));
-                    this.htmlCache.element.addEventListener('touchstart', this.touchStart.bind(this));
-                    break;
-                case 'wheel':
-                    this.vhandle.onscroll = this.handleEventVhandle.bind(this);
-                    break;
-                default:
-            }
-        };
-        MainScrollEvents.prototype.removeScrollEvents = function (type) {
-            switch (type) {
-                case 'all':
-                    this.vhandle.onscroll = null;
-                    break;
-                case 'wheel':
-                    this.vhandle.onscroll = null;
-                    break;
-                default:
-            }
-        };
-        MainScrollEvents.prototype.touchStart = function (e) {
-            var touchobj = e.changedTouches[0];
-            this.touchY = parseInt(touchobj.clientY, 10);
-            this.touchX = parseInt(touchobj.clientX, 10);
-        };
-        MainScrollEvents.prototype.touchMove = function (e) {
-            var touchobj = e.changedTouches[0];
-            var dist = this.touchY - parseInt(touchobj.clientY, 10);
-            var distX = parseInt(touchobj.clientX, 10) - this.touchX;
-            this.touchY = parseInt(touchobj.clientY, 10);
-            this.touchX = parseInt(touchobj.clientX, 10);
-            this.handleEventWheelScroll(dist, -distX);
-            e.preventDefault();
-        };
-        MainScrollEvents.prototype.handleEventWheelScroll = function (newTopPosition, left) {
-            var _this = this;
-            requestAnimationFrame(function () {
-                if (_this.timerWheel) {
-                    clearTimeout(_this.timerWheel);
-                    _this.removeScrollEvents('wheel');
-                }
-                requestAnimationFrame(function () {
-                    _this.main.scrollTop = _this.main.scrollTop + newTopPosition;
-                    _this.right.scrollTop = _this.right.scrollTop + newTopPosition;
-                    _this.left.scrollTop = _this.left.scrollTop + newTopPosition;
-                    _this.vhandle.scrollTop = _this.vhandle.scrollTop + newTopPosition;
-                    _this.group.scrollTop = _this.group.scrollTop + newTopPosition;
-                    if (left !== undefined) {
-                        _this.main.scrollLeft = _this.main.scrollLeft + left;
-                        _this.mainHead.style.left = -_this.main.scrollLeft + 'px';
-                    }
-                    _this.checkScroll(_this.main.scrollTop);
-                    _this.timerWheel = setTimeout(function () {
-                        _this.addScrollEvents('wheel');
-                        _this.timerWheel = null;
-                    }, 30);
-                });
-            });
-        };
-        MainScrollEvents.prototype.handleEventVhandle = function () {
-            var _this = this;
-            requestAnimationFrame(function () {
-                if (_this.timerVhandle) {
-                    clearTimeout(_this.timerVhandle);
-                    _this.removeScrollEvents('Vhandle');
-                }
-                requestAnimationFrame(function () {
-                    var newTopPosition = _this.vhandle.scrollTop;
-                    _this.right.scrollTop = newTopPosition;
-                    _this.main.scrollTop = newTopPosition;
-                    _this.left.scrollTop = newTopPosition;
-                    _this.group.scrollTop = newTopPosition;
-                    _this.checkScroll(newTopPosition);
-                    _this.timerVhandle = setTimeout(function () {
-                        _this.addScrollEvents('Vhandle');
-                        _this.timerVhandle = null;
-                    }, 30);
-                });
-            });
-        };
-        MainScrollEvents.prototype.handleEventHhandle = function () {
-            var _this = this;
-            requestAnimationFrame(function () {
-                if (_this.timerHhandle) {
-                    clearTimeout(_this.timerHhandle);
-                    _this.removeScrollEvents('Hhandle');
-                }
-                requestAnimationFrame(function () {
-                    var newLeftPosition = _this.hhandle.scrollLeft;
-                    _this.main.scrollLeft = newLeftPosition;
-                    _this.mainHead.style.left = -newLeftPosition + 'px';
-                    _this.timerHhandle = setTimeout(function () {
-                        _this.addScrollEvents('Hhandle');
-                        _this.timerHhandle = null;
-                    }, 30);
-                });
-            });
-        };
-        MainScrollEvents.prototype.checkScroll = function (newTopPosition) {
-            if (this.lastTopPosition !== newTopPosition) {
-                var offset = Math.abs(this.lastTopPosition - newTopPosition);
-                var isScrollBarScrolling = false;
-                if (offset > 200) {
-                    isScrollBarScrolling = true;
-                }
-                var isDown = true;
-                if (this.lastTopPosition > newTopPosition) {
-                    isDown = false;
-                }
-                this.lastTopPosition = newTopPosition;
-                this.triggerGridScrollEvent(isScrollBarScrolling, isDown, newTopPosition);
-            }
-        };
-        MainScrollEvents.prototype.triggerGridScrollEvent = function (scrollbarScrolling, down, topPosition) {
-            var event = new CustomEvent('avg-scroll', {
-                detail: {
-                    isScrollBarScrolling: scrollbarScrolling,
-                    isDown: down,
-                    newTopPosition: topPosition
-                },
-                bubbles: false
-            });
-            this.element.dispatchEvent(event);
-        };
-        return MainScrollEvents;
-    }());
-    exports.MainScrollEvents = MainScrollEvents;
-});
-
-//# sourceMappingURL=mainScrollEvents.js.map
-
-define('aurelia-v-grid/grid/rowMarkup',["require", "exports"], function (require, exports) {
-    var RowMarkup = (function () {
-        function RowMarkup(element, htmlCache) {
-            this.element = element;
-            this.htmlCache = htmlCache;
-        }
-        RowMarkup.prototype.init = function (rowHeight) {
-            this.rowHeight = rowHeight;
-            this.updateInternalHtmlCache();
-            this.generateRows();
-        };
-        RowMarkup.prototype.generateRows = function () {
-            var markupLeft = '';
-            var markupMain = '';
-            var markupRight = '';
-            var markupGroup = '';
-            for (var i = 0; i < 40; i++) {
-                var translateY = this.rowHeight * i;
-                var avgRowMarkup = "\n        <avg-row \n          class=\"avg-row\" \n          style=\"height:" + this.rowHeight + "px; \n            transform:translate3d(0px, " + translateY + "px, 0px);\n            z-index:5;\" \n          row=\"" + i + "\">\n        </avg-row>";
-                var avgRowMarkupGroup = "\n        <avg-row \n          class=\"avg-row-helper\" \n          style=\"height:" + this.rowHeight + "px; \n            transform:translate3d(0px, " + translateY + "px, 0px);\n            z-index:5;\" \n          row=\"" + i + "\">\n        </avg-row>";
-                markupLeft = markupLeft + avgRowMarkup;
-                markupMain = markupMain + avgRowMarkup;
-                markupRight = markupRight + avgRowMarkup;
-                markupGroup = markupGroup + avgRowMarkupGroup;
-            }
-            this.left.innerHTML = markupLeft;
-            this.main.innerHTML = markupLeft;
-            this.right.innerHTML = markupLeft;
-            this.group.innerHTML = markupGroup;
-        };
-        RowMarkup.prototype.updateInternalHtmlCache = function () {
-            this.left = this.htmlCache.avg_content_left_scroll;
-            this.main = this.htmlCache.avg_content_main_scroll;
-            this.right = this.htmlCache.avg_content_right_scroll;
-            this.group = this.htmlCache.avg_content_group_scroll;
-        };
-        return RowMarkup;
-    }());
-    exports.RowMarkup = RowMarkup;
-});
-
-//# sourceMappingURL=rowMarkup.js.map
-
-define('aurelia-v-grid/grid/rowScrollEvents',["require", "exports"], function (require, exports) {
-    var RowScrollEvents = (function () {
-        function RowScrollEvents(element, htmlCache) {
-            this.htmlCache = htmlCache;
-            this.element = element;
-            this.timer = null;
-            this.largeScroll = false;
-            this.collectionLength = 0;
-            this.largeScrollUpdateDelay = 0;
-        }
-        RowScrollEvents.prototype.init = function (rowHeight, attDataDelay) {
-            this.rowCache = this.htmlCache.rowCache;
-            this.largeScrollUpdateDelay = attDataDelay;
-            this.rowHeight = rowHeight;
-            this.updateInternalHtmlCache();
-            this.createRowCache();
-            this.addEventListener();
-        };
-        RowScrollEvents.prototype.setCollectionLength = function (length) {
-            this.collectionLength = length;
-        };
-        RowScrollEvents.prototype.createRowCache = function () {
-            for (var i = 0; i < this.cacheLength; i++) {
-                this.rowCache.push({
-                    left: this.leftRows[i],
-                    main: this.mainRows[i],
-                    right: this.rightRows[i],
-                    group: this.groupRows[i],
-                    top: this.rowHeight * i,
-                    row: i
-                });
-            }
-        };
-        RowScrollEvents.prototype.updateInternalHtmlCache = function () {
-            this.left = this.htmlCache.avg_content_left_scroll;
-            this.main = this.htmlCache.avg_content_main_scroll;
-            this.right = this.htmlCache.avg_content_right_scroll;
-            this.scroller = this.htmlCache.avg_content_right_scroll;
-            this.leftRows = this.htmlCache.avg_left_rows;
-            this.mainRows = this.htmlCache.avg_main_rows;
-            this.rightRows = this.htmlCache.avg_right_rows;
-            this.groupRows = this.htmlCache.avg_group_rows;
-            this.cacheLength = this.leftRows.length;
-        };
-        Object.defineProperty(RowScrollEvents.prototype, "contentHeight", {
-            get: function () {
-                return this.htmlCache.avg_content_main.offsetHeight;
-            },
-            enumerable: true,
-            configurable: true
-        });
-        RowScrollEvents.prototype.onScroll = function (event) {
-            var _this = this;
-            var isDown = event.detail.isDown;
-            var isScrollBarScrolling = event.detail.isScrollBarScrolling;
-            var newTopPosition = event.detail.newTopPosition;
-            if (this.largeScroll || isScrollBarScrolling) {
-                if (this.largeScrollUpdateDelay) {
-                    clearTimeout(this.timer);
-                    this.largeScroll = true;
-                    this.timer = setTimeout(function () {
-                        _this.largeScroll = false;
-                        _this.scrollScrollBar(newTopPosition, isDown);
-                    }, this.largeScrollUpdateDelay);
-                }
-                else {
-                    this.scrollScrollBar(newTopPosition, isDown);
-                }
-            }
-            else {
-                switch (true) {
-                    case isDown && !isScrollBarScrolling:
-                        this.scrollNormal(newTopPosition, true);
-                        break;
-                    case !isDown && !isScrollBarScrolling:
-                        this.scrollNormal(newTopPosition, false);
-                        break;
-                    default:
-                }
-            }
-        };
-        RowScrollEvents.prototype.setRowTopValue = function (cache, top) {
-            cache.left.style.transform = "translate3d(0px," + top + "px, 0px)";
-            cache.main.style.transform = "translate3d(0px," + top + "px, 0px)";
-            cache.right.style.transform = "translate3d(0px," + top + "px, 0px)";
-            cache.group.style.transform = "translate3d(0px," + top + "px, 0px)";
-            cache.top = top;
-            cache.row = Math.floor(top / this.rowHeight);
-        };
-        RowScrollEvents.prototype.scrollNormal = function (newTopPosition, downScroll) {
-            var rowHeight = this.rowHeight;
-            var currentRow = Math.floor(newTopPosition / rowHeight);
-            var cacheHeight = rowHeight * this.cacheLength;
-            for (var i = 0; i < this.cacheLength; i++) {
-                var cache = this.rowCache[i];
-                var top_1 = this.rowCache[i].top;
-                var update = false;
-                var newTop = void 0;
-                if (!downScroll) {
-                    if (top_1 > (newTopPosition + this.contentHeight)) {
-                        update = true;
-                        newTop = top_1 - cacheHeight;
-                        currentRow = (top_1 - cacheHeight) / rowHeight;
-                    }
-                }
-                else {
-                    if (top_1 < (newTopPosition - rowHeight)) {
-                        update = true;
-                        newTop = top_1 + cacheHeight;
-                        currentRow = (top_1 + cacheHeight) / rowHeight;
-                    }
-                }
-                if (update === true && currentRow >= 0 && currentRow <= this.collectionLength - 1) {
-                    this.setRowTopValue(cache, newTop);
-                    this.triggerRebindRowEvent(currentRow, cache, downScroll);
-                }
-            }
-            this.rowCache.sort(function (a, b) {
-                return a.top - b.top;
-            });
-        };
-        RowScrollEvents.prototype.scrollScrollBar = function (newTopPosition, downScroll) {
-            var _this = this;
-            if (this.collectionLength <= this.cacheLength) {
-                newTopPosition = 0;
-            }
-            var rowHeight = this.rowHeight;
-            var bodyHeight = this.contentHeight;
-            var currentRow = Math.floor(newTopPosition / rowHeight);
-            var firstRow = Math.floor(newTopPosition / rowHeight);
-            var currentRowTop = rowHeight * currentRow;
-            var firstRowTop = rowHeight * firstRow;
-            var collectionLength = this.collectionLength;
-            var setAfter = function (no) {
-                var row = _this.rowCache[no];
-                _this.setRowTopValue(row, currentRowTop);
-                currentRowTop = currentRowTop + rowHeight;
-            };
-            var setBefore = function (no) {
-                var row = _this.rowCache[no];
-                firstRowTop = firstRowTop - rowHeight;
-                _this.setRowTopValue(row, firstRowTop);
-            };
-            var setHiddenFromView = function (no) {
-                var row = _this.rowCache[no];
-                _this.setRowTopValue(row, -(currentRowTop + (rowHeight * 50)));
-            };
-            for (var i = 0; i < this.cacheLength; i++) {
-                var moved = false;
-                switch (true) {
-                    case currentRow >= 0 && currentRow <= collectionLength - 1:
-                        setAfter(i);
-                        moved = true;
-                        break;
-                    case currentRow >= collectionLength && (collectionLength * rowHeight) >= bodyHeight:
-                        setBefore(i);
-                        moved = true;
-                        break;
-                    default:
-                }
-                if (!moved) {
-                    if (currentRow >= collectionLength && (currentRowTop - rowHeight) >= bodyHeight) {
-                        setHiddenFromView(i);
-                    }
-                    else {
-                        if (currentRow >= collectionLength) {
-                            setAfter(i);
-                        }
-                    }
-                }
-                currentRow++;
-            }
-            this.rowCache.sort(function (a, b) {
-                return a.top - b.top;
-            });
-            this.triggerRebindAllRowsEvent(downScroll, this.rowCache);
-        };
-        RowScrollEvents.prototype.addEventListener = function () {
-            this.onScrollBinded = this.onScroll.bind(this);
-            this.element.addEventListener('avg-scroll', this.onScrollBinded);
-        };
-        RowScrollEvents.prototype.triggerRebindRowEvent = function (curRow, curRowCache, isDownScroll) {
-            var event = new CustomEvent('avg-rebind-row', {
-                detail: {
-                    currentRow: curRow,
-                    rowCache: curRowCache,
-                    downScroll: isDownScroll
-                },
-                bubbles: false
-            });
-            this.element.dispatchEvent(event);
-        };
-        RowScrollEvents.prototype.triggerRebindAllRowsEvent = function (isDownScroll, curRowCache) {
-            var event = new CustomEvent('avg-rebind-all-rows', {
-                detail: {
-                    downScroll: isDownScroll,
-                    rowCache: curRowCache
-                },
-                bubbles: false
-            });
-            this.element.dispatchEvent(event);
-        };
-        return RowScrollEvents;
-    }());
-    exports.RowScrollEvents = RowScrollEvents;
-});
-
-//# sourceMappingURL=rowScrollEvents.js.map
-
-define('aurelia-v-grid/grid/htmlHeightWidth',["require", "exports"], function (require, exports) {
-    var HtmlHeightWidth = (function () {
-        function HtmlHeightWidth() {
-            this.avgScrollBarWidth = this.getScrollbarWidth() || 17;
-            this.avgPanel_Height = 0;
-            this.avgHeader_Height = 30;
-            this.avgHeader_Top = 0;
-            this.avgContent_Top = 30;
-            this.avgContent_Bottom = 30;
-            this.avgHeaderLeft_Width = 200;
-            this.avgHeaderMain_Left = 200;
-            this.avgHeaderMain_Right = 150;
-            this.avgHeaderMainScroll_Width = 0;
-            this.avgHeaderMainScroll_Height = 100;
-            this.avgHeaderRight_Right = 0;
-            this.avgHeaderRight_Width = 150;
-            this.avgContentLeft_Width = 200 + this.avgScrollBarWidth;
-            this.avgContentLeftScroll_Width = '100%';
-            this.avgContentLeftScroll_Height = 0 + this.avgScrollBarWidth;
-            this.avgContentMain_Left = 200;
-            this.avgContentMain_Right = 150 - this.avgScrollBarWidth;
-            this.avgContentMainScroll_Width = 0;
-            this.avgContentMainScroll_Height = 0;
-            this.avgContentRight_Right = 0;
-            this.avgContentRight_Width = 150;
-            this.avgContentRightScroll_Width = '100%';
-            this.avgContentRightScroll_Height = 0 + this.avgScrollBarWidth;
-            this.avgContentGroup_Width = 150;
-            this.avgContentGroup_Height = 0;
-            this.avgContentGroup_Top = 0;
-            this.avgContentGroup_Bottom = 0;
-            this.avgContentVhandle_Width = 0 + this.avgScrollBarWidth;
-            this.avgContentVhandle_Height = 0;
-            this.avgContentVhandle_Top = 0;
-            this.avgContentVhandleScroll_Height = 0;
-            this.avgContentVhandle_Bottom = 0;
-            this.avgContentHhandle_Bottom = 0;
-            this.avgContentHhandle_Right = 0 + this.avgScrollBarWidth;
-            this.avgContentHhandle_Left = 0;
-            this.avgContentHhandle_Height = 17;
-            this.avgContentHhandleScroll_Width = 17;
-            this.avgFooter_Height = 30;
-        }
-        HtmlHeightWidth.prototype.getNewHeight = function (length) {
-            return length * this.attRowHeight;
-        };
-        HtmlHeightWidth.prototype.setCollectionLength = function (length, includeScroller) {
-            var rowTotal = this.getNewHeight(length);
-            var avgScrollbarHeightValue = includeScroller === false ? 0 : this.avgScrollBarWidth;
-            var total = rowTotal + avgScrollbarHeightValue;
-            this.avgContentRightScroll_Height = total;
-            this.avgContentGroup_Height = total;
-            this.avgContentVhandleScroll_Height = total;
-            this.avgContentMainScroll_Height = total;
-            this.avgContentLeftScroll_Height = total;
-        };
-        HtmlHeightWidth.prototype.addDefaultsAttributes = function (attHeaderHeight, attRowHeight, attFooterHeight, attPanelHeight) {
-            this.attHeaderHeight = attHeaderHeight;
-            this.attRowHeight = attRowHeight;
-            this.attFooterHeight = attFooterHeight;
-            this.attPanelHeight = attPanelHeight;
-            this.avgPanel_Height = attPanelHeight;
-            this.avgHeader_Top = attPanelHeight;
-            this.avgHeader_Height = attHeaderHeight;
-            this.avgContent_Top = attHeaderHeight + attPanelHeight;
-            this.avgContent_Bottom = attFooterHeight;
-            this.avgFooter_Height = attFooterHeight;
-            this.avgHeaderMainScroll_Height = attHeaderHeight;
-            this.avgContentGroup_Height = this.avgContentGroup_Height;
-            this.avgContentGroup_Top = this.avgContent_Top;
-            this.avgContentGroup_Bottom = this.avgContent_Bottom;
-            this.avgContentVhandle_Height = this.avgContentVhandle_Height;
-            this.avgContentVhandle_Top = this.avgContent_Top;
-            this.avgContentVhandle_Bottom = this.avgContent_Bottom;
-            this.avgContentHhandle_Bottom = attFooterHeight;
-            this.avgContentHhandle_Height = this.avgScrollBarWidth;
-        };
-        HtmlHeightWidth.prototype.adjustWidthsColumns = function (columnBindingContext, groupsLength) {
-            var left = groupsLength ? groupsLength * 15 : 0;
-            var main = 0;
-            var right = 0;
-            for (var i = 0; i < columnBindingContext.setupmain.length; i++) {
-                if (columnBindingContext.setupleft[i].show) {
-                    left = left + columnBindingContext.setupleft[i].width;
-                }
-                if (columnBindingContext.setupmain[i].show) {
-                    main = main + columnBindingContext.setupmain[i].width;
-                }
-                if (columnBindingContext.setupright[i].show) {
-                    right = right + columnBindingContext.setupright[i].width;
-                }
-            }
-            this.avgContentLeft_Width = left;
-            this.avgHeaderLeft_Width = left;
-            this.avgContentMain_Left = left;
-            this.avgContentMain_Right = right;
-            this.avgHeaderMain_Left = left;
-            this.avgHeaderMain_Right = right;
-            this.avgHeaderMainScroll_Width = main;
-            this.avgContentMainScroll_Width = main;
-            this.avgContentRight_Width = right;
-            this.avgHeaderRight_Width = right;
-            this.avgContentHhandle_Right = right;
-            this.avgContentHhandle_Left = left;
-            this.avgContentHhandleScroll_Width = main;
-        };
-        HtmlHeightWidth.prototype.setWidthFromColumnConfig = function (colConfig, groupsLength) {
-            var left = groupsLength ? groupsLength * 15 : 0;
-            var main = 0;
-            var right = 0;
-            for (var i = 0; i < colConfig.length; i++) {
-                switch (true) {
-                    case colConfig[i].colPinLeft && colConfig[i].colPinRight:
-                        left = left + colConfig[i].colWidth;
-                        right = right + colConfig[i].colWidth;
-                        break;
-                    case colConfig[i].colPinLeft:
-                        left = left + colConfig[i].colWidth;
-                        break;
-                    case colConfig[i].colPinRight:
-                        right = right + colConfig[i].colWidth;
-                        break;
-                    case !colConfig[i].colPinLeft && !colConfig[i].colPinRight:
-                        main = main + colConfig[i].colWidth;
-                        break;
-                    default:
-                }
-            }
-            this.avgContentLeft_Width = left;
-            this.avgHeaderLeft_Width = left;
-            this.avgContentMain_Left = left;
-            this.avgContentMain_Right = right;
-            this.avgHeaderMain_Left = left;
-            this.avgHeaderMain_Right = right;
-            this.avgHeaderMainScroll_Width = main;
-            this.avgContentMainScroll_Width = main;
-            this.avgContentRight_Width = right;
-            this.avgHeaderRight_Width = right;
-            this.avgContentHhandle_Right = right;
-            this.avgContentHhandle_Left = left;
-            this.avgContentHhandleScroll_Width = main;
-        };
-        HtmlHeightWidth.prototype.getScrollbarWidth = function () {
-            var outer = document.createElement('div');
-            outer.style.visibility = 'hidden';
-            outer.style.width = '100px';
-            document.body.appendChild(outer);
-            var widthNoScroll = outer.offsetWidth;
-            outer.style.overflow = 'scroll';
-            var inner = document.createElement('div');
-            inner.style.width = '100%';
-            outer.appendChild(inner);
-            var widthWithScroll = inner.offsetWidth;
-            outer.parentNode.removeChild(outer);
-            return widthNoScroll - widthWithScroll;
-        };
-        return HtmlHeightWidth;
-    }());
-    exports.HtmlHeightWidth = HtmlHeightWidth;
-});
-
-//# sourceMappingURL=htmlHeightWidth.js.map
-
-define('aurelia-v-grid/grid/viewSlots',["require", "exports"], function (require, exports) {
-    var ViewSlots = (function () {
-        function ViewSlots(htmlCache) {
-            this.rowCache = htmlCache.rowCache;
-            this.headerCache = htmlCache.headerCache;
-            this.leftRowViewSlots = [];
-            this.mainRowViewSlots = [];
-            this.rightRowViewSlots = [];
-            this.groupRowViewSlots = [];
-            this.leftHeaderViewSlot = null;
-            this.mainHeaderViewSlot = null;
-            this.rightHeaderViewSlot = null;
-            this.mainViewSlot = null;
-            this.loadingScreenViewSlot = null;
-            this.groupingViewSlots = [];
-            this.contextMenu = null;
-        }
-        ViewSlots.prototype.bindAndAttachColumns = function (overrideContext, columnBindingContext, curSelection) {
-            var context;
-            var newParentOverrideContext = {
-                bindingContext: columnBindingContext,
-                parentOverrideContext: overrideContext
-            };
-            for (var i = 0; i < this.rowCache.length; i++) {
-                context = {};
-                this.rowCache[i].bindingContext = context;
-                this.rowCache[i].parentOverrideContext = {
-                    bindingContext: context,
-                    parentOverrideContext: newParentOverrideContext
-                };
-                this.leftRowViewSlots[i].bind(this.rowCache[i].bindingContext, this.rowCache[i].parentOverrideContext);
-                this.leftRowViewSlots[i].attached();
-                this.mainRowViewSlots[i].bind(this.rowCache[i].bindingContext, this.rowCache[i].parentOverrideContext);
-                this.mainRowViewSlots[i].attached();
-                this.rightRowViewSlots[i].bind(this.rowCache[i].bindingContext, this.rowCache[i].parentOverrideContext);
-                this.rightRowViewSlots[i].attached();
-                this.groupRowViewSlots[i].bind(this.rowCache[i].bindingContext, this.rowCache[i].parentOverrideContext);
-                this.groupRowViewSlots[i].attached();
-            }
-            context = { selection: curSelection };
-            this.headerCache.bindingContext = context;
-            this.headerCache.parentOverrideContext = {
-                bindingContext: context,
-                parentOverrideContext: newParentOverrideContext
-            };
-            this.leftHeaderViewSlot.bind(this.headerCache.bindingContext, this.headerCache.parentOverrideContext);
-            this.leftHeaderViewSlot.attached();
-            this.mainHeaderViewSlot.bind(this.headerCache.bindingContext, this.headerCache.parentOverrideContext);
-            this.mainHeaderViewSlot.attached();
-            this.rightHeaderViewSlot.bind(this.headerCache.bindingContext, this.headerCache.parentOverrideContext);
-            this.rightHeaderViewSlot.attached();
-        };
-        ViewSlots.prototype.unbindAndDetachColumns = function () {
-            for (var i = 0; i < this.groupRowViewSlots.length; i++) {
-                this.leftRowViewSlots[i].unbind();
-                this.leftRowViewSlots[i].detached();
-                this.mainRowViewSlots[i].unbind();
-                this.mainRowViewSlots[i].detached();
-                this.rightRowViewSlots[i].unbind();
-                this.rightRowViewSlots[i].detached();
-                this.groupRowViewSlots[i].unbind();
-                this.groupRowViewSlots[i].detached();
-            }
-            this.leftHeaderViewSlot.unbind();
-            this.leftHeaderViewSlot.detached();
-            this.mainHeaderViewSlot.unbind();
-            this.mainHeaderViewSlot.detached();
-            this.rightHeaderViewSlot.unbind();
-            this.rightHeaderViewSlot.detached();
-        };
-        ViewSlots.prototype.clear = function () {
-            for (var i = 0; i < this.groupRowViewSlots.length; i++) {
-                this.leftRowViewSlots[i].removeAll();
-                this.mainRowViewSlots[i].removeAll();
-                this.rightRowViewSlots[i].removeAll();
-                this.groupRowViewSlots[i].removeAll();
-            }
-            this.leftHeaderViewSlot.removeAll();
-            this.mainHeaderViewSlot.removeAll();
-            this.rightHeaderViewSlot.removeAll();
-            this.leftRowViewSlots = null;
-            this.mainRowViewSlots = null;
-            this.rightRowViewSlots = null;
-            this.groupRowViewSlots = null;
-            this.leftRowViewSlots = [];
-            this.mainRowViewSlots = [];
-            this.rightRowViewSlots = [];
-            this.groupRowViewSlots = [];
-            this.leftHeaderViewSlot = null;
-            this.mainHeaderViewSlot = null;
-            this.rightHeaderViewSlot = null;
-        };
-        return ViewSlots;
-    }());
-    exports.ViewSlots = ViewSlots;
-});
-
-//# sourceMappingURL=viewSlots.js.map
-
-define('aurelia-v-grid/grid/rowDataBinder',["require", "exports"], function (require, exports) {
-    var RowDataBinder = (function () {
-        function RowDataBinder(element, controller) {
-            this.element = element;
-            this.controller = controller;
-        }
-        RowDataBinder.prototype.init = function () {
-            this.addEventListener();
-        };
-        RowDataBinder.prototype.addEventListener = function () {
-            this.rebindRowBinded = this.rebindRow.bind(this);
-            this.rebindAllRowsBinded = this.rebindAllRows.bind(this);
-            this.element.addEventListener('avg-rebind-row', this.rebindRowBinded);
-            this.element.addEventListener('avg-rebind-all-rows', this.rebindAllRowsBinded);
-        };
-        RowDataBinder.prototype.rebindRow = function (event) {
-            var currentRow = event.detail.currentRow;
-            var rowCache = event.detail.rowCache;
-            var downScroll = event.detail.downScroll;
-            var bindingContext = rowCache.bindingContext;
-            this.controller.getElement(currentRow, downScroll, function (data) {
-                if (data.rowRef) {
-                    if (data.rowRef.__group) {
-                        rowCache.isGroup = true;
-                    }
-                    else {
-                        rowCache.isGroup = false;
-                    }
-                }
-                var isSelected = data.selection.isSelected(rowCache.row);
-                if (isSelected) {
-                    if (!rowCache.selected) {
-                        rowCache.selected = true;
-                        rowCache.left.classList.add('avg-selected-row');
-                        rowCache.main.classList.add('avg-selected-row');
-                        rowCache.right.classList.add('avg-selected-row');
-                    }
-                }
-                else {
-                    if (rowCache.selected) {
-                        rowCache.selected = false;
-                        rowCache.left.classList.remove('avg-selected-row');
-                        rowCache.main.classList.remove('avg-selected-row');
-                        rowCache.right.classList.remove('avg-selected-row');
-                    }
-                }
-                if (data.rowRef === undefined || data.rowRef === null) {
-                    rowCache.left.style.display = 'none';
-                    rowCache.main.style.display = 'none';
-                    rowCache.right.style.display = 'none';
-                    rowCache.group.style.display = 'none';
-                }
-                else {
-                    rowCache.left.style.display = 'block';
-                    rowCache.main.style.display = 'block';
-                    rowCache.right.style.display = 'block';
-                    rowCache.group.style.display = 'block';
-                }
-                bindingContext.rowRef = data.rowRef;
-                bindingContext.selection = data.selection;
-                bindingContext.selected = isSelected;
-                bindingContext.row = currentRow;
-            });
-        };
-        RowDataBinder.prototype.rebindAllRows = function (event) {
-            var rowCache = event.detail.rowCache;
-            var downScroll = event.detail.downScroll;
-            var _loop_1 = function (i) {
-                this_1.controller.getElement(rowCache[i].row, downScroll, function (data) {
-                    var bindingContext = rowCache[i].bindingContext;
-                    if (data.rowRef) {
-                        if (data.rowRef.__group) {
-                            rowCache[i].isGroup = true;
-                        }
-                        else {
-                            rowCache[i].isGroup = false;
-                        }
-                    }
-                    var isSelected = data.selection.isSelected(rowCache[i].row);
-                    if (isSelected) {
-                        if (!rowCache[i].selected) {
-                            rowCache[i].selected = true;
-                            rowCache[i].left.classList.add('avg-selected-row');
-                            rowCache[i].main.classList.add('avg-selected-row');
-                            rowCache[i].right.classList.add('avg-selected-row');
-                        }
-                    }
-                    else {
-                        if (rowCache[i].selected) {
-                            rowCache[i].selected = false;
-                            rowCache[i].left.classList.remove('avg-selected-row');
-                            rowCache[i].main.classList.remove('avg-selected-row');
-                            rowCache[i].right.classList.remove('avg-selected-row');
-                        }
-                    }
-                    if (data.rowRef === undefined || data.rowRef === null) {
-                        rowCache[i].left.style.display = 'none';
-                        rowCache[i].main.style.display = 'none';
-                        rowCache[i].right.style.display = 'none';
-                        rowCache[i].group.style.display = 'none';
-                    }
-                    else {
-                        rowCache[i].left.style.display = 'block';
-                        rowCache[i].main.style.display = 'block';
-                        rowCache[i].right.style.display = 'block';
-                        rowCache[i].group.style.display = 'block';
-                    }
-                    bindingContext.rowRef = data.rowRef;
-                    bindingContext.selection = data.selection;
-                    bindingContext.selected = isSelected;
-                    bindingContext.row = rowCache[i].row;
-                });
-            };
-            var this_1 = this;
-            for (var i = 0; i < rowCache.length; i++) {
-                _loop_1(i);
-            }
-        };
-        return RowDataBinder;
-    }());
-    exports.RowDataBinder = RowDataBinder;
-});
-
-//# sourceMappingURL=rowDataBinder.js.map
-
-define('aurelia-v-grid/grid/rowClickHandler',["require", "exports"], function (require, exports) {
-    var RowClickHandler = (function () {
-        function RowClickHandler(element, htmlCache) {
-            this.element = element;
-            this.htmlCache = htmlCache;
-            this.selectionMode = 'none';
-            this.lastRowSelected = -1;
-            this.lastKeyKodeUsed = 'none';
-            this.selectedRows = 0;
-        }
-        RowClickHandler.prototype.init = function (mode, manualSelection, controller) {
-            this.controller = controller;
-            this.getSelection = controller.getSelectionContext.bind(controller);
-            this.manualSelection = manualSelection;
-            if (mode === false) {
-                this.selectionMode = 'single';
-            }
-            if (mode === true) {
-                this.selectionMode = 'multiple';
-            }
-            this.addEventlistener();
-        };
-        RowClickHandler.prototype.updateSelectionOnAllRows = function () {
-            var rowCache = this.htmlCache.rowCache;
-            for (var i = 0; i < rowCache.length; i++) {
-                var selection = this.getSelection();
-                var isSelected = selection.isSelected(rowCache[i].row);
-                rowCache[i].bindingContext.selected = isSelected;
-                rowCache[i].bindingContext.selected = isSelected;
-                rowCache[i].bindingContext.selected = isSelected;
-                if (isSelected) {
-                    if (!rowCache[i].selected) {
-                        rowCache[i].selected = true;
-                        rowCache[i].left.classList.add('avg-selected-row');
-                        rowCache[i].main.classList.add('avg-selected-row');
-                        rowCache[i].right.classList.add('avg-selected-row');
-                    }
-                }
-                else {
-                    if (rowCache[i].selected) {
-                        rowCache[i].selected = false;
-                        rowCache[i].left.classList.remove('avg-selected-row');
-                        rowCache[i].main.classList.remove('avg-selected-row');
-                        rowCache[i].right.classList.remove('avg-selected-row');
-                    }
-                }
-            }
-        };
-        RowClickHandler.prototype.getSelectionMode = function () {
-            var selection = this.getSelection();
-            return selection.getMode();
-        };
-        RowClickHandler.prototype.removeEventlistener = function () {
-            var avgLeftRows = this.htmlCache.avg_left_rows;
-            var avgMainRows = this.htmlCache.avg_main_rows;
-            var avgRightRows = this.htmlCache.avg_right_rows;
-            for (var i = 0; i < avgLeftRows.length; i++) {
-                avgLeftRows[i].onclick = null;
-                avgLeftRows[i].ondblclick = null;
-                avgMainRows[i].onclick = null;
-                avgMainRows[i].ondblclick = null;
-                avgRightRows[i].onclick = null;
-                avgRightRows[i].ondblclick = null;
-            }
-        };
-        RowClickHandler.prototype.addEventlistener = function () {
-            var avgLeftRows = this.htmlCache.avg_left_rows;
-            var avgMainRows = this.htmlCache.avg_main_rows;
-            var avgRightRows = this.htmlCache.avg_right_rows;
-            for (var i = 0; i < avgLeftRows.length; i++) {
-                avgLeftRows[i].onclick = this.singleClick.bind(this);
-                avgLeftRows[i].ondblclick = this.doubleClick.bind(this);
-                avgMainRows[i].onclick = this.singleClick.bind(this);
-                avgMainRows[i].ondblclick = this.doubleClick.bind(this);
-                avgRightRows[i].onclick = this.singleClick.bind(this);
-                avgRightRows[i].ondblclick = this.doubleClick.bind(this);
-            }
-        };
-        RowClickHandler.prototype.getCache = function (target) {
-            var no = -1;
-            this.htmlCache.rowCache.forEach(function (row, i) {
-                if (row.left === target) {
-                    no = i;
-                }
-                if (row.main === target) {
-                    no = i;
-                }
-                if (row.right === target) {
-                    no = i;
-                }
-                if (row.group === target) {
-                    no = i;
-                }
-            });
-            if (no !== -1) {
-                return this.htmlCache.rowCache[no];
-            }
-            else {
-                return null;
-            }
-        };
-        RowClickHandler.prototype.singleClick = function (event) {
-            var cache = this.getCache(event.currentTarget) || {};
-            if (!cache.isGroup) {
-                this.highlightRow(event, cache.row);
-                this.controller.select(cache.row);
-            }
-            if (!this.manualSelection) {
-                this.controller.raiseEvent('v-row-onclick', {
-                    evt: event,
-                    data: null,
-                    row: cache.row
-                });
-            }
-        };
-        RowClickHandler.prototype.doubleClick = function (event) {
-            var cache = this.getCache(event.currentTarget) || {};
-            this.controller.raiseEvent('v-row-ondblclick', {
-                evt: event,
-                data: null,
-                row: cache.row
-            });
-        };
-        RowClickHandler.prototype.isSelected = function (row) {
-            var selection = this.getSelection();
-            return selection.isSelected(row);
-        };
-        RowClickHandler.prototype.deSelect = function (row) {
-            var selection = this.getSelection();
-            selection.deSelect(row);
-        };
-        RowClickHandler.prototype.select = function (row, addToSelection) {
-            var selection = this.getSelection();
-            selection.select(row, addToSelection);
-        };
-        RowClickHandler.prototype.selectRange = function (start, end) {
-            var selection = this.getSelection();
-            selection.selectRange(start, end);
-        };
-        RowClickHandler.prototype.getSelectedRows = function () {
-            var selection = this.getSelection();
-            return selection.getSelectedRows();
-        };
-        RowClickHandler.prototype.setSelectedRows = function (newRows) {
-            var selection = this.getSelection();
-            selection.setSelectedRows(newRows);
-        };
-        RowClickHandler.prototype.highlightRow = function (e, currentRow) {
-            var isSel;
-            var manualSel = this.manualSelection;
-            if (!manualSel) {
-                var currentselectedRows = this.getSelectedRows();
-                var currentKeyKode = '';
-                if (currentRow !== this.lastRowSelected || currentselectedRows[0] !== currentRow) {
-                    if (currentRow <= (this.controller.collectionLength() - 1)) {
-                        if (this.selectionMode === 'multiple') {
-                            if (e.shiftKey) {
-                                currentKeyKode = 'shift';
-                                currentselectedRows = this.getSelectedRows();
-                                if (currentselectedRows.length > 0 && this.lastKeyKodeUsed === 'none') {
-                                    this.lastRowSelected = currentselectedRows[0];
-                                    this.lastKeyKodeUsed = 'shift';
-                                }
-                            }
-                            if (e.ctrlKey) {
-                                currentKeyKode = 'ctrl';
-                            }
-                            if (!e.ctrlKey && !e.shiftKey) {
-                                currentKeyKode = 'none';
-                            }
-                            switch (true) {
-                                case currentKeyKode === 'none':
-                                    this.select(currentRow, false);
-                                    break;
-                                case this.lastKeyKodeUsed === 'shift' && currentKeyKode === 'ctrl':
-                                    isSel = this.isSelected(currentRow);
-                                    if (isSel === true) {
-                                        this.deSelect(currentRow);
-                                    }
-                                    else {
-                                        this.select(currentRow, true);
-                                    }
-                                    this.lastRowSelected = currentRow;
-                                    break;
-                                case this.lastKeyKodeUsed === 'ctrl' && currentKeyKode === 'shift':
-                                    var oldSel = this.getSelectedRows();
-                                    this.selectRange(this.lastRowSelected, currentRow);
-                                    var newSel = this.getSelectedRows();
-                                    this.setSelectedRows(oldSel.concat(newSel));
-                                    break;
-                                case this.lastKeyKodeUsed === 'ctrl' && currentKeyKode === 'ctrl':
-                                    isSel = this.isSelected(currentRow);
-                                    if (isSel === true) {
-                                        this.deSelect(currentRow);
-                                    }
-                                    else {
-                                        this.select(currentRow, true);
-                                    }
-                                    this.lastRowSelected = currentRow;
-                                    break;
-                                case this.lastKeyKodeUsed === 'none' && currentKeyKode === 'ctrl':
-                                    isSel = this.isSelected(currentRow);
-                                    if (isSel === true) {
-                                        this.deSelect(currentRow);
-                                    }
-                                    else {
-                                        this.select(currentRow, true);
-                                    }
-                                    this.lastRowSelected = currentRow;
-                                    break;
-                                case this.lastKeyKodeUsed === 'shift' && currentKeyKode === 'shift':
-                                    if (this.lastRowSelected > currentRow) {
-                                        this.selectRange(currentRow, this.lastRowSelected);
-                                    }
-                                    else {
-                                        this.selectRange(this.lastRowSelected, currentRow);
-                                    }
-                                    break;
-                                case this.lastKeyKodeUsed === 'none' && currentKeyKode === 'shift':
-                                    if (this.lastRowSelected !== -1) {
-                                        if (this.lastRowSelected > currentRow) {
-                                            this.selectRange(currentRow, this.lastRowSelected);
-                                        }
-                                        else {
-                                            this.selectRange(this.lastRowSelected, currentRow);
-                                        }
-                                    }
-                                    else {
-                                        this.lastRowSelected = currentRow;
-                                        this.select(currentRow, false);
-                                    }
-                                    break;
-                                default:
-                                    console.error('error, this should not happen, debug selection');
-                            }
-                        }
-                        else {
-                            this.select(currentRow, false);
-                        }
-                        this.lastKeyKodeUsed = currentKeyKode;
-                        this.updateSelectionOnAllRows();
-                    }
-                }
-                else {
-                    if (e.ctrlKey) {
-                        currentKeyKode = 'ctrl';
-                    }
-                    if (currentKeyKode === 'ctrl') {
-                        this.lastKeyKodeUsed = currentKeyKode;
-                        isSel = this.isSelected(currentRow);
-                        if (isSel === true) {
-                            this.deSelect(currentRow);
-                        }
-                        this.lastRowSelected = currentRow;
-                    }
-                    else {
-                        this.select(currentRow, false);
-                    }
-                    this.updateSelectionOnAllRows();
-                }
-            }
-        };
-        return RowClickHandler;
-    }());
-    exports.RowClickHandler = RowClickHandler;
-});
-
-//# sourceMappingURL=rowClickHandler.js.map
-
-define('aurelia-v-grid/grid/groupingElements',["require", "exports", "aurelia-framework"], function (require, exports, aurelia_framework_1) {
-    var GroupContext = (function () {
-        function GroupContext(name, field, groupingElements) {
-            this.name = name;
-            this.field = field;
-            this.groupingElements = groupingElements;
-        }
-        GroupContext.prototype.remove = function () {
-            this.groupingElements.removeGroup(this.name);
-            this.groupingElements.removeFromGrouping(this.field);
-        };
-        return GroupContext;
-    }());
-    var GroupingElements = (function () {
-        function GroupingElements(element, viewCompiler, container, viewResources, htmlCache, viewSlots, columnBindingContext) {
-            this.element = element;
-            this.htmlCache = htmlCache;
-            this.viewSlots = viewSlots;
-            this.viewCompiler = viewCompiler;
-            this.container = container;
-            this.viewResources = viewResources;
-            this.columnBindingContext = columnBindingContext;
-            this.groupContext = {};
-            this.lastAdded = null;
-        }
-        GroupingElements.prototype.getGroups = function () {
-            var x = [];
-            for (var i in this.groupContext) {
-                if (i) {
-                    x.push(i);
-                }
-            }
-            return x;
-        };
-        GroupingElements.prototype.init = function (controller, colGroupElement) {
-            this.controller = controller;
-            this.avgTopPanel = this.htmlCache.avg_top_panel;
-            this.colGroupElement = colGroupElement;
-        };
-        GroupingElements.prototype.addGroup = function (name, field) {
-            if (!this.groupContext[name]) {
-                this.lastAdded = name;
-                this.groupContext[name] = new GroupContext(name, field, this);
-                var viewMarkup = this.colGroupElement ||
-                    "<div class=\"avg-grouping\">  \n          <p class=\"avg-grouping-element\" v-sort=\"field.bind:field\">" + name + " \n            <i><svg click.delegate=\"remove()\" class=\"icon iconhidden\" xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 16 16\">\n              <path d=\"M3 4l4.3 4L3 12h1.4L8 8.7l3.5 3.3H13L8.6 8 13 4h-1.5L8 7.3 4.4 4H3z\"/>\n            </svg></i>\n          </p>\n         </div>";
-                var viewFactory = this.viewCompiler.compile("<template>" + viewMarkup + "</template>", this.viewResources);
-                var view = viewFactory.create(this.container);
-                var viewSlot = new aurelia_framework_1.ViewSlot(this.avgTopPanel, true);
-                viewSlot.add(view);
-                this.groupContext[name].viewSlot = viewSlot;
-                this.viewSlots.groupingViewSlots.push(this.groupContext[name]);
-            }
-            this.groupContext[name].viewSlot.bind(this.groupContext[name]);
-            this.groupContext[name].viewSlot.attached();
-        };
-        GroupingElements.prototype.removeGroup = function (name) {
-            if (name) {
-                if (this.groupContext[name] !== null) {
-                    this.groupContext[name].viewSlot.unbind();
-                    this.groupContext[name].viewSlot.detached();
-                    this.groupContext[name].viewSlot.removeAll();
-                    this.groupContext[name] = null;
-                }
-            }
-            else {
-                if (this.lastAdded) {
-                    if (this.groupContext[this.lastAdded] !== null) {
-                        this.groupContext[this.lastAdded].viewSlot.unbind();
-                        this.groupContext[this.lastAdded].viewSlot.detached();
-                        this.groupContext[this.lastAdded].viewSlot.removeAll();
-                        this.groupContext[this.lastAdded] = null;
-                        this.lastAdded = null;
-                    }
-                }
-            }
-        };
-        GroupingElements.prototype.addToGrouping = function () {
-            if (this.lastAdded) {
-                var toAdd = this.groupContext[this.lastAdded].field;
-                this.controller.addToGrouping(toAdd);
-                this.lastAdded = null;
-            }
-        };
-        GroupingElements.prototype.removeFromGrouping = function (field) {
-            this.controller.removeFromGrouping(field);
-        };
-        return GroupingElements;
-    }());
-    exports.GroupingElements = GroupingElements;
-});
-
-//# sourceMappingURL=groupingElements.js.map
-
-define('aurelia-v-grid/grid/loadingScreen',["require", "exports", "aurelia-framework"], function (require, exports, aurelia_framework_1) {
-    var LoadingScreen = (function () {
-        function LoadingScreen(element, viewCompiler, container, viewResources, viewSlots) {
-            this.element = element;
-            this.viewSlots = viewSlots;
-            this.viewCompiler = viewCompiler;
-            this.container = container;
-            this.viewResources = viewResources;
-            this.loading = false;
-            this.loadingMessage = 'Loading';
-        }
-        LoadingScreen.prototype.updateLoadingDefaultLoadingMessage = function (msg) {
-            this.loadingMessage = msg;
-        };
-        LoadingScreen.prototype.init = function (overrideContext, loadingScreenTemplate) {
-            this.overrideContext = overrideContext;
-            var loadingScreentHtml = loadingScreenTemplate || "[\n      <div class=\"avg-overlay\" if.bind=\"loading\">\n      </div>\n      <div if.two-way=\"loading\" class=\"avg-progress-indicator\">\n      <div class=\"avg-progress-bar\" role=\"progressbar\" style=\"width:100%\">\n      <span>$au{ loadingMessage }</span>\n      </div>\n      </div>".replace(/\$(au{)/g, '${');
-            var viewFactory = this.viewCompiler.compile("<template>\n      " + loadingScreentHtml + "\n      </template>", this.viewResources);
-            var view = viewFactory.create(this.container);
-            var loadingScreenViewSlot = new aurelia_framework_1.ViewSlot(this.element, true);
-            loadingScreenViewSlot.add(view);
-            loadingScreenViewSlot.bind(this, {
-                bindingContext: this,
-                parentOverrideContext: this.overrideContext
-            });
-            loadingScreenViewSlot.attached();
-            this.viewSlots.loadingScreenViewSlot = loadingScreenViewSlot;
-        };
-        LoadingScreen.prototype.enable = function (msg, collectionLength) {
-            var _this = this;
-            return new Promise(function (resolve) {
-                _this.loading = collectionLength ? collectionLength > 10000 ? true : false : false;
-                _this.loadingMessage = msg || '...';
-                setTimeout(function () {
-                    resolve(null);
-                });
-            });
-        };
-        LoadingScreen.prototype.disable = function () {
-            var _this = this;
-            return new Promise(function (resolve) {
-                _this.loading = false;
-                setTimeout(function () {
-                    resolve();
-                });
-            });
-        };
-        return LoadingScreen;
-    }());
-    exports.LoadingScreen = LoadingScreen;
-});
-
-//# sourceMappingURL=loadingScreen.js.map
-
-var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var __metadata = (this && this.__metadata) || function (k, v) {
-    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
-};
-define('aurelia-v-grid/grid/v-grid',["require", "exports", "aurelia-framework", "./mainMarkup", "./mainScrollEvents", "./rowMarkup", "./rowScrollEvents", "./columnMarkup", "./htmlCache", "./htmlHeightWidth", "./viewSlots", "./columnBindingContext", "./rowDataBinder", "./rowClickHandler", "./groupingElements", "./controller", "./loadingScreen", "./contextMenu", "./footer"], function (require, exports, aurelia_framework_1, mainMarkup_1, mainScrollEvents_1, rowMarkup_1, rowScrollEvents_1, columnMarkup_1, htmlCache_1, htmlHeightWidth_1, viewSlots_1, columnBindingContext_1, rowDataBinder_1, rowClickHandler_1, groupingElements_1, controller_1, loadingScreen_1, contextMenu_1, footer_1) {
-    var VGrid = (function () {
-        function VGrid(element, viewCompiler, container, viewResources, taskQueue) {
-            this.element = element;
-            this.viewCompiler = viewCompiler;
-            this.container = container;
-            this.viewResources = viewResources;
-            this.taskQueue = taskQueue;
-            this.dragDropAttributeSharedContext = {};
-            this.resizeAttributeSharedContext = {};
-            this.colConfig = [];
-            this.backupColConfig = [];
-            this.colRepeater = false;
-            this.colRepeatRowTemplate = null;
-            this.colRepeatRowHeaderTemplate = null;
-            this.colGroupRow = null;
-            this.colGroupElement = null;
-            this.customMenuTemplates = {};
-            this.footerTemplate = null;
-            this.loadingScreenTemplate = null;
-            this.newGrid = true;
-            this.controller = new controller_1.Controller(this);
-            this.htmlCache = new htmlCache_1.HtmlCache(element);
-            this.htmlHeightWidth = new htmlHeightWidth_1.HtmlHeightWidth();
-            this.viewSlots = new viewSlots_1.ViewSlots(this.htmlCache);
-            this.columnBindingContext = new columnBindingContext_1.ColumnBindingContext(this.controller);
-            this.rowDataBinder = new rowDataBinder_1.RowDataBinder(element, this.controller);
-            this.mainMarkup = new mainMarkup_1.MainMarkup(element, viewCompiler, container, viewResources, this.htmlHeightWidth, this.viewSlots);
-            this.mainScrollEvents = new mainScrollEvents_1.MainScrollEvents(element, this.htmlCache);
-            this.rowMarkup = new rowMarkup_1.RowMarkup(element, this.htmlCache);
-            this.rowScrollEvents = new rowScrollEvents_1.RowScrollEvents(element, this.htmlCache);
-            this.rowClickHandler = new rowClickHandler_1.RowClickHandler(element, this.htmlCache);
-            this.columnMarkup = new columnMarkup_1.ColumnMarkup(element, viewCompiler, container, viewResources, this.htmlCache, this.viewSlots, this.columnBindingContext);
-            this.groupingElements = new groupingElements_1.GroupingElements(element, viewCompiler, container, viewResources, this.htmlCache, this.viewSlots, this.columnBindingContext);
-            this.loadingScreen = new loadingScreen_1.LoadingScreen(element, viewCompiler, container, viewResources, this.viewSlots);
-            this.contextMenu = new contextMenu_1.ContextMenu(viewCompiler, container, viewResources, this.viewSlots);
-            this.footer = new footer_1.Footer(this.htmlCache, viewCompiler, container, viewResources, this.viewSlots);
-            this.filterOperatorNames = {
-                '=': 'equals',
-                '<=': 'less than or eq',
-                '>=': 'greater than or eq',
-                '<': 'less than',
-                '>': 'greater than',
-                '*': 'contains',
-                '!=': 'not equal to',
-                '!*': 'does not contain',
-                '*=': 'begins with',
-                '=*': 'ends with'
-            };
-            this.filterOperatorTranslationKeys = {
-                equals: '=',
-                lessThanOrEqual: '<=',
-                greaterThanOrEqual: '>=',
-                lessThan: '<',
-                greaterThan: '>',
-                contains: '*',
-                notEqualTo: '!=',
-                doesNotContain: '!*',
-                beginsWith: '*=',
-                endsWith: '=*'
-            };
-        }
-        VGrid.prototype.bind = function (bindingContext, overrideContext) {
-            this.bindingContext = bindingContext;
-            this.overrideContext = overrideContext;
-            this.attRowHeight = this.attRowHeight ? this.attRowHeight * 1 : 25;
-            this.attHeaderHeight = this.attHeaderHeight ? this.attHeaderHeight * 1 : 25;
-            this.attFooterHeight = this.attFooterHeight ? this.attFooterHeight * 1 : 25;
-            this.attPanelHeight = this.attPanelHeight ? this.attPanelHeight * 1 : 25;
-            this.attDataDelay = this.attDataDelay ? this.attDataDelay * 1 : 0;
-            this.attMultiSelect = this.checkBool(this.attMultiSelect);
-            this.attManualSelection = this.attManualSelection ? this.checkBool(this.attManualSelection) : null;
-            this.attTheme = this.attTheme || 'avg-default';
-            this.element.classList.add(this.attTheme);
-            this.attOnRowDraw = typeof this.attOnRowDraw === 'function' ? this.attOnRowDraw : null;
-            this.attI18N = typeof this.attI18N === 'function' ? this.attI18N : null;
-        };
-        VGrid.prototype.unbind = function () {
-            this.newGrid = false;
-            this.viewSlots.unbindAndDetachColumns();
-        };
-        VGrid.prototype.attached = function () {
-            var _this = this;
-            this.attGridConnector.connect(this.controller, function () {
-                if (_this.newGrid) {
-                    _this.backupColConfig = _this.colConfig.slice(0);
-                    if (_this.attColConfig) {
-                        _this.colConfig = _this.attColConfig.length > 0 ? _this.attColConfig : _this.colConfig;
-                    }
-                    _this.controller.getContext();
-                    _this.controller.createGrid();
-                }
-                _this.viewSlots.bindAndAttachColumns(_this.overrideContext, _this.columnBindingContext, _this.attGridConnector.getSelection());
-                _this.controller.udateHorizontalScroller();
-                _this.attGridConnector.gridCreated();
-            });
-        };
-        VGrid.prototype.checkBool = function (value) {
-            if (typeof value === 'string') {
-                value = value.toLowerCase();
-            }
-            switch (true) {
-                case value === 'true':
-                case value === true:
+    BooleanFormatterValueConverter.prototype.fromView = function (value) {
+        if (typeof value === 'string') {
+            value = value.toLowerCase();
+            switch (value) {
+                case 'true':
                     value = true;
                     break;
-                case value === 'false':
-                case value === false:
-                    value = false;
+                case 'false':
+                    value = true;
                     break;
                 default:
                     value = false;
-                    break;
             }
-            return value;
-        };
-        return VGrid;
-    }());
-    VGrid.inject = [Element, aurelia_framework_1.ViewCompiler, aurelia_framework_1.Container, aurelia_framework_1.ViewResources, aurelia_framework_1.TaskQueue];
-    __decorate([
-        aurelia_framework_1.bindable({ attribute: 'v-row-height' }),
-        __metadata("design:type", Number)
-    ], VGrid.prototype, "attRowHeight", void 0);
-    __decorate([
-        aurelia_framework_1.bindable({ attribute: 'v-header-height' }),
-        __metadata("design:type", Number)
-    ], VGrid.prototype, "attHeaderHeight", void 0);
-    __decorate([
-        aurelia_framework_1.bindable({ attribute: 'v-footer-height' }),
-        __metadata("design:type", Number)
-    ], VGrid.prototype, "attFooterHeight", void 0);
-    __decorate([
-        aurelia_framework_1.bindable({ attribute: 'v-panel-height' }),
-        __metadata("design:type", Number)
-    ], VGrid.prototype, "attPanelHeight", void 0);
-    __decorate([
-        aurelia_framework_1.bindable({ attribute: 'v-grid-connector' }),
-        __metadata("design:type", Object)
-    ], VGrid.prototype, "attGridConnector", void 0);
-    __decorate([
-        aurelia_framework_1.bindable({ attribute: 'v-multi-select' }),
-        __metadata("design:type", Boolean)
-    ], VGrid.prototype, "attMultiSelect", void 0);
-    __decorate([
-        aurelia_framework_1.bindable({ attribute: 'v-manual-sel' }),
-        __metadata("design:type", Boolean)
-    ], VGrid.prototype, "attManualSelection", void 0);
-    __decorate([
-        aurelia_framework_1.bindable({ attribute: 'v-theme' }),
-        __metadata("design:type", String)
-    ], VGrid.prototype, "attTheme", void 0);
-    __decorate([
-        aurelia_framework_1.bindable({ attribute: 'v-row-on-draw' }),
-        __metadata("design:type", Function)
-    ], VGrid.prototype, "attOnRowDraw", void 0);
-    __decorate([
-        aurelia_framework_1.bindable({ attribute: 'v-columns' }),
-        __metadata("design:type", Array)
-    ], VGrid.prototype, "attColConfig", void 0);
-    __decorate([
-        aurelia_framework_1.bindable({ attribute: 'v-i18n' }),
-        __metadata("design:type", Function)
-    ], VGrid.prototype, "attI18N", void 0);
-    __decorate([
-        aurelia_framework_1.bindable({ attribute: 'v-data-delay' }),
-        __metadata("design:type", Number)
-    ], VGrid.prototype, "attDataDelay", void 0);
-    exports.VGrid = VGrid;
-});
-
-//# sourceMappingURL=v-grid.js.map
-
-define('aurelia-v-grid/grid/footer',["require", "exports", "aurelia-framework"], function (require, exports, aurelia_framework_1) {
-    var Footer = (function () {
-        function Footer(htmlCache, viewCompiler, container, viewResources, viewSlots) {
-            this.htmlCache = htmlCache;
-            this.viewSlots = viewSlots;
-            this.viewCompiler = viewCompiler;
-            this.container = container;
-            this.viewResources = viewResources;
         }
-        Footer.prototype.init = function (overrideContext, footerStringTemplate) {
-            this.overrideContext = overrideContext;
-            var footerTemplate = footerStringTemplate || "".replace(/\$(au{)/g, '${');
-            var viewFactory = this.viewCompiler.compile("<template>\n      " + footerTemplate + "\n      </template>", this.viewResources);
-            var view = viewFactory.create(this.container);
-            var footerViewSlot = new aurelia_framework_1.ViewSlot(this.htmlCache.avg_footer, true);
-            footerViewSlot.add(view);
-            footerViewSlot.bind(this, {
-                bindingContext: this,
-                parentOverrideContext: this.overrideContext
-            });
-            footerViewSlot.attached();
-            this.viewSlots.footerViewSlot = footerViewSlot;
-        };
-        return Footer;
-    }());
-    exports.Footer = Footer;
+        return value;
+    };
+    return BooleanFormatterValueConverter;
+}());
+exports.BooleanFormatterValueConverter = BooleanFormatterValueConverter;
+//# sourceMappingURL=index.js.map
+});
 });
 
-//# sourceMappingURL=footer.js.map
-
-define('aurelia-v-grid/utils/arrayUtils',["require", "exports", "./arrayFilter", "./arraySort", "./arrayGrouping"], function (require, exports, arrayFilter_1, arraySort_1, arrayGrouping_1) {
-    var ArrayUtils = (function () {
-        function ArrayUtils() {
-            this.arrayFilter = new arrayFilter_1.ArrayFilter();
-            this.arraySort = new arraySort_1.ArraySort();
-            this.arrayGrouping = new arrayGrouping_1.ArrayGrouping();
-        }
-        ArrayUtils.prototype.orderBy = function (collection, attribute, addToCurrentSort) {
-            var grouping = this.getGrouping();
-            var result = {
-                fixed: null,
-                full: null
-            };
-            if (grouping.length > 0) {
-                var lastSort = this.getOrderBy();
-                this.resetSort();
-                var exist_1 = false;
-                var newSort_1 = [];
-                var count_1 = 0;
-                lastSort.forEach(function (sort) {
-                    count_1++;
-                    if (grouping.indexOf(sort.attribute) !== -1 || addToCurrentSort) {
-                        newSort_1.push(sort);
-                        if (sort.attribute === attribute) {
-                            sort.asc = sort.asc === true ? false : true;
-                            sort.no = count_1;
-                            exist_1 = true;
-                        }
-                    }
-                    else {
-                        if (sort.attribute === attribute) {
-                            sort.asc = sort.asc === true ? false : true;
-                            sort.no = count_1;
-                            exist_1 = true;
-                            newSort_1.push(sort);
-                        }
-                    }
-                });
-                this.setLastSort(newSort_1);
-                if (!exist_1 && attribute) {
-                    this.setOrderBy(attribute, true);
-                }
-                this.runOrderbyOn(collection);
-                var groupedArray = this.group(collection, grouping, true);
-                result = {
-                    fixed: groupedArray,
-                    full: collection
-                };
-            }
-            else {
-                if (!attribute) {
-                    var lastSort = this.getOrderBy();
-                    this.resetSort();
-                    this.setLastSort(lastSort);
-                    this.runOrderbyOn(collection);
-                    result = {
-                        fixed: collection,
-                        full: collection
-                    };
-                }
-                else {
-                    this.setOrderBy(attribute, addToCurrentSort);
-                    this.runOrderbyOn(collection);
-                    result = {
-                        fixed: collection,
-                        full: collection
-                    };
-                }
-            }
-            return result;
-        };
-        ArrayUtils.prototype.group = function (array, grouping, keepExpanded) {
-            return this.arrayGrouping.group(array, grouping, keepExpanded);
-        };
-        ArrayUtils.prototype.getGrouping = function () {
-            return this.arrayGrouping.getGrouping();
-        };
-        ArrayUtils.prototype.groupCollapse = function (id) {
-            return this.arrayGrouping.collapse(id);
-        };
-        ArrayUtils.prototype.groupExpand = function (id) {
-            return this.arrayGrouping.expand(id);
-        };
-        ArrayUtils.prototype.getOrderBy = function () {
-            return this.arraySort.getOrderBy();
-        };
-        ArrayUtils.prototype.setLastSort = function (array) {
-            this.arraySort.setLastSort(array);
-        };
-        ArrayUtils.prototype.setOrderBy = function (attribute, addToCurrentSort) {
-            this.arraySort.setOrderBy(attribute, addToCurrentSort);
-        };
-        ArrayUtils.prototype.runOrderbyOn = function (array) {
-            this.arraySort.runOrderbyOn(array);
-        };
-        ArrayUtils.prototype.resetSort = function () {
-            this.arraySort.reset();
-        };
-        ArrayUtils.prototype.resetGrouping = function () {
-            this.arrayGrouping.reset();
-        };
-        ArrayUtils.prototype.getCurrentFilter = function () {
-            return this.arrayFilter.getLastFilter();
-        };
-        ArrayUtils.prototype.query = function (array, params) {
-            return this.arrayFilter.runQueryOn(array, params);
-        };
-        return ArrayUtils;
-    }());
-    exports.ArrayUtils = ArrayUtils;
-});
-
-//# sourceMappingURL=arrayUtils.js.map
-
-define('aurelia-v-grid/utils/arrayFilter',["require", "exports"], function (require, exports) {
-    var ArrayFilter = (function () {
-        function ArrayFilter() {
-            this.filterOperators = {
-                '=': 1,
-                '<=': 2,
-                '>=': 3,
-                '<': 4,
-                '>': 5,
-                '*': 6,
-                '!=': 7,
-                '!*': 8,
-                '*=': 9,
-                '=*': 10
-            };
-            this.lastFilter = [];
-        }
-        ArrayFilter.prototype.getOperatorNo = function (val) {
-            return this.filterOperators[val];
-        };
-        ArrayFilter.prototype.getLastFilter = function () {
-            return this.lastFilter;
-        };
-        ArrayFilter.prototype.runQueryOn = function (objArray, ObjFilter) {
-            var _this = this;
-            var resultArray = objArray.filter(function (data) {
-                var result = true;
-                ObjFilter.forEach(function (x) {
-                    var rowValue;
-                    var filterValue;
-                    var filterOperator = _this.getOperatorNo(x.operator);
-                    var newFilterOperator;
-                    var typeBool = {
-                        true: true,
-                        false: false
-                    };
-                    var type;
-                    try {
-                        type = typeof (data[x.attribute]);
-                    }
-                    catch (e) {
-                        type = 'string';
-                    }
-                    switch (type) {
-                        case 'number':
-                            rowValue = data[x.attribute];
-                            filterValue = Number(x.value);
-                            filterOperator = filterOperator || 1;
-                            if (filterOperator === 6) {
-                                filterOperator = 1;
-                            }
-                            break;
-                        case 'string':
-                            rowValue = data[x.attribute].toLowerCase();
-                            filterValue = x.value.toLowerCase();
-                            filterOperator = filterOperator || 9;
-                            newFilterOperator = filterOperator;
-                            if (x.value.charAt(0) === '*' && filterOperator === 9) {
-                                newFilterOperator = 6;
-                                filterValue = filterValue.substr(1, filterValue.length);
-                            }
-                            if (x.value.charAt(0) === '*' && filterOperator === 1) {
-                                newFilterOperator = 10;
-                                filterValue = filterValue.substr(1, filterValue.length);
-                            }
-                            if (x.value.charAt(x.value.length - 1) === '*' && filterOperator === 1 && newFilterOperator === 10) {
-                                newFilterOperator = 6;
-                                filterValue = filterValue.substr(0, filterValue.length - 1);
-                            }
-                            if (x.value.charAt(x.value.length - 1) === '*'
-                                && filterOperator === 1
-                                && newFilterOperator !== 10
-                                && newFilterOperator !== 6) {
-                                newFilterOperator = 9;
-                                filterValue = filterValue.substr(0, filterValue.length - 1);
-                            }
-                            if (filterOperator !== newFilterOperator) {
-                                filterOperator = newFilterOperator;
-                            }
-                            break;
-                        case 'boolean':
-                            rowValue = data[x.attribute];
-                            filterValue = typeBool[x.value];
-                            filterOperator = 1;
-                            break;
-                        case 'object':
-                            rowValue = data[x.attribute].toISOString();
-                            filterValue = new Date(x.value).toISOString();
-                            filterOperator = filterOperator || 2;
-                            break;
-                        default:
-                            try {
-                                rowValue = data[x.attribute].toLowerCase();
-                            }
-                            catch (err) {
-                                rowValue = data[x.attribute];
-                            }
-                            try {
-                                filterValue = x.value.toLowerCase();
-                            }
-                            catch (err) {
-                                filterValue = x.value;
-                            }
-                            filterOperator = filterOperator || 1;
-                            break;
-                    }
-                    switch (filterOperator) {
-                        case 1:
-                            if (rowValue !== filterValue) {
-                                result = false;
-                            }
-                            break;
-                        case 2:
-                            if (!(rowValue <= filterValue)) {
-                                result = false;
-                            }
-                            break;
-                        case 3:
-                            if (!(rowValue >= filterValue)) {
-                                result = false;
-                            }
-                            break;
-                        case 4:
-                            if (!(rowValue < filterValue)) {
-                                result = false;
-                            }
-                            break;
-                        case 5:
-                            if (!(rowValue > filterValue)) {
-                                result = false;
-                            }
-                            break;
-                        case 6:
-                            if (rowValue.indexOf(filterValue) === -1) {
-                                result = false;
-                            }
-                            break;
-                        case 7:
-                            if (rowValue === filterValue) {
-                                result = false;
-                            }
-                            break;
-                        case 8:
-                            if (rowValue.indexOf(filterValue) !== -1) {
-                                result = false;
-                            }
-                            break;
-                        case 9:
-                            if (rowValue.substring(0, filterValue.length) !== filterValue) {
-                                result = false;
-                            }
-                            break;
-                        case 10:
-                            if (rowValue.substring(rowValue.length - filterValue.length, rowValue.length) !== filterValue) {
-                                result = false;
-                            }
-                            break;
-                        default:
-                            if (rowValue !== filterValue) {
-                                result = false;
-                            }
-                    }
-                    if (type === 'string') {
-                        if (x.value.charAt(0) === '*' && x.value.length === 1) {
-                            result = true;
-                        }
-                    }
-                });
-                return result;
-            });
-            return resultArray;
-        };
-        return ArrayFilter;
-    }());
-    exports.ArrayFilter = ArrayFilter;
-});
-
-//# sourceMappingURL=arrayFilter.js.map
-
-define('aurelia-v-grid/utils/arraySort',["require", "exports"], function (require, exports) {
-    var ArraySort = (function () {
-        function ArraySort() {
-            this.lastSort = [];
-            this.curSort = [];
-        }
-        ArraySort.prototype.reset = function () {
-            this.lastSort = [];
-            this.curSort = [];
-        };
-        ArraySort.prototype.setLastSort = function (array) {
-            this.lastSort = array;
-            this.curSort = array;
-        };
-        ArraySort.prototype.setOrderBy = function (param, add) {
-            var sort;
-            var useSetValue = false;
-            if (param.asc === undefined) {
-                sort = {
-                    attribute: param,
-                    asc: true
-                };
-            }
-            else {
-                sort = {
-                    attribute: param.attribute,
-                    asc: param.asc
-                };
-                useSetValue = true;
-            }
-            if (add && this.lastSort.length > 0) {
-                this.curSort = this.lastSort;
-                var exist_1 = false;
-                this.curSort.forEach(function (x) {
-                    if (!useSetValue) {
-                        if (x.attribute === sort.attribute) {
-                            exist_1 = true;
-                            x.asc = x.asc === true ? false : true;
-                        }
-                    }
-                });
-                if (!exist_1) {
-                    this.curSort.push(sort);
-                    this.curSort[this.curSort.length - 1].no = this.curSort.length;
-                }
-                this.lastSort = this.curSort;
-            }
-            else {
-                this.curSort = [sort];
-                this.curSort[0].no = 1;
-                if (this.lastSort[0]) {
-                    if (this.lastSort[0].attribute === this.curSort[0].attribute) {
-                        if (this.lastSort[0].asc === this.curSort[0].asc) {
-                            if (!useSetValue) {
-                                this.curSort[0].asc = this.curSort[0].asc === true ? false : true;
-                            }
-                        }
-                    }
-                }
-                this.lastSort = this.curSort;
-            }
-        };
-        ArraySort.prototype.getOrderBy = function () {
-            return this.curSort;
-        };
-        ArraySort.prototype.getValue = function (attribute, obj) {
-            var arr = attribute.split('.');
-            var tempValue = Infinity;
-            if (arr.length > 1) {
-                try {
-                    tempValue = obj[arr[0]][arr[1]];
-                }
-                catch (e) { }
-            }
-            if (arr.length === 1) {
-                try {
-                    tempValue = obj[attribute];
-                }
-                catch (e) { }
-            }
-            return tempValue;
-        };
-        ArraySort.prototype.runOrderbyOn = function (array) {
-            var _this = this;
-            var thisSort = this.getOrderBy();
-            array.sort(function (obj1, obj2) {
-                var result = 0;
-                for (var i = 0; i < thisSort.length && result === 0; ++i) {
-                    var currentObj = thisSort[i];
-                    var v1 = _this.getValue(currentObj.attribute, obj1);
-                    var v2 = _this.getValue(currentObj.attribute, obj2);
-                    if (v1 !== v2) {
-                        if (currentObj.asc) {
-                            if (v1 < v2) {
-                                result = -1;
-                            }
-                            else {
-                                result = 1;
-                            }
-                        }
-                        else {
-                            if (v1 < v2) {
-                                result = 1;
-                            }
-                            else {
-                                result = -1;
-                            }
-                        }
-                    }
-                }
-                return result;
-            });
-            this.lastSort = this.getOrderBy().slice(0);
-        };
-        return ArraySort;
-    }());
-    exports.ArraySort = ArraySort;
-});
-
-//# sourceMappingURL=arraySort.js.map
-
-define('aurelia-v-grid/utils/arrayGrouping',["require", "exports"], function (require, exports) {
-    var ArrayGrouping = (function () {
-        function ArrayGrouping() {
-            this.grouping = [];
-            this.expanded = new Set([]);
-        }
-        ArrayGrouping.prototype.reset = function () {
-            this.groups = [];
-            this.grouping = [];
-            this.expanded = new Set([]);
-        };
-        ArrayGrouping.prototype.group = function (arrayToGroup, grouping, keepExpanded) {
-            var _this = this;
-            if (grouping.length > 0) {
-                if (!keepExpanded) {
-                    this.expanded = new Set([]);
-                }
-                var groups_1 = [];
-                grouping.forEach(function (groupBy, groupNo) {
-                    if (groupNo === 0) {
-                        var mainGroup = _this.groupMain(arrayToGroup, groupBy, groupNo);
-                        groups_1.push(mainGroup);
-                    }
-                    else {
-                        var childGroupArray = groups_1[groups_1.length - 1];
-                        var newSubGroup = _this.groupChildren(childGroupArray, groupBy, groupNo);
-                        groups_1.push(newSubGroup);
-                    }
-                });
-                this.groups = groups_1;
-                this.grouping = grouping;
-                if (!keepExpanded) {
-                    return groups_1[0];
-                }
-                else {
-                    return this.expand(null, this.expanded);
-                }
-            }
-            else {
-                arrayToGroup.forEach(function (row) {
-                    row.__groupLvl = 0;
-                });
-                this.grouping = [];
-                return arrayToGroup;
-            }
-        };
-        ArrayGrouping.prototype.getGrouping = function () {
-            return this.grouping;
-        };
-        ArrayGrouping.prototype.expand = function (id, array) {
-            var _this = this;
-            var all = id ? false : true;
-            if (!id) {
-                if (array) {
-                    all = false;
-                }
-            }
-            if (!array) {
-                array = new Set([]);
-            }
-            var subGroup;
-            var collection = [];
-            var mainGroups = this.groups[0];
-            subGroup = function (g) {
-                g.__groupChildren.forEach(function (sg) {
-                    collection.push(sg);
-                    switch (true) {
-                        case all:
-                        case sg.__groupID === id:
-                        case array.has(sg.__groupID):
-                        case sg.__groupID !== id && sg.__groupExpanded:
-                            if (sg.__groupChildren) {
-                                sg.__groupExpanded = true;
-                                _this.expanded.add(sg.__groupID);
-                                subGroup(sg);
-                            }
-                            break;
-                        default:
-                            break;
-                    }
-                });
-            };
-            mainGroups.forEach(function (g) {
-                collection.push(g);
-                switch (true) {
-                    case all:
-                    case g.__groupID === id:
-                    case array.has(g.__groupID):
-                    case g.__groupID !== id && g.__groupExpanded:
-                        g.__groupExpanded = true;
-                        _this.expanded.add(g.__groupID);
-                        if (g.__groupChildren) {
-                            subGroup(g);
-                        }
-                        break;
-                    default:
-                        break;
-                }
-            });
-            return collection;
-        };
-        ArrayGrouping.prototype.collapse = function (id) {
-            var _this = this;
-            var all = id ? false : true;
-            id = id === undefined ? null : id;
-            var subGroup;
-            var collection = [];
-            var mainGroups = this.groups[0];
-            subGroup = function (g) {
-                g.__groupChildren.forEach(function (sg) {
-                    switch (true) {
-                        case all:
-                            if (sg.__groupChildren) {
-                                sg.__groupExpanded = false;
-                                _this.expanded.delete(sg.__groupID);
-                                subGroup(sg);
-                            }
-                            break;
-                        case sg.__groupID === id:
-                            collection.push(sg);
-                            _this.expanded.delete(sg.__groupID);
-                            sg.__groupExpanded = false;
-                            break;
-                        default:
-                            collection.push(sg);
-                            if (sg.__groupChildren && sg.__groupExpanded) {
-                                subGroup(sg);
-                            }
-                            break;
-                    }
-                });
-            };
-            mainGroups.forEach(function (g) {
-                collection.push(g);
-                switch (true) {
-                    case all:
-                        g.__groupExpanded = false;
-                        _this.expanded.delete(g.__groupID);
-                        if (g.__groupChildren) {
-                            subGroup(g);
-                        }
-                        break;
-                    case g.__groupID === id:
-                        g.__groupExpanded = false;
-                        _this.expanded.delete(g.__groupID);
-                        break;
-                    default:
-                        if (g.__groupChildren && g.__groupExpanded) {
-                            subGroup(g);
-                        }
-                        break;
-                }
-            });
-            return collection;
-        };
-        ArrayGrouping.prototype.groupMain = function (array, groupBy, groupNo) {
-            var tempGroupArray = [];
-            var curGroup = {};
-            var tempValue = null;
-            array.forEach(function (element) {
-                if (element[groupBy] !== tempValue) {
-                    curGroup = {
-                        __groupName: element[groupBy] || 'blank',
-                        __group: true,
-                        __groupID: element[groupBy],
-                        __groupLvl: groupNo,
-                        __groupChildren: [element],
-                        __groupTotal: 1,
-                        __groupExpanded: false
-                    };
-                    element.__groupLvl = groupNo + 1;
-                    tempValue = element[groupBy];
-                    tempGroupArray.push(curGroup);
-                }
-                else {
-                    element.__groupLvl = groupNo + 1;
-                    curGroup.__groupChildren.push(element);
-                    curGroup.__groupTotal++;
-                }
-            });
-            return tempGroupArray;
-        };
-        ArrayGrouping.prototype.groupChildren = function (childGroupArray, groupBy, groupNo) {
-            var tempGroupArray = [];
-            var curGroup = {};
-            childGroupArray.forEach(function (element) {
-                var tempValue = null;
-                var rebuiltChildrenArray = [];
-                element.__groupChildren.forEach(function (child) {
-                    if (child[groupBy] !== tempValue) {
-                        var gidm = child[groupBy] || 'blank';
-                        var gidc = element.__groupID || 'blank';
-                        curGroup = {
-                            __groupName: child[groupBy],
-                            __groupID: gidm + '-' + gidc,
-                            __group: true,
-                            __groupLvl: groupNo,
-                            __groupChildren: [child],
-                            __groupTotal: 1,
-                            __groupExpanded: false
-                        };
-                        child.__groupLvl = groupNo + 1;
-                        tempValue = child[groupBy];
-                        rebuiltChildrenArray.push(curGroup);
-                        tempGroupArray.push(curGroup);
-                    }
-                    else {
-                        child.__groupLvl = groupNo + 1;
-                        curGroup.__groupChildren.push(child);
-                        curGroup.__groupTotal++;
-                    }
-                });
-                element.__groupChildren = rebuiltChildrenArray;
-            });
-            return tempGroupArray;
-        };
-        return ArrayGrouping;
-    }());
-    exports.ArrayGrouping = ArrayGrouping;
-});
-
-//# sourceMappingURL=arrayGrouping.js.map
-
-define('text!app.html', ['module'], function(module) { module.exports = "<template><require from=\"./resources/value-converters/index\"></require><span style=\"margin:5px\"><iframe src=\"https://ghbtns.com/github-btn.html?user=vegarringdal&repo=vGrid&type=star&count=true\" frameborder=\"0\" scrolling=\"0\" width=\"100px\" height=\"20px\"></iframe></span><div style=\"margin:25px\"><div class=\"row\"><div class=\"col-md-5\"><v-grid v-multi-select=\"true\" v-grid-connector.bind=\"gridConnector\" v-row-height=\"25\" v-header-height=\"50\" v-panel-height=\"25\" v-footer-height=\"25\" style=\"height:400px;width:100%\"><v-grid-col col-filter-menu=\"filter:country\" col-label-menu=\"sort:country;groupby:country\" col-width=\"100\" col-drag-drop=\"title:Country;field:country\" col-sort=\"field:country\" col-filter=\"field:country;i18n.call:translate()\" col-field=\"country\"></v-grid-col><v-grid-col col-filter-menu=\"filter:index\" col-label-menu=\"sort:index\" col-width=\"100\" col-sort=\"field:index;asc:false\" col-filter=\"field:index\" col-field=\"index | numberFormatter\" col-pin-left=\"true\"></v-grid-col><v-grid-col col-filter-menu=\"filter:high\" col-label-menu=\"sort:high;groupby:high\" col-filter-menu=\"filter:high\" col-width=\"100\" col-drag-drop=\"title:high;field:high\" col-sort=\"field:high\" col-filter=\"field:high\" col-field=\"high\"></v-grid-col><v-grid-col col-filter-menu=\"filter:bool\" col-label-menu=\"sort:bool;groupby:bool\" col-width=\"100\" col-sort=\"field:bool\" col-drag-drop=\"title:bool;field:bool\" col-filter=\"field:bool\" col-field=\"bool | booleanFormatter\" col-type=\"checkbox\"></v-grid-col><v-grid-col col-filter-menu=\"filter:guid\" col-label-menu=\"sort:guid\" col-width=\"100\" col-sort=\"field:guid\" col-filter=\"field:guid\" col-field=\"guid\"></v-grid-col><v-grid-col col-label-menu=\"sort:name\" col-width=\"100\" col-sort=\"field:name\" col-type=\"image\" col-field=\"images\" image-fix></v-grid-col><v-grid-col col-filter-menu=\"filter:name\" col-label-menu=\"sort:name\" col-width=\"160\" col-sort=\"field:name\" col-filter=\"field:name;operator:*\" col-field=\"name\" col-pin-left=\"true\"></v-grid-col><v-grid-col col-filter-menu=\"filter:number\" col-label-menu=\"sort:number\" col-width=\"100\" col-sort=\"field:number\" col-filter=\"field:number\" col-field=\"number | numberFormatter\" col-pin-right=\"true\"></v-grid-col></v-grid></div><div class=\"col-md-5\"><div class=\"row\"><input class=\"btn btn-default\" type=\"button\" click.delegate=\"replace(10)\" value=\"setArray(data) 10\"> <input class=\"btn btn-default\" type=\"button\" click.delegate=\"replace(1000)\" value=\"setArray(data) 1000\"> <input class=\"btn btn-default\" type=\"button\" click.delegate=\"replace(5000)\" value=\"setArray(data) 5000\"> <input class=\"btn btn-default\" type=\"button\" click.delegate=\"replace(10000)\" value=\"setArray(data) 10 000\"></div><div class=\"row\"><input class=\"btn btn-default\" type=\"button\" click.delegate=\"add(10)\" value=\"push(data) 10\"> <input class=\"btn btn-default\" type=\"button\" click.delegate=\"add(1000)\" value=\"push(data) 1000\"> <input class=\"btn btn-default\" type=\"button\" click.delegate=\"add(5000)\" value=\"push(data) 5000\"> <input class=\"btn btn-default\" type=\"button\" click.delegate=\"add(10000)\" value=\"push(data) 10 000\"></div><div class=\"row\"><input class=\"btn btn-default\" type=\"button\" click.delegate=\"default()\" value=\"default columns\"> <input class=\"btn btn-default\" type=\"button\" click.delegate=\"save()\" value=\"save columns\"> <input class=\"btn btn-default\" type=\"button\" click.delegate=\"load()\" value=\"load columns\"></div><div class=\"row\"><input class=\"btn btn-default\" type=\"button\" click.delegate=\"refresh()\" value=\"refresh() only (grouping/orderby)\"> <input class=\"btn btn-default\" type=\"button\" click.delegate=\"refresh(10)\" value=\"refresh(data) by replacing, but keeping orderby/grouping\"></div><div class=\"row\"><input class=\"btn btn-default\" type=\"button\" click.delegate=\"addNew()\" value=\"addBlankRow()\"> <input class=\"btn btn-default\" type=\"button\" click.delegate=\"addNew(10)\" value=\"unshift({ name: 'new' })\"></div><div class=\"row\"><input class=\"btn btn-default\" type=\"button\" click.delegate=\"remove()\" value=\"remove() (selected rows)\"></div></div></div><div class=\"row col-md-5\"><form><div class=\"form-group\"><label for=\"exampleInputEmail1\">name</label><input value.bind=\"ds.entity.name\" disabled.bind=\"!ds.entity.__avgKey\" class=\"form-control\" id=\"exampleInputEmail1\"></div><div class=\"checkbox\"><label><input type=\"checkbox\" checked.bind=\"ds.entity.bool | booleanFormatter\" disabled.bind=\"!ds.entity.__avgKey\"> Bool</label></div></form></div></div></template>"; });
-//# sourceMappingURL=app-bundle.js.map
+FuseBox.import("default/main.js");
+FuseBox.main("default/main.js");
+})
+(function(e){function r(e){var r=e.charCodeAt(0),n=e.charCodeAt(1);if((d||58!==n)&&(r>=97&&r<=122||64===r)){if(64===r){var t=e.split("/"),i=t.splice(2,t.length).join("/");return[t[0]+"/"+t[1],i||void 0]}var o=e.indexOf("/");if(o===-1)return[e];var a=e.substring(0,o),f=e.substring(o+1);return[a,f]}}function n(e){return e.substring(0,e.lastIndexOf("/"))||"./"}function t(){for(var e=[],r=0;r<arguments.length;r++)e[r]=arguments[r];for(var n=[],t=0,i=arguments.length;t<i;t++)n=n.concat(arguments[t].split("/"));for(var o=[],t=0,i=n.length;t<i;t++){var a=n[t];a&&"."!==a&&(".."===a?o.pop():o.push(a))}return""===n[0]&&o.unshift(""),o.join("/")||(o.length?"/":".")}function i(e){var r=e.match(/\.(\w{1,})$/);return r&&r[1]?e:e+".js"}function o(e){if(d){var r,n=document,t=n.getElementsByTagName("head")[0];/\.css$/.test(e)?(r=n.createElement("link"),r.rel="stylesheet",r.type="text/css",r.href=e):(r=n.createElement("script"),r.type="text/javascript",r.src=e,r.async=!0),t.insertBefore(r,t.firstChild)}}function a(e,r){for(var n in e)e.hasOwnProperty(n)&&r(n,e[n])}function f(e){return{server:require(e)}}function u(e,n){var o=n.path||"./",a=n.pkg||"default",u=r(e);if(u&&(o="./",a=u[0],n.v&&n.v[a]&&(a=a+"@"+n.v[a]),e=u[1]),e)if(126===e.charCodeAt(0))e=e.slice(2,e.length),o="./";else if(!d&&(47===e.charCodeAt(0)||58===e.charCodeAt(1)))return f(e);var s=h[a];if(!s){if(d)throw"Package not found "+a;return f(a+(e?"/"+e:""))}e=e?e:"./"+s.s.entry;var l,c=t(o,e),v=i(c),p=s.f[v];return!p&&v.indexOf("*")>-1&&(l=v),p||l||(v=t(c,"/","index.js"),p=s.f[v],p||(v=c+".js",p=s.f[v]),p||(p=s.f[c+".jsx"]),p||(v=c+"/index.jsx",p=s.f[v])),{file:p,wildcard:l,pkgName:a,versions:s.v,filePath:c,validPath:v}}function s(e,r){if(!d)return r(/\.(js|json)$/.test(e)?v.require(e):"");var n=new XMLHttpRequest;n.onreadystatechange=function(){if(4==n.readyState)if(200==n.status){var i=n.getResponseHeader("Content-Type"),o=n.responseText;/json/.test(i)?o="module.exports = "+o:/javascript/.test(i)||(o="module.exports = "+JSON.stringify(o));var a=t("./",e);g.dynamic(a,o),r(g.import(e,{}))}else console.error(e,"not found on request"),r(void 0)},n.open("GET",e,!0),n.send()}function l(e,r){var n=m[e];if(n)for(var t in n){var i=n[t].apply(null,r);if(i===!1)return!1}}function c(e,r){if(void 0===r&&(r={}),58===e.charCodeAt(4)||58===e.charCodeAt(5))return o(e);var t=u(e,r);if(t.server)return t.server;var i=t.file;if(t.wildcard){var a=new RegExp(t.wildcard.replace(/\*/g,"@").replace(/[.?*+^$[\]\\(){}|-]/g,"\\$&").replace(/@@/g,".*").replace(/@/g,"[a-z0-9$_-]+"),"i"),f=h[t.pkgName];if(f){var p={};for(var m in f.f)a.test(m)&&(p[m]=c(t.pkgName+"/"+m));return p}}if(!i){var g="function"==typeof r,x=l("async",[e,r]);if(x===!1)return;return s(e,function(e){return g?r(e):null})}var _=t.pkgName;if(i.locals&&i.locals.module)return i.locals.module.exports;var w=i.locals={},y=n(t.validPath);w.exports={},w.module={exports:w.exports},w.require=function(e,r){return c(e,{pkg:_,path:y,v:t.versions})},w.require.main={filename:d?"./":v.require.main.filename,paths:d?[]:v.require.main.paths};var b=[w.module.exports,w.require,w.module,t.validPath,y,_];return l("before-import",b),i.fn.apply(0,b),l("after-import",b),w.module.exports}if(e.FuseBox)return e.FuseBox;var d="undefined"!=typeof window&&window.navigator,v=d?window:global;d&&(v.global=window),e=d&&"undefined"==typeof __fbx__dnm__?e:module.exports;var p=d?window.__fsbx__=window.__fsbx__||{}:v.$fsbx=v.$fsbx||{};d||(v.require=require);var h=p.p=p.p||{},m=p.e=p.e||{},g=function(){function r(){}return r.global=function(e,r){return void 0===r?v[e]:void(v[e]=r)},r.import=function(e,r){return c(e,r)},r.on=function(e,r){m[e]=m[e]||[],m[e].push(r)},r.exists=function(e){try{var r=u(e,{});return void 0!==r.file}catch(e){return!1}},r.remove=function(e){var r=u(e,{}),n=h[r.pkgName];n&&n.f[r.validPath]&&delete n.f[r.validPath]},r.main=function(e){return this.mainFile=e,r.import(e,{})},r.expose=function(r){var n=function(n){var t=r[n].alias,i=c(r[n].pkg);"*"===t?a(i,function(r,n){return e[r]=n}):"object"==typeof t?a(t,function(r,n){return e[n]=i[r]}):e[t]=i};for(var t in r)n(t)},r.dynamic=function(r,n,t){this.pkg(t&&t.pkg||"default",{},function(t){t.file(r,function(r,t,i,o,a){var f=new Function("__fbx__dnm__","exports","require","module","__filename","__dirname","__root__",n);f(!0,r,t,i,o,a,e)})})},r.flush=function(e){var r=h.default;for(var n in r.f)e&&!e(n)||delete r.f[n].locals},r.pkg=function(e,r,n){if(h[e])return n(h[e].s);var t=h[e]={};return t.f={},t.v=r,t.s={file:function(e,r){return t.f[e]={fn:r}}},n(t.s)},r.addPlugin=function(e){this.plugins.push(e)},r}();return g.packages=h,g.isBrowser=void 0!==d,g.isServer=!d,g.plugins=[],e.FuseBox=g}(this))
+//# sourceMappingURL=app.js.map

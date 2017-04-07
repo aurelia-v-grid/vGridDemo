@@ -1,3 +1,5 @@
+// this is not ts code...
+
 import {
   GridConnector
 } from 'aurelia-v-grid';
@@ -45,13 +47,15 @@ export class App {
     if (!data) {
       this.ds.addBlankRow();
     } else {
-      this.ds.unshift({ name: 'new' });
+      this.ds.unshift({
+        name: 'new'
+      });
     }
   }
 
-  remove(){
-     console.log("removed");
-     console.log(this.ds.remove(this.gridConnector.getSelection().getSelectedRows()));
+  remove() {
+    console.log("removed");
+    console.log(this.ds.remove(this.gridConnector.getSelection().getSelectedRows()));
   }
 
   refresh(x) {
