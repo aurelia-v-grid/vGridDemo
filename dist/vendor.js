@@ -15516,7 +15516,7 @@ var VGridAttributeMenu = (function () {
         var x = e.target.classList.contains('avg-menu__link');
         if (!x) {
             this.controller.contextMenu.setDefaults();
-            document.removeEventListener('click', this.checkBinded);
+            document.removeEventListener('mousedown', this.checkBinded);
         }
     };
     VGridAttributeMenu.prototype.callback = function (type, option, event) {
@@ -15563,7 +15563,7 @@ var VGridAttributeMenu = (function () {
                 }
                 columnsArraySorted_1.push(x);
             });
-            if (count_1) {
+            if (count_1 || x.curColType !== 'main') {
                 x.curColumnsArray[x.curColNo].show = false;
                 columnsArraySorted_1.sort(function (a, b) {
                     return a.left - b.left;
@@ -15622,7 +15622,7 @@ var VGridAttributeMenu = (function () {
     };
     VGridAttributeMenu.prototype.open = function (e) {
         this.check(e);
-        document.addEventListener('click', this.checkBinded);
+        document.addEventListener('mousedown', this.checkBinded);
         e.preventDefault();
         if (!this.controller.contextMenu.show) {
             var clickCoords = this.getPosition(e);
@@ -19784,7 +19784,12 @@ var ArrayFilter = (function () {
                 };
                 var type;
                 try {
-                    type = typeof (data[x.attribute]);
+                    if (data[x.attribute] === null || data[x.attribute] === undefined) {
+                        type = 'string';
+                    }
+                    else {
+                        type = typeof (data[x.attribute]);
+                    }
                 }
                 catch (e) {
                     type = 'string';
@@ -19799,7 +19804,12 @@ var ArrayFilter = (function () {
                         }
                         break;
                     case 'string':
-                        rowValue = data[x.attribute].toLowerCase();
+                        if (data[x.attribute] === null || data[x.attribute] === undefined) {
+                            rowValue = '';
+                        }
+                        else {
+                            rowValue = data[x.attribute].toLowerCase();
+                        }
                         filterValue = x.value.toLowerCase();
                         filterOperator = filterOperator || 9;
                         newFilterOperator = filterOperator;
@@ -19832,8 +19842,14 @@ var ArrayFilter = (function () {
                         filterOperator = 1;
                         break;
                     case 'object':
-                        rowValue = data[x.attribute].toISOString();
-                        filterValue = new Date(x.value).toISOString();
+                        try {
+                            rowValue = new Date(data[x.attribute].getFullYear(), data[x.attribute].getMonth(), data[x.attribute].getDate()).getTime();
+                            filterValue = new Date(x.value.getFullYear(), x.value.getMonth(), x.value.getDate()).getTime();
+                        }
+                        catch (e) {
+                            rowValue = 0;
+                            filterValue = 1;
+                        }
                         filterOperator = filterOperator || 2;
                         break;
                     default:
@@ -24108,7 +24124,12 @@ var ArrayFilter = (function () {
                 };
                 var type;
                 try {
-                    type = typeof (data[x.attribute]);
+                    if (data[x.attribute] === null || data[x.attribute] === undefined) {
+                        type = 'string';
+                    }
+                    else {
+                        type = typeof (data[x.attribute]);
+                    }
                 }
                 catch (e) {
                     type = 'string';
@@ -24123,7 +24144,12 @@ var ArrayFilter = (function () {
                         }
                         break;
                     case 'string':
-                        rowValue = data[x.attribute].toLowerCase();
+                        if (data[x.attribute] === null || data[x.attribute] === undefined) {
+                            rowValue = '';
+                        }
+                        else {
+                            rowValue = data[x.attribute].toLowerCase();
+                        }
                         filterValue = x.value.toLowerCase();
                         filterOperator = filterOperator || 9;
                         newFilterOperator = filterOperator;
@@ -24156,8 +24182,14 @@ var ArrayFilter = (function () {
                         filterOperator = 1;
                         break;
                     case 'object':
-                        rowValue = data[x.attribute].toISOString();
-                        filterValue = new Date(x.value).toISOString();
+                        try {
+                            rowValue = new Date(data[x.attribute].getFullYear(), data[x.attribute].getMonth(), data[x.attribute].getDate()).getTime();
+                            filterValue = new Date(x.value.getFullYear(), x.value.getMonth(), x.value.getDate()).getTime();
+                        }
+                        catch (e) {
+                            rowValue = 0;
+                            filterValue = 1;
+                        }
                         filterOperator = filterOperator || 2;
                         break;
                     default:
