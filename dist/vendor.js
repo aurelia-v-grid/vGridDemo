@@ -14257,6 +14257,7 @@ var Collection = (function () {
         this.key = datasource.getKey();
         this.rowHeight = datasource.rowHeight || 25;
         this.groupHeight = datasource.groupHeight || 25;
+        this.rowHeightCallback = datasource.rowHeightCallback;
         this.displayedEntities = [];
         this.keys = [];
         this.count = 0;
@@ -14281,9 +14282,10 @@ var Collection = (function () {
                 rowData[_this.key] = _this.count;
             }
             if (!rowData.__group) {
-                _this.rowHeightArray.push(_this.rowHeight);
+                var rowHeight = _this.rowHeightCallback(rowData) || _this.rowHeight;
+                _this.rowHeightArray.push(rowHeight);
                 _this.rowTopArray.push(_this.rowHeightTotal);
-                _this.rowHeightTotal = _this.rowHeightTotal + _this.rowHeight;
+                _this.rowHeightTotal = _this.rowHeightTotal + rowHeight;
                 _this.keys.push(rowData[_this.key]);
             }
             else {
@@ -14345,9 +14347,13 @@ var DataSource = (function () {
             this.key = config.key || '__avgKey';
             this.rowHeight = config.rowHeight || 25;
             this.groupHeight = config.groupHeight || 25;
+            this.rowHeightCallback = config.rowHeightCallback || function () { return null; };
         }
         else {
             this.key = '__avgKey';
+            this.rowHeight = 25;
+            this.groupHeight = 25;
+            this.rowHeightCallback = function () { return null; };
         }
         this.eventIdCount = -1;
         this.eventCallBacks = [];
@@ -14558,10 +14564,11 @@ var DataSource = (function () {
         return returnArray;
     };
     DataSource.prototype.getCollectionStatus = function () {
-        var status = {};
-        status.collectionLength = this.mainArray ? this.mainArray.length : 0;
-        status.filteredCollectionLength = this.collection.getEntities().length;
-        status.selectionLength = this.selection.getLength();
+        var status = {
+            collectionLength: this.mainArray ? this.mainArray.length : 0,
+            filteredCollectionLength: this.collection.getEntities().length,
+            selectionLength: this.selection.getLength()
+        };
         return status;
     };
     DataSource.prototype.setLocaleCompare = function (code, options) {
@@ -15610,13 +15617,29 @@ var VGridAttributeMenu = (function () {
                 left: clickCoords.x,
                 filter: this.filter,
                 sort: this.sort,
-                hideshow: this.hideshow,
+                hideshow: this.canHide() ? this.hideshow : null,
                 pinned: this.pinned,
                 copypaste: this.copypaste,
                 groupby: this.groupby,
                 callback: this.callbackBinded
             });
         }
+    };
+    VGridAttributeMenu.prototype.canHide = function () {
+        var x = this.getColumnContext();
+        var returnValue = false;
+        var count = -1;
+        var columnsArraySorted = [];
+        x.curColumnsArray.forEach(function (xy) {
+            if (xy.show) {
+                count++;
+            }
+            columnsArraySorted.push(xy);
+        });
+        if (count || x.curColType !== 'main') {
+            returnValue = true;
+        }
+        return returnValue;
     };
     VGridAttributeMenu.prototype.getPosition = function (e) {
         var posx = 0;
@@ -17523,7 +17546,7 @@ var LoadingScreen = (function () {
     };
     LoadingScreen.prototype.init = function (overrideContext, loadingScreenTemplate) {
         this.overrideContext = overrideContext;
-        var loadingScreentHtml = loadingScreenTemplate || "[\n      <div class=\"avg-overlay\" if.bind=\"loading\">\n      </div>\n      <div if.two-way=\"loading\" class=\"avg-progress-indicator\">\n      <div class=\"avg-progress-bar\" role=\"progressbar\" style=\"width:100%\">\n      <span>$au{ loadingMessage }</span>\n      </div>\n      </div>".replace(/\$(au{)/g, '${');
+        var loadingScreentHtml = loadingScreenTemplate || "\n      <div class=\"avg-overlay\" if.bind=\"loading\">\n      </div>\n      <div if.two-way=\"loading\" class=\"avg-progress-indicator\">\n      <div class=\"avg-progress-bar\" role=\"progressbar\" style=\"width:100%\">\n      <span>$au{ loadingMessage }</span>\n      </div>\n      </div>".replace(/\$(au{)/g, '${');
         var viewFactory = this.viewCompiler.compile("<template>\n      " + loadingScreentHtml + "\n      </template>", this.viewResources);
         var view = viewFactory.create(this.container);
         var loadingScreenViewSlot = new aurelia_framework_1.ViewSlot(this.element, true);
@@ -18598,7 +18621,7 @@ module.exports = "/*here we can have utility classes the users can use to simply
 });
 ___scope___.file("grid/styles/contextmenu.css", function(exports, require, module, __filename, __dirname){
 
-module.exports = ".avg-default.avg-menu {\r\n  position: absolute;\r\n  z-index: 901;\r\n  background-color: rgb(240, 240, 240);\r\n  min-width: 170px;\r\n}\r\n\r\n.avg-default .avg-menu--active {\r\n  display: block;\r\n}\r\n\r\n.avg-default .avg-menu__items {\r\n  padding-left: 0;\r\n  padding-bottom: 3px;\r\n  margin: 0;\r\n}\r\n\r\n.avg-default .avg-menu__item {\r\n  list-style: none;\r\n}\r\n\r\n.avg-default .avg-menu__item p {\r\n  margin: 0 0 0 10px;\r\n}\r\n\r\n.avg-default .avg-menu__item:hover {\r\n  border-left: 6px solid grey;\r\n  background-color: lightcyan\r\n}\r\n"
+module.exports = ".avg-default.avg-menu {\r\n  position: absolute;\r\n  z-index: 901;\r\n  background-color: rgb(240, 240, 240);\r\n  min-width: 170px;\r\n}\r\n\r\n.avg-default .avg-menu--active {\r\n  display: block;\r\n}\r\n\r\n.avg-default .avg-menu__items {\r\n  padding-left: 0;\r\n  padding-bottom: 3px;\r\n  margin: 0;\r\n  \r\n}\r\n\r\n.avg-default .avg-menu__item {\r\n  list-style: none;\r\n  border-left: 6px solid transparent;\r\n}\r\n\r\n.avg-default .avg-menu__item p {\r\n  margin: 0 0 0 10px;\r\n}\r\n\r\n.avg-default .avg-menu__item:hover {\r\n  border-left: 6px solid grey;\r\n  background-color: lightcyan\r\n}\r\n"
 });
 ___scope___.file("grid/styles/dragAndResize.css", function(exports, require, module, __filename, __dirname){
 
@@ -23015,7 +23038,7 @@ var LoadingScreen = (function () {
     };
     LoadingScreen.prototype.init = function (overrideContext, loadingScreenTemplate) {
         this.overrideContext = overrideContext;
-        var loadingScreentHtml = loadingScreenTemplate || "[\n      <div class=\"avg-overlay\" if.bind=\"loading\">\n      </div>\n      <div if.two-way=\"loading\" class=\"avg-progress-indicator\">\n      <div class=\"avg-progress-bar\" role=\"progressbar\" style=\"width:100%\">\n      <span>$au{ loadingMessage }</span>\n      </div>\n      </div>".replace(/\$(au{)/g, '${');
+        var loadingScreentHtml = loadingScreenTemplate || "\n      <div class=\"avg-overlay\" if.bind=\"loading\">\n      </div>\n      <div if.two-way=\"loading\" class=\"avg-progress-indicator\">\n      <div class=\"avg-progress-bar\" role=\"progressbar\" style=\"width:100%\">\n      <span>$au{ loadingMessage }</span>\n      </div>\n      </div>".replace(/\$(au{)/g, '${');
         var viewFactory = this.viewCompiler.compile("<template>\n      " + loadingScreentHtml + "\n      </template>", this.viewResources);
         var view = viewFactory.create(this.container);
         var loadingScreenViewSlot = new aurelia_framework_1.ViewSlot(this.element, true);
@@ -23721,9 +23744,13 @@ var DataSource = (function () {
             this.key = config.key || '__avgKey';
             this.rowHeight = config.rowHeight || 25;
             this.groupHeight = config.groupHeight || 25;
+            this.rowHeightCallback = config.rowHeightCallback || function () { return null; };
         }
         else {
             this.key = '__avgKey';
+            this.rowHeight = 25;
+            this.groupHeight = 25;
+            this.rowHeightCallback = function () { return null; };
         }
         this.eventIdCount = -1;
         this.eventCallBacks = [];
@@ -23934,10 +23961,11 @@ var DataSource = (function () {
         return returnArray;
     };
     DataSource.prototype.getCollectionStatus = function () {
-        var status = {};
-        status.collectionLength = this.mainArray ? this.mainArray.length : 0;
-        status.filteredCollectionLength = this.collection.getEntities().length;
-        status.selectionLength = this.selection.getLength();
+        var status = {
+            collectionLength: this.mainArray ? this.mainArray.length : 0,
+            filteredCollectionLength: this.collection.getEntities().length,
+            selectionLength: this.selection.getLength()
+        };
         return status;
     };
     DataSource.prototype.setLocaleCompare = function (code, options) {
@@ -24113,6 +24141,7 @@ var Collection = (function () {
         this.key = datasource.getKey();
         this.rowHeight = datasource.rowHeight || 25;
         this.groupHeight = datasource.groupHeight || 25;
+        this.rowHeightCallback = datasource.rowHeightCallback;
         this.displayedEntities = [];
         this.keys = [];
         this.count = 0;
@@ -24137,9 +24166,10 @@ var Collection = (function () {
                 rowData[_this.key] = _this.count;
             }
             if (!rowData.__group) {
-                _this.rowHeightArray.push(_this.rowHeight);
+                var rowHeight = _this.rowHeightCallback(rowData) || _this.rowHeight;
+                _this.rowHeightArray.push(rowHeight);
                 _this.rowTopArray.push(_this.rowHeightTotal);
-                _this.rowHeightTotal = _this.rowHeightTotal + _this.rowHeight;
+                _this.rowHeightTotal = _this.rowHeightTotal + rowHeight;
                 _this.keys.push(rowData[_this.key]);
             }
             else {
