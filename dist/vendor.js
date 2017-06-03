@@ -17623,6 +17623,7 @@ ___scope___.file("grid/mainScrollEvents.js", function(exports, require, module, 
 Object.defineProperty(exports, "__esModule", { value: true });
 var MainScrollEvents = (function () {
     function MainScrollEvents(element, htmlCache) {
+        var _this = this;
         this.element = element;
         this.htmlCache = htmlCache;
         this.timerLeft = null;
@@ -17633,12 +17634,27 @@ var MainScrollEvents = (function () {
         this.timerWheel = null;
         this.isScrollbar = false;
         this.lastTopPosition = 0;
-        this.wheelEvent = 'onwheel';
+        this.wheelEvent = 'wheel';
+        this.onWeelBinded = this.onWeel.bind(this);
+        this.handleEventVhandleBinded = this.handleEventVhandle.bind(this);
+        this.handleEventHhandleBinded = this.handleEventHhandle.bind(this);
+        this.touchMoveBinded = this.touchMove.bind(this);
+        this.touchStartBinded = this.touchStart.bind(this);
         this.isIE11 = !!window.MSInputMethodContext && !!document.documentMode;
         if (this.isIE11) {
-            this.wheelEvent = 'onmousewheel';
+            this.wheelEvent = 'mousewheel';
             console.warn('IE11, why!?!?!');
         }
+        this.passiveSupported = false;
+        try {
+            var options = Object.defineProperty({}, 'passive', {
+                get: function () {
+                    _this.passiveSupported = true;
+                }
+            });
+            window.addEventListener('testavg', null, options);
+        }
+        catch (err) { }
     }
     MainScrollEvents.prototype.init = function () {
         this.updateInternalHtmlCache();
@@ -17673,23 +17689,23 @@ var MainScrollEvents = (function () {
             }
             _this.handleEventWheelScroll(deltaY);
         });
-        event.preventDefault();
         return false;
     };
     MainScrollEvents.prototype.addScrollEvents = function (type) {
+        var options = this.passiveSupported ? { passive: true } : false;
         switch (type) {
             case 'all':
-                this.right[this.wheelEvent] = this.onWeel.bind(this);
-                this.main[this.wheelEvent] = this.onWeel.bind(this);
-                this.left[this.wheelEvent] = this.onWeel.bind(this);
-                this.group[this.wheelEvent] = this.onWeel.bind(this);
-                this.vhandle.onscroll = this.handleEventVhandle.bind(this);
-                this.hhandle.onscroll = this.handleEventHhandle.bind(this);
-                this.htmlCache.element.addEventListener('touchmove', this.touchMove.bind(this));
-                this.htmlCache.element.addEventListener('touchstart', this.touchStart.bind(this));
+                this.right.addEventListener(this.wheelEvent, this.onWeelBinded, options);
+                this.main.addEventListener(this.wheelEvent, this.onWeelBinded, options);
+                this.left.addEventListener(this.wheelEvent, this.onWeelBinded, options);
+                this.group.addEventListener(this.wheelEvent, this.onWeelBinded, options);
+                this.vhandle.addEventListener('scroll', this.handleEventVhandleBinded, options);
+                this.hhandle.addEventListener('scroll', this.handleEventHhandleBinded, options);
+                this.htmlCache.element.addEventListener('touchmove', this.touchMoveBinded, options);
+                this.htmlCache.element.addEventListener('touchstart', this.touchStartBinded, options);
                 break;
             case 'wheel':
-                this.vhandle.onscroll = this.handleEventVhandle.bind(this);
+                this.vhandle.addEventListener('scroll', this.handleEventVhandleBinded, options);
                 break;
             default:
         }
@@ -17697,10 +17713,10 @@ var MainScrollEvents = (function () {
     MainScrollEvents.prototype.removeScrollEvents = function (type) {
         switch (type) {
             case 'all':
-                this.vhandle.onscroll = null;
+                this.vhandle.removeEventListener('onscroll', this.handleEventVhandleBinded);
                 break;
             case 'wheel':
-                this.vhandle.onscroll = null;
+                this.vhandle.removeEventListener('onscroll', this.handleEventVhandleBinded);
                 break;
             default:
         }
@@ -17717,7 +17733,6 @@ var MainScrollEvents = (function () {
         this.touchY = parseInt(touchobj.clientY, 10);
         this.touchX = parseInt(touchobj.clientX, 10);
         this.handleEventWheelScroll(dist, -distX);
-        e.preventDefault();
     };
     MainScrollEvents.prototype.handleEventWheelScroll = function (newTopPosition, left) {
         var _this = this;
@@ -21130,6 +21145,7 @@ ___scope___.file("grid/mainScrollEvents.js", function(exports, require, module, 
 Object.defineProperty(exports, "__esModule", { value: true });
 var MainScrollEvents = (function () {
     function MainScrollEvents(element, htmlCache) {
+        var _this = this;
         this.element = element;
         this.htmlCache = htmlCache;
         this.timerLeft = null;
@@ -21140,12 +21156,27 @@ var MainScrollEvents = (function () {
         this.timerWheel = null;
         this.isScrollbar = false;
         this.lastTopPosition = 0;
-        this.wheelEvent = 'onwheel';
+        this.wheelEvent = 'wheel';
+        this.onWeelBinded = this.onWeel.bind(this);
+        this.handleEventVhandleBinded = this.handleEventVhandle.bind(this);
+        this.handleEventHhandleBinded = this.handleEventHhandle.bind(this);
+        this.touchMoveBinded = this.touchMove.bind(this);
+        this.touchStartBinded = this.touchStart.bind(this);
         this.isIE11 = !!window.MSInputMethodContext && !!document.documentMode;
         if (this.isIE11) {
-            this.wheelEvent = 'onmousewheel';
+            this.wheelEvent = 'mousewheel';
             console.warn('IE11, why!?!?!');
         }
+        this.passiveSupported = false;
+        try {
+            var options = Object.defineProperty({}, 'passive', {
+                get: function () {
+                    _this.passiveSupported = true;
+                }
+            });
+            window.addEventListener('testavg', null, options);
+        }
+        catch (err) { }
     }
     MainScrollEvents.prototype.init = function () {
         this.updateInternalHtmlCache();
@@ -21180,23 +21211,23 @@ var MainScrollEvents = (function () {
             }
             _this.handleEventWheelScroll(deltaY);
         });
-        event.preventDefault();
         return false;
     };
     MainScrollEvents.prototype.addScrollEvents = function (type) {
+        var options = this.passiveSupported ? { passive: true } : false;
         switch (type) {
             case 'all':
-                this.right[this.wheelEvent] = this.onWeel.bind(this);
-                this.main[this.wheelEvent] = this.onWeel.bind(this);
-                this.left[this.wheelEvent] = this.onWeel.bind(this);
-                this.group[this.wheelEvent] = this.onWeel.bind(this);
-                this.vhandle.onscroll = this.handleEventVhandle.bind(this);
-                this.hhandle.onscroll = this.handleEventHhandle.bind(this);
-                this.htmlCache.element.addEventListener('touchmove', this.touchMove.bind(this));
-                this.htmlCache.element.addEventListener('touchstart', this.touchStart.bind(this));
+                this.right.addEventListener(this.wheelEvent, this.onWeelBinded, options);
+                this.main.addEventListener(this.wheelEvent, this.onWeelBinded, options);
+                this.left.addEventListener(this.wheelEvent, this.onWeelBinded, options);
+                this.group.addEventListener(this.wheelEvent, this.onWeelBinded, options);
+                this.vhandle.addEventListener('scroll', this.handleEventVhandleBinded, options);
+                this.hhandle.addEventListener('scroll', this.handleEventHhandleBinded, options);
+                this.htmlCache.element.addEventListener('touchmove', this.touchMoveBinded, options);
+                this.htmlCache.element.addEventListener('touchstart', this.touchStartBinded, options);
                 break;
             case 'wheel':
-                this.vhandle.onscroll = this.handleEventVhandle.bind(this);
+                this.vhandle.addEventListener('scroll', this.handleEventVhandleBinded, options);
                 break;
             default:
         }
@@ -21204,10 +21235,10 @@ var MainScrollEvents = (function () {
     MainScrollEvents.prototype.removeScrollEvents = function (type) {
         switch (type) {
             case 'all':
-                this.vhandle.onscroll = null;
+                this.vhandle.removeEventListener('onscroll', this.handleEventVhandleBinded);
                 break;
             case 'wheel':
-                this.vhandle.onscroll = null;
+                this.vhandle.removeEventListener('onscroll', this.handleEventVhandleBinded);
                 break;
             default:
         }
@@ -21224,7 +21255,6 @@ var MainScrollEvents = (function () {
         this.touchY = parseInt(touchobj.clientY, 10);
         this.touchX = parseInt(touchobj.clientX, 10);
         this.handleEventWheelScroll(dist, -distX);
-        e.preventDefault();
     };
     MainScrollEvents.prototype.handleEventWheelScroll = function (newTopPosition, left) {
         var _this = this;
