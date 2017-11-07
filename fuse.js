@@ -8,7 +8,7 @@ var build = function () {
         HTMLPlugin,
         RawPlugin,
         TypeScriptHelpers
-    } = require("fsbx");
+    } = require("fuse-box");
 
 
     const fuse = FuseBox.init({

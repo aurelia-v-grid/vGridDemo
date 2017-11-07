@@ -256,7 +256,7 @@ if (typeof FEATURE_NO_ES2015 === 'undefined') {
     },
         propertyIsEnumerable = function propertyIsEnumerable(key) {
       var uid = '' + key;
-      return onlySymbols(uid) ? hOP.call(this, uid) && this[internalSymbol]['@@' + uid] : pIE.call(this, key);
+      return onlySymbols(uid) ? hOP.call(this, uid) && this[internalSymbol] && this[internalSymbol]['@@' + uid] : pIE.call(this, key);
     },
         setAndGetSymbol = function setAndGetSymbol(uid) {
       var descriptor = {
@@ -309,7 +309,16 @@ if (typeof FEATURE_NO_ES2015 === 'undefined') {
     descriptor.value = $getOwnPropertySymbols;
     defineProperty(Object, GOPS, descriptor);
 
+    var cachedWindowNames = (typeof window === 'undefined' ? 'undefined' : _typeof(window)) === 'object' ? Object.getOwnPropertyNames(window) : [];
+    var originalObjectGetOwnPropertyNames = Object.getOwnPropertyNames;
     descriptor.value = function getOwnPropertyNames(o) {
+      if (toString.call(o) === '[object Window]') {
+        try {
+          return originalObjectGetOwnPropertyNames(o);
+        } catch (e) {
+          return [].concat([], cachedWindowNames);
+        }
+      }
       return gOPN(o).filter(onlyNonSymbols);
     };
     defineProperty(Object, GOPN, descriptor);
@@ -1134,7 +1143,34 @@ if (FuseBox.isServer) {
     }
     module.exports = global.process;
 } else {
-    require("object-assign-polyfill");
+    // Object assign polyfill
+    if (typeof Object.assign != "function") {
+        Object.assign = function(target, varArgs) { // .length of function is 2
+            "use strict";
+            if (target == null) { // TypeError if undefined or null
+                throw new TypeError("Cannot convert undefined or null to object");
+            }
+
+            var to = Object(target);
+
+            for (var index = 1; index < arguments.length; index++) {
+                var nextSource = arguments[index];
+
+                if (nextSource != null) { // Skip over if undefined or null
+                    for (var nextKey in nextSource) {
+                        // Avoid bugs when hasOwnProperty is shadowed
+                        if (Object.prototype.hasOwnProperty.call(nextSource, nextKey)) {
+                            to[nextKey] = nextSource[nextKey];
+                        }
+                    }
+                }
+            }
+            return to;
+        };
+    }
+
+
+
     var productionEnv = false; //require('@system-env').production;
 
     var process = module.exports = {};
@@ -1233,38 +1269,6 @@ if (FuseBox.isServer) {
     process.umask = function() { return 0; };
 
 }
-
-});
-return ___scope___.entry = "index.js";
-});
-FuseBox.pkg("object-assign-polyfill", {}, function(___scope___){
-___scope___.file("index.js", function(exports, require, module, __filename, __dirname){
-
-if (typeof Object.assign != "function") {
-    Object.assign = function(target, varArgs) { // .length of function is 2
-        "use strict";
-        if (target == null) { // TypeError if undefined or null
-            throw new TypeError("Cannot convert undefined or null to object");
-        }
-
-        var to = Object(target);
-
-        for (var index = 1; index < arguments.length; index++) {
-            var nextSource = arguments[index];
-
-            if (nextSource != null) { // Skip over if undefined or null
-                for (var nextKey in nextSource) {
-                    // Avoid bugs when hasOwnProperty is shadowed
-                    if (Object.prototype.hasOwnProperty.call(nextSource, nextKey)) {
-                        to[nextKey] = nextSource[nextKey];
-                    }
-                }
-            }
-        }
-        return to;
-    };
-}
-
 });
 return ___scope___.entry = "index.js";
 });
@@ -1290,8 +1294,8 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 var __generator = (this && this.__generator) || function (thisArg, body) {
-    var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t;
-    return { next: verb(0), "throw": verb(1), "return": verb(2) };
+    var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g;
+    return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
     function verb(n) { return function (v) { return step([n, v]); }; }
     function step(op) {
         if (f) throw new TypeError("Generator is already executing.");
@@ -1321,9 +1325,6 @@ var aurelia_metadata_1 = require("aurelia-metadata");
 var aurelia_loader_1 = require("aurelia-loader");
 var aurelia_pal_1 = require("aurelia-pal");
 var aurelia_logging_1 = require("aurelia-logging");
-var aurelia_dependency_injection_1 = require("aurelia-dependency-injection");
-var aurelia_framework_1 = require("aurelia-framework");
-var fuse_box_aurelia_hmr_plugin_1 = require("./fuse-box-aurelia-hmr-plugin");
 var log = aurelia_logging_1.getLogger('fuse-box-aurelia-loader');
 var TextTemplateLoader = (function () {
     function TextTemplateLoader() {
@@ -1333,11 +1334,11 @@ var TextTemplateLoader = (function () {
             var text;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0: return [4 /*yield*/, loader.loadText(entry.address)];
+                    case 0: return [4, loader.loadText(entry.address)];
                     case 1:
                         text = _a.sent();
                         entry.template = aurelia_pal_1.DOM.createTemplateFromMarkup(text);
-                        return [2 /*return*/];
+                        return [2];
                 }
             });
         });
@@ -1399,12 +1400,12 @@ var FuseBoxAureliaLoader = (function (_super) {
                         case 0:
                             debugPrint('info', 'template-registry-entry- fetch =>', address);
                             entry = this.getOrCreateTemplateRegistryEntry(address);
-                            if (!!entry.templateIsLoaded) return [3 /*break*/, 2];
-                            return [4 /*yield*/, this.templateLoader.loadTemplate(this, entry)];
+                            if (!!entry.templateIsLoaded) return [3, 2];
+                            return [4, this.templateLoader.loadTemplate(this, entry)];
                         case 1:
                             _a.sent();
                             _a.label = 2;
-                        case 2: return [2 /*return*/, entry];
+                        case 2: return [2, entry];
                     }
                 });
             }); }
@@ -1446,20 +1447,20 @@ var FuseBoxAureliaLoader = (function (_super) {
                         debugPrint('info', 'loadModule => ', moduleId);
                         existing = this.moduleRegistry[moduleId];
                         if (existing) {
-                            return [2 /*return*/, existing];
+                            return [2, existing];
                         }
                         beingLoaded = this.modulesBeingLoaded.get(moduleId);
                         if (beingLoaded) {
-                            return [2 /*return*/, beingLoaded];
+                            return [2, beingLoaded];
                         }
                         beingLoaded = this._import(moduleId);
                         this.modulesBeingLoaded.set(moduleId, beingLoaded);
-                        return [4 /*yield*/, beingLoaded];
+                        return [4, beingLoaded];
                     case 1:
                         moduleExports = _a.sent();
                         this.moduleRegistry[moduleId] = ensureOriginOnExports(moduleExports, moduleId);
                         this.modulesBeingLoaded.delete(moduleId);
-                        return [2 /*return*/, moduleExports];
+                        return [2, moduleExports];
                 }
             });
         });
@@ -1475,25 +1476,39 @@ var FuseBoxAureliaLoader = (function (_super) {
     ;
     FuseBoxAureliaLoader.prototype._import = function (address) {
         return __awaiter(this, void 0, void 0, function () {
-            var addressParts, moduleId, loaderPlugin, plugin, module;
+            var addressParts, moduleId, loaderPlugin, plugin, err_1, modulePath, module;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
                         addressParts = address.split('!');
                         moduleId = addressParts.splice(addressParts.length - 1, 1)[0];
                         loaderPlugin = addressParts.length === 1 ? addressParts[0] : null;
-                        if (!loaderPlugin) return [3 /*break*/, 2];
+                        _a.label = 1;
+                    case 1:
+                        _a.trys.push([1, 4, , 5]);
+                        if (!loaderPlugin) return [3, 3];
                         plugin = this.loaderPlugins[loaderPlugin];
                         if (!plugin) {
                             throw new Error("Plugin " + loaderPlugin + " is not registered in the loader.");
                         }
-                        return [4 /*yield*/, plugin.fetch(moduleId)];
-                    case 1: return [2 /*return*/, _a.sent()];
-                    case 2:
-                        module = this.loadWithFusebox(this.findFuseBoxPath(moduleId));
-                        module = ensureOriginOnExports(module, moduleId);
-                        this.moduleRegistry[moduleId] = module;
-                        return [2 /*return*/, Promise.resolve(module)];
+                        return [4, plugin.fetch(moduleId)];
+                    case 2: return [2, _a.sent()];
+                    case 3: return [3, 5];
+                    case 4:
+                        err_1 = _a.sent();
+                        throw new Error("\n        Fusebox-loader _import() telling this not registered in the loader:" + address + ", module id was: " + moduleId + "\n        Did you forget to add it to bundle?\n\n        " + err_1 + "\n      ");
+                    case 5:
+                        modulePath = this.findFuseBoxPath(moduleId);
+                        try {
+                            module = this.loadWithFusebox(modulePath);
+                            module = ensureOriginOnExports(module, moduleId);
+                            this.moduleRegistry[moduleId] = module;
+                            return [2, Promise.resolve(module)];
+                        }
+                        catch (err) {
+                            throw new Error("\n        Fusebox-loader _import() telling this not registered in the loader:" + address + ", module path returned: " + modulePath + "\n        Did you forget to add it to bundle?\n\n        " + err + "\n      ");
+                        }
+                        return [2];
                 }
             });
         });
@@ -1538,7 +1553,8 @@ var FuseBoxAureliaLoader = (function (_super) {
                             retunValue = moduleId + "/" + entry;
                         }
                         if (!this.fuseBoxExist(retunValue)) {
-                            debugPrint('error', 'findFuseBoxPath() failed to find', arguments);
+                            debugPrint('error', 'findFuseBoxPath() failed to find', path);
+                            throw new Error("\n                fusebox-loader - findFuseBoxPath() failed to find:" + path + "\n                Did you forget to add it to bundle??\n\n                ");
                         }
                 }
                 break;
@@ -1551,7 +1567,8 @@ var FuseBoxAureliaLoader = (function (_super) {
                         retunValue = '~/' + path;
                         break;
                     default:
-                        debugPrint('error', 'findFuseBoxPath() failed to find', arguments);
+                        debugPrint('error', 'findFuseBoxPath() failed to find', path);
+                        throw new Error("\n                fusebox-loader - findFuseBoxPath() failed to find:" + path + "\n                Did you forget to add it to bundle??\n\n                ");
                 }
         }
         return retunValue;
@@ -1560,74 +1577,6 @@ var FuseBoxAureliaLoader = (function (_super) {
 }(aurelia_loader_1.Loader));
 exports.FuseBoxAureliaLoader = FuseBoxAureliaLoader;
 aurelia_pal_1.PLATFORM.Loader = FuseBoxAureliaLoader;
-document.addEventListener('aurelia-started', function () {
-    var env;
-    try {
-        env = FuseBox.import('process').env;
-    }
-    catch (e) {
-        env = {};
-        console.log(e);
-    }
-    var hmr = env.FB_AU_HMR || window.FUSEBOX_AURELIA_LOADER_HMR;
-    var reload = env.FB_AU_RELOAD || window.FUSEBOX_AURELIA_LOADER_RELOAD;
-    if (hmr || reload) {
-        var container = aurelia_dependency_injection_1.Container.instance;
-        var aurelia = container.get(aurelia_framework_1.Aurelia);
-        FuseBox.plugins.push(new fuse_box_aurelia_hmr_plugin_1.FuseBoxAureliaHmrPlugin(aurelia.loader, reload));
-    }
-});
-
-});
-___scope___.file("dist/commonjs/fuse-box-aurelia-hmr-plugin.js", function(exports, require, module, __filename, __dirname){
-
-Object.defineProperty(exports, "__esModule", { value: true });
-var FuseBoxAureliaHmrPlugin = (function () {
-    function FuseBoxAureliaHmrPlugin(loader, reloadPageOnly) {
-        if (!reloadPageOnly) {
-            var HmrContext = require('aurelia-hot-module-reload').HmrContext;
-            this.context = new HmrContext(loader);
-            this.loader = loader;
-        }
-        this.reloadPageOnly = reloadPageOnly;
-    }
-    FuseBoxAureliaHmrPlugin.prototype.hmrUpdate = function (data) {
-        if (this.reloadPageOnly) {
-            clearTimeout(this.timer);
-            this.timer = setTimeout(function () {
-                document.location.reload();
-            }, 250);
-        }
-        else {
-            if (data.type === 'js') {
-                FuseBox.flush();
-                FuseBox.dynamic(data.path, data.content);
-                if (FuseBox.mainFile) {
-                    FuseBox.import(FuseBox.mainFile);
-                }
-                if (data.path.indexOf('.html') >= 0) {
-                    this.context.handleViewChange(data.path);
-                    return true;
-                }
-                else {
-                    if (data.path.indexOf('.css') >= 0) {
-                        this.loader.moduleRegistry[data.path] = true;
-                        this.context.reloadCss(data.path);
-                        return true;
-                    }
-                    else {
-                        var moduleId = data.path.substr(0, data.path.length - 3);
-                        this.context.handleModuleChange(moduleId, {});
-                        return true;
-                    }
-                }
-            }
-        }
-        return false;
-    };
-    return FuseBoxAureliaHmrPlugin;
-}());
-exports.FuseBoxAureliaHmrPlugin = FuseBoxAureliaHmrPlugin;
 
 });
 return ___scope___.entry = "dist/commonjs/fuse-box-aurelia-loader.js";
@@ -2383,774 +2332,6 @@ var Logger = exports.Logger = function () {
 });
 return ___scope___.entry = "dist/commonjs/aurelia-logging.js";
 });
-FuseBox.pkg("aurelia-dependency-injection", {}, function(___scope___){
-___scope___.file("dist/commonjs/aurelia-dependency-injection.js", function(exports, require, module, __filename, __dirname){
-
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.Container = exports.InvocationHandler = exports._emptyParameters = exports.SingletonRegistration = exports.TransientRegistration = exports.FactoryInvoker = exports.NewInstance = exports.Factory = exports.StrategyResolver = exports.Parent = exports.Optional = exports.All = exports.Lazy = exports.resolver = undefined;
-
-var _dec, _class, _dec2, _class3, _dec3, _class5, _dec4, _class7, _dec5, _class9, _dec6, _class11, _dec7, _class13, _classInvokers;
-
-exports.getDecoratorDependencies = getDecoratorDependencies;
-exports.lazy = lazy;
-exports.all = all;
-exports.optional = optional;
-exports.parent = parent;
-exports.factory = factory;
-exports.newInstance = newInstance;
-exports.invoker = invoker;
-exports.invokeAsFactory = invokeAsFactory;
-exports.registration = registration;
-exports.transient = transient;
-exports.singleton = singleton;
-exports.autoinject = autoinject;
-exports.inject = inject;
-
-var _aureliaMetadata = require('aurelia-metadata');
-
-var _aureliaPal = require('aurelia-pal');
-
-
-
-var resolver = exports.resolver = _aureliaMetadata.protocol.create('aurelia:resolver', function (target) {
-  if (!(typeof target.get === 'function')) {
-    return 'Resolvers must implement: get(container: Container, key: any): any';
-  }
-
-  return true;
-});
-
-var Lazy = exports.Lazy = (_dec = resolver(), _dec(_class = function () {
-  function Lazy(key) {
-    
-
-    this._key = key;
-  }
-
-  Lazy.prototype.get = function get(container) {
-    var _this = this;
-
-    return function () {
-      return container.get(_this._key);
-    };
-  };
-
-  Lazy.of = function of(key) {
-    return new Lazy(key);
-  };
-
-  return Lazy;
-}()) || _class);
-var All = exports.All = (_dec2 = resolver(), _dec2(_class3 = function () {
-  function All(key) {
-    
-
-    this._key = key;
-  }
-
-  All.prototype.get = function get(container) {
-    return container.getAll(this._key);
-  };
-
-  All.of = function of(key) {
-    return new All(key);
-  };
-
-  return All;
-}()) || _class3);
-var Optional = exports.Optional = (_dec3 = resolver(), _dec3(_class5 = function () {
-  function Optional(key) {
-    var checkParent = arguments.length <= 1 || arguments[1] === undefined ? true : arguments[1];
-
-    
-
-    this._key = key;
-    this._checkParent = checkParent;
-  }
-
-  Optional.prototype.get = function get(container) {
-    if (container.hasResolver(this._key, this._checkParent)) {
-      return container.get(this._key);
-    }
-
-    return null;
-  };
-
-  Optional.of = function of(key) {
-    var checkParent = arguments.length <= 1 || arguments[1] === undefined ? true : arguments[1];
-
-    return new Optional(key, checkParent);
-  };
-
-  return Optional;
-}()) || _class5);
-var Parent = exports.Parent = (_dec4 = resolver(), _dec4(_class7 = function () {
-  function Parent(key) {
-    
-
-    this._key = key;
-  }
-
-  Parent.prototype.get = function get(container) {
-    return container.parent ? container.parent.get(this._key) : null;
-  };
-
-  Parent.of = function of(key) {
-    return new Parent(key);
-  };
-
-  return Parent;
-}()) || _class7);
-var StrategyResolver = exports.StrategyResolver = (_dec5 = resolver(), _dec5(_class9 = function () {
-  function StrategyResolver(strategy, state) {
-    
-
-    this.strategy = strategy;
-    this.state = state;
-  }
-
-  StrategyResolver.prototype.get = function get(container, key) {
-    switch (this.strategy) {
-      case 0:
-        return this.state;
-      case 1:
-        var singleton = container.invoke(this.state);
-        this.state = singleton;
-        this.strategy = 0;
-        return singleton;
-      case 2:
-        return container.invoke(this.state);
-      case 3:
-        return this.state(container, key, this);
-      case 4:
-        return this.state[0].get(container, key);
-      case 5:
-        return container.get(this.state);
-      default:
-        throw new Error('Invalid strategy: ' + this.strategy);
-    }
-  };
-
-  return StrategyResolver;
-}()) || _class9);
-var Factory = exports.Factory = (_dec6 = resolver(), _dec6(_class11 = function () {
-  function Factory(key) {
-    
-
-    this._key = key;
-  }
-
-  Factory.prototype.get = function get(container) {
-    var _this2 = this;
-
-    return function () {
-      for (var _len = arguments.length, rest = Array(_len), _key = 0; _key < _len; _key++) {
-        rest[_key] = arguments[_key];
-      }
-
-      return container.invoke(_this2._key, rest);
-    };
-  };
-
-  Factory.of = function of(key) {
-    return new Factory(key);
-  };
-
-  return Factory;
-}()) || _class11);
-var NewInstance = exports.NewInstance = (_dec7 = resolver(), _dec7(_class13 = function () {
-  function NewInstance(key) {
-    
-
-    this.key = key;
-    this.asKey = key;
-
-    for (var _len2 = arguments.length, dynamicDependencies = Array(_len2 > 1 ? _len2 - 1 : 0), _key2 = 1; _key2 < _len2; _key2++) {
-      dynamicDependencies[_key2 - 1] = arguments[_key2];
-    }
-
-    this.dynamicDependencies = dynamicDependencies;
-  }
-
-  NewInstance.prototype.get = function get(container) {
-    var dynamicDependencies = this.dynamicDependencies.length > 0 ? this.dynamicDependencies.map(function (dependency) {
-      return dependency['protocol:aurelia:resolver'] ? dependency.get(container) : container.get(dependency);
-    }) : undefined;
-    var instance = container.invoke(this.key, dynamicDependencies);
-    container.registerInstance(this.asKey, instance);
-    return instance;
-  };
-
-  NewInstance.prototype.as = function as(key) {
-    this.asKey = key;
-    return this;
-  };
-
-  NewInstance.of = function of(key) {
-    for (var _len3 = arguments.length, dynamicDependencies = Array(_len3 > 1 ? _len3 - 1 : 0), _key3 = 1; _key3 < _len3; _key3++) {
-      dynamicDependencies[_key3 - 1] = arguments[_key3];
-    }
-
-    return new (Function.prototype.bind.apply(NewInstance, [null].concat([key], dynamicDependencies)))();
-  };
-
-  return NewInstance;
-}()) || _class13);
-function getDecoratorDependencies(target, name) {
-  var dependencies = target.inject;
-  if (typeof dependencies === 'function') {
-    throw new Error('Decorator ' + name + ' cannot be used with "inject()".  Please use an array instead.');
-  }
-  if (!dependencies) {
-    dependencies = _aureliaMetadata.metadata.getOwn(_aureliaMetadata.metadata.paramTypes, target).slice();
-    target.inject = dependencies;
-  }
-
-  return dependencies;
-}
-
-function lazy(keyValue) {
-  return function (target, key, index) {
-    var params = getDecoratorDependencies(target, 'lazy');
-    params[index] = Lazy.of(keyValue);
-  };
-}
-
-function all(keyValue) {
-  return function (target, key, index) {
-    var params = getDecoratorDependencies(target, 'all');
-    params[index] = All.of(keyValue);
-  };
-}
-
-function optional() {
-  var checkParentOrTarget = arguments.length <= 0 || arguments[0] === undefined ? true : arguments[0];
-
-  var deco = function deco(checkParent) {
-    return function (target, key, index) {
-      var params = getDecoratorDependencies(target, 'optional');
-      params[index] = Optional.of(params[index], checkParent);
-    };
-  };
-  if (typeof checkParentOrTarget === 'boolean') {
-    return deco(checkParentOrTarget);
-  }
-  return deco(true);
-}
-
-function parent(target, key, index) {
-  var params = getDecoratorDependencies(target, 'parent');
-  params[index] = Parent.of(params[index]);
-}
-
-function factory(keyValue, asValue) {
-  return function (target, key, index) {
-    var params = getDecoratorDependencies(target, 'factory');
-    var factory = Factory.of(keyValue);
-    params[index] = asValue ? factory.as(asValue) : factory;
-  };
-}
-
-function newInstance(asKeyOrTarget) {
-  for (var _len4 = arguments.length, dynamicDependencies = Array(_len4 > 1 ? _len4 - 1 : 0), _key4 = 1; _key4 < _len4; _key4++) {
-    dynamicDependencies[_key4 - 1] = arguments[_key4];
-  }
-
-  var deco = function deco(asKey) {
-    return function (target, key, index) {
-      var params = getDecoratorDependencies(target, 'newInstance');
-      params[index] = NewInstance.of.apply(NewInstance, [params[index]].concat(dynamicDependencies));
-      if (!!asKey) {
-        params[index].as(asKey);
-      }
-    };
-  };
-  if (arguments.length >= 1) {
-    return deco(asKeyOrTarget);
-  }
-  return deco();
-}
-
-function invoker(value) {
-  return function (target) {
-    _aureliaMetadata.metadata.define(_aureliaMetadata.metadata.invoker, value, target);
-  };
-}
-
-function invokeAsFactory(potentialTarget) {
-  var deco = function deco(target) {
-    _aureliaMetadata.metadata.define(_aureliaMetadata.metadata.invoker, FactoryInvoker.instance, target);
-  };
-
-  return potentialTarget ? deco(potentialTarget) : deco;
-}
-
-var FactoryInvoker = exports.FactoryInvoker = function () {
-  function FactoryInvoker() {
-    
-  }
-
-  FactoryInvoker.prototype.invoke = function invoke(container, fn, dependencies) {
-    var i = dependencies.length;
-    var args = new Array(i);
-
-    while (i--) {
-      args[i] = container.get(dependencies[i]);
-    }
-
-    return fn.apply(undefined, args);
-  };
-
-  FactoryInvoker.prototype.invokeWithDynamicDependencies = function invokeWithDynamicDependencies(container, fn, staticDependencies, dynamicDependencies) {
-    var i = staticDependencies.length;
-    var args = new Array(i);
-
-    while (i--) {
-      args[i] = container.get(staticDependencies[i]);
-    }
-
-    if (dynamicDependencies !== undefined) {
-      args = args.concat(dynamicDependencies);
-    }
-
-    return fn.apply(undefined, args);
-  };
-
-  return FactoryInvoker;
-}();
-
-FactoryInvoker.instance = new FactoryInvoker();
-
-function registration(value) {
-  return function (target) {
-    _aureliaMetadata.metadata.define(_aureliaMetadata.metadata.registration, value, target);
-  };
-}
-
-function transient(key) {
-  return registration(new TransientRegistration(key));
-}
-
-function singleton(keyOrRegisterInChild) {
-  var registerInChild = arguments.length <= 1 || arguments[1] === undefined ? false : arguments[1];
-
-  return registration(new SingletonRegistration(keyOrRegisterInChild, registerInChild));
-}
-
-var TransientRegistration = exports.TransientRegistration = function () {
-  function TransientRegistration(key) {
-    
-
-    this._key = key;
-  }
-
-  TransientRegistration.prototype.registerResolver = function registerResolver(container, key, fn) {
-    var existingResolver = container.getResolver(this._key || key);
-    return existingResolver === undefined ? container.registerTransient(this._key || key, fn) : existingResolver;
-  };
-
-  return TransientRegistration;
-}();
-
-var SingletonRegistration = exports.SingletonRegistration = function () {
-  function SingletonRegistration(keyOrRegisterInChild) {
-    var registerInChild = arguments.length <= 1 || arguments[1] === undefined ? false : arguments[1];
-
-    
-
-    if (typeof keyOrRegisterInChild === 'boolean') {
-      this._registerInChild = keyOrRegisterInChild;
-    } else {
-      this._key = keyOrRegisterInChild;
-      this._registerInChild = registerInChild;
-    }
-  }
-
-  SingletonRegistration.prototype.registerResolver = function registerResolver(container, key, fn) {
-    var targetContainer = this._registerInChild ? container : container.root;
-    var existingResolver = targetContainer.getResolver(this._key || key);
-    return existingResolver === undefined ? targetContainer.registerSingleton(this._key || key, fn) : existingResolver;
-  };
-
-  return SingletonRegistration;
-}();
-
-function validateKey(key) {
-  if (key === null || key === undefined) {
-    throw new Error('key/value cannot be null or undefined. Are you trying to inject/register something that doesn\'t exist with DI?');
-  }
-}
-var _emptyParameters = exports._emptyParameters = Object.freeze([]);
-
-_aureliaMetadata.metadata.registration = 'aurelia:registration';
-_aureliaMetadata.metadata.invoker = 'aurelia:invoker';
-
-var resolverDecorates = resolver.decorates;
-
-var InvocationHandler = exports.InvocationHandler = function () {
-  function InvocationHandler(fn, invoker, dependencies) {
-    
-
-    this.fn = fn;
-    this.invoker = invoker;
-    this.dependencies = dependencies;
-  }
-
-  InvocationHandler.prototype.invoke = function invoke(container, dynamicDependencies) {
-    return dynamicDependencies !== undefined ? this.invoker.invokeWithDynamicDependencies(container, this.fn, this.dependencies, dynamicDependencies) : this.invoker.invoke(container, this.fn, this.dependencies);
-  };
-
-  return InvocationHandler;
-}();
-
-function invokeWithDynamicDependencies(container, fn, staticDependencies, dynamicDependencies) {
-  var i = staticDependencies.length;
-  var args = new Array(i);
-
-  while (i--) {
-    args[i] = container.get(staticDependencies[i]);
-  }
-
-  if (dynamicDependencies !== undefined) {
-    args = args.concat(dynamicDependencies);
-  }
-
-  return Reflect.construct(fn, args);
-}
-
-var classInvokers = (_classInvokers = {}, _classInvokers[0] = {
-  invoke: function invoke(container, Type) {
-    return new Type();
-  },
-
-  invokeWithDynamicDependencies: invokeWithDynamicDependencies
-}, _classInvokers[1] = {
-  invoke: function invoke(container, Type, deps) {
-    return new Type(container.get(deps[0]));
-  },
-
-  invokeWithDynamicDependencies: invokeWithDynamicDependencies
-}, _classInvokers[2] = {
-  invoke: function invoke(container, Type, deps) {
-    return new Type(container.get(deps[0]), container.get(deps[1]));
-  },
-
-  invokeWithDynamicDependencies: invokeWithDynamicDependencies
-}, _classInvokers[3] = {
-  invoke: function invoke(container, Type, deps) {
-    return new Type(container.get(deps[0]), container.get(deps[1]), container.get(deps[2]));
-  },
-
-  invokeWithDynamicDependencies: invokeWithDynamicDependencies
-}, _classInvokers[4] = {
-  invoke: function invoke(container, Type, deps) {
-    return new Type(container.get(deps[0]), container.get(deps[1]), container.get(deps[2]), container.get(deps[3]));
-  },
-
-  invokeWithDynamicDependencies: invokeWithDynamicDependencies
-}, _classInvokers[5] = {
-  invoke: function invoke(container, Type, deps) {
-    return new Type(container.get(deps[0]), container.get(deps[1]), container.get(deps[2]), container.get(deps[3]), container.get(deps[4]));
-  },
-
-  invokeWithDynamicDependencies: invokeWithDynamicDependencies
-}, _classInvokers.fallback = {
-  invoke: invokeWithDynamicDependencies,
-  invokeWithDynamicDependencies: invokeWithDynamicDependencies
-}, _classInvokers);
-
-function getDependencies(f) {
-  if (!f.hasOwnProperty('inject')) {
-    return [];
-  }
-
-  if (typeof f.inject === 'function') {
-    return f.inject();
-  }
-
-  return f.inject;
-}
-
-var Container = exports.Container = function () {
-  function Container(configuration) {
-    
-
-    if (configuration === undefined) {
-      configuration = {};
-    }
-
-    this._configuration = configuration;
-    this._onHandlerCreated = configuration.onHandlerCreated;
-    this._handlers = configuration.handlers || (configuration.handlers = new Map());
-    this._resolvers = new Map();
-    this.root = this;
-    this.parent = null;
-  }
-
-  Container.prototype.makeGlobal = function makeGlobal() {
-    Container.instance = this;
-    return this;
-  };
-
-  Container.prototype.setHandlerCreatedCallback = function setHandlerCreatedCallback(onHandlerCreated) {
-    this._onHandlerCreated = onHandlerCreated;
-    this._configuration.onHandlerCreated = onHandlerCreated;
-  };
-
-  Container.prototype.registerInstance = function registerInstance(key, instance) {
-    return this.registerResolver(key, new StrategyResolver(0, instance === undefined ? key : instance));
-  };
-
-  Container.prototype.registerSingleton = function registerSingleton(key, fn) {
-    return this.registerResolver(key, new StrategyResolver(1, fn === undefined ? key : fn));
-  };
-
-  Container.prototype.registerTransient = function registerTransient(key, fn) {
-    return this.registerResolver(key, new StrategyResolver(2, fn === undefined ? key : fn));
-  };
-
-  Container.prototype.registerHandler = function registerHandler(key, handler) {
-    return this.registerResolver(key, new StrategyResolver(3, handler));
-  };
-
-  Container.prototype.registerAlias = function registerAlias(originalKey, aliasKey) {
-    return this.registerResolver(aliasKey, new StrategyResolver(5, originalKey));
-  };
-
-  Container.prototype.registerResolver = function registerResolver(key, resolver) {
-    validateKey(key);
-
-    var allResolvers = this._resolvers;
-    var result = allResolvers.get(key);
-
-    if (result === undefined) {
-      allResolvers.set(key, resolver);
-    } else if (result.strategy === 4) {
-      result.state.push(resolver);
-    } else {
-      allResolvers.set(key, new StrategyResolver(4, [result, resolver]));
-    }
-
-    return resolver;
-  };
-
-  Container.prototype.autoRegister = function autoRegister(key, fn) {
-    fn = fn === undefined ? key : fn;
-
-    if (typeof fn === 'function') {
-      var _registration = _aureliaMetadata.metadata.get(_aureliaMetadata.metadata.registration, fn);
-
-      if (_registration === undefined) {
-        return this.registerResolver(key, new StrategyResolver(1, fn));
-      }
-
-      return _registration.registerResolver(this, key, fn);
-    }
-
-    return this.registerResolver(key, new StrategyResolver(0, fn));
-  };
-
-  Container.prototype.autoRegisterAll = function autoRegisterAll(fns) {
-    var i = fns.length;
-    while (i--) {
-      this.autoRegister(fns[i]);
-    }
-  };
-
-  Container.prototype.unregister = function unregister(key) {
-    this._resolvers.delete(key);
-  };
-
-  Container.prototype.hasResolver = function hasResolver(key) {
-    var checkParent = arguments.length <= 1 || arguments[1] === undefined ? false : arguments[1];
-
-    validateKey(key);
-
-    return this._resolvers.has(key) || checkParent && this.parent !== null && this.parent.hasResolver(key, checkParent);
-  };
-
-  Container.prototype.getResolver = function getResolver(key) {
-    return this._resolvers.get(key);
-  };
-
-  Container.prototype.get = function get(key) {
-    validateKey(key);
-
-    if (key === Container) {
-      return this;
-    }
-
-    if (resolverDecorates(key)) {
-      return key.get(this, key);
-    }
-
-    var resolver = this._resolvers.get(key);
-
-    if (resolver === undefined) {
-      if (this.parent === null) {
-        return this.autoRegister(key).get(this, key);
-      }
-
-      var _registration2 = _aureliaMetadata.metadata.get(_aureliaMetadata.metadata.registration, key);
-
-      if (_registration2 === undefined) {
-        return this.parent._get(key);
-      }
-
-      return _registration2.registerResolver(this, key, key).get(this, key);
-    }
-
-    return resolver.get(this, key);
-  };
-
-  Container.prototype._get = function _get(key) {
-    var resolver = this._resolvers.get(key);
-
-    if (resolver === undefined) {
-      if (this.parent === null) {
-        return this.autoRegister(key).get(this, key);
-      }
-
-      return this.parent._get(key);
-    }
-
-    return resolver.get(this, key);
-  };
-
-  Container.prototype.getAll = function getAll(key) {
-    validateKey(key);
-
-    var resolver = this._resolvers.get(key);
-
-    if (resolver === undefined) {
-      if (this.parent === null) {
-        return _emptyParameters;
-      }
-
-      return this.parent.getAll(key);
-    }
-
-    if (resolver.strategy === 4) {
-      var state = resolver.state;
-      var i = state.length;
-      var results = new Array(i);
-
-      while (i--) {
-        results[i] = state[i].get(this, key);
-      }
-
-      return results;
-    }
-
-    return [resolver.get(this, key)];
-  };
-
-  Container.prototype.createChild = function createChild() {
-    var child = new Container(this._configuration);
-    child.root = this.root;
-    child.parent = this;
-    return child;
-  };
-
-  Container.prototype.invoke = function invoke(fn, dynamicDependencies) {
-    try {
-      var _handler = this._handlers.get(fn);
-
-      if (_handler === undefined) {
-        _handler = this._createInvocationHandler(fn);
-        this._handlers.set(fn, _handler);
-      }
-
-      return _handler.invoke(this, dynamicDependencies);
-    } catch (e) {
-      throw new _aureliaPal.AggregateError('Error invoking ' + fn.name + '. Check the inner error for details.', e, true);
-    }
-  };
-
-  Container.prototype._createInvocationHandler = function _createInvocationHandler(fn) {
-    var dependencies = void 0;
-
-    if (fn.inject === undefined) {
-      dependencies = _aureliaMetadata.metadata.getOwn(_aureliaMetadata.metadata.paramTypes, fn) || _emptyParameters;
-    } else {
-      dependencies = [];
-      var ctor = fn;
-      while (typeof ctor === 'function') {
-        var _dependencies;
-
-        (_dependencies = dependencies).push.apply(_dependencies, getDependencies(ctor));
-        ctor = Object.getPrototypeOf(ctor);
-      }
-    }
-
-    var invoker = _aureliaMetadata.metadata.getOwn(_aureliaMetadata.metadata.invoker, fn) || classInvokers[dependencies.length] || classInvokers.fallback;
-
-    var handler = new InvocationHandler(fn, invoker, dependencies);
-    return this._onHandlerCreated !== undefined ? this._onHandlerCreated(handler) : handler;
-  };
-
-  return Container;
-}();
-
-function autoinject(potentialTarget) {
-  var deco = function deco(target) {
-    var previousInject = target.inject ? target.inject.slice() : null;
-    var autoInject = _aureliaMetadata.metadata.getOwn(_aureliaMetadata.metadata.paramTypes, target) || _emptyParameters;
-    if (!previousInject) {
-      target.inject = autoInject;
-    } else {
-      for (var i = 0; i < autoInject.length; i++) {
-        if (previousInject[i] && previousInject[i] !== autoInject[i]) {
-          var prevIndex = previousInject.indexOf(autoInject[i]);
-          if (prevIndex > -1) {
-            previousInject.splice(prevIndex, 1);
-          }
-          previousInject.splice(prevIndex > -1 && prevIndex < i ? i - 1 : i, 0, autoInject[i]);
-        } else if (!previousInject[i]) {
-          previousInject[i] = autoInject[i];
-        }
-      }
-      target.inject = previousInject;
-    }
-  };
-
-  return potentialTarget ? deco(potentialTarget) : deco;
-}
-
-function inject() {
-  for (var _len5 = arguments.length, rest = Array(_len5), _key5 = 0; _key5 < _len5; _key5++) {
-    rest[_key5] = arguments[_key5];
-  }
-
-  return function (target, key, descriptor) {
-    if (typeof descriptor === 'number' && rest.length === 1) {
-      var params = target.inject;
-      if (typeof params === 'function') {
-        throw new Error('Decorator inject cannot be used with "inject()".  Please use an array instead.');
-      }
-      if (!params) {
-        params = _aureliaMetadata.metadata.getOwn(_aureliaMetadata.metadata.paramTypes, target).slice();
-        target.inject = params;
-      }
-      params[descriptor] = rest[0];
-      return;
-    }
-
-    if (descriptor) {
-      var _fn = descriptor.value;
-      _fn.inject = rest;
-    } else {
-      target.inject = rest;
-    }
-  };
-}
-});
-return ___scope___.entry = "dist/commonjs/aurelia-dependency-injection.js";
-});
 FuseBox.pkg("aurelia-framework", {}, function(___scope___){
 ___scope___.file("dist/commonjs/aurelia-framework.js", function(exports, require, module, __filename, __dirname){
 
@@ -3714,6 +2895,781 @@ var LogManager = exports.LogManager = TheLogManager;
 });
 return ___scope___.entry = "dist/commonjs/aurelia-framework.js";
 });
+FuseBox.pkg("aurelia-dependency-injection", {}, function(___scope___){
+___scope___.file("dist/commonjs/aurelia-dependency-injection.js", function(exports, require, module, __filename, __dirname){
+
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.Container = exports.InvocationHandler = exports._emptyParameters = exports.SingletonRegistration = exports.TransientRegistration = exports.FactoryInvoker = exports.NewInstance = exports.Factory = exports.StrategyResolver = exports.Parent = exports.Optional = exports.All = exports.Lazy = exports.resolver = undefined;
+
+var _dec, _class, _dec2, _class3, _dec3, _class5, _dec4, _class7, _dec5, _class9, _dec6, _class11, _dec7, _class13, _classInvokers;
+
+exports.getDecoratorDependencies = getDecoratorDependencies;
+exports.lazy = lazy;
+exports.all = all;
+exports.optional = optional;
+exports.parent = parent;
+exports.factory = factory;
+exports.newInstance = newInstance;
+exports.invoker = invoker;
+exports.invokeAsFactory = invokeAsFactory;
+exports.registration = registration;
+exports.transient = transient;
+exports.singleton = singleton;
+exports.autoinject = autoinject;
+exports.inject = inject;
+
+var _aureliaMetadata = require('aurelia-metadata');
+
+var _aureliaPal = require('aurelia-pal');
+
+
+
+var resolver = exports.resolver = _aureliaMetadata.protocol.create('aurelia:resolver', function (target) {
+  if (!(typeof target.get === 'function')) {
+    return 'Resolvers must implement: get(container: Container, key: any): any';
+  }
+
+  return true;
+});
+
+var Lazy = exports.Lazy = (_dec = resolver(), _dec(_class = function () {
+  function Lazy(key) {
+    
+
+    this._key = key;
+  }
+
+  Lazy.prototype.get = function get(container) {
+    var _this = this;
+
+    return function () {
+      return container.get(_this._key);
+    };
+  };
+
+  Lazy.of = function of(key) {
+    return new Lazy(key);
+  };
+
+  return Lazy;
+}()) || _class);
+var All = exports.All = (_dec2 = resolver(), _dec2(_class3 = function () {
+  function All(key) {
+    
+
+    this._key = key;
+  }
+
+  All.prototype.get = function get(container) {
+    return container.getAll(this._key);
+  };
+
+  All.of = function of(key) {
+    return new All(key);
+  };
+
+  return All;
+}()) || _class3);
+var Optional = exports.Optional = (_dec3 = resolver(), _dec3(_class5 = function () {
+  function Optional(key) {
+    var checkParent = arguments.length <= 1 || arguments[1] === undefined ? true : arguments[1];
+
+    
+
+    this._key = key;
+    this._checkParent = checkParent;
+  }
+
+  Optional.prototype.get = function get(container) {
+    if (container.hasResolver(this._key, this._checkParent)) {
+      return container.get(this._key);
+    }
+
+    return null;
+  };
+
+  Optional.of = function of(key) {
+    var checkParent = arguments.length <= 1 || arguments[1] === undefined ? true : arguments[1];
+
+    return new Optional(key, checkParent);
+  };
+
+  return Optional;
+}()) || _class5);
+var Parent = exports.Parent = (_dec4 = resolver(), _dec4(_class7 = function () {
+  function Parent(key) {
+    
+
+    this._key = key;
+  }
+
+  Parent.prototype.get = function get(container) {
+    return container.parent ? container.parent.get(this._key) : null;
+  };
+
+  Parent.of = function of(key) {
+    return new Parent(key);
+  };
+
+  return Parent;
+}()) || _class7);
+var StrategyResolver = exports.StrategyResolver = (_dec5 = resolver(), _dec5(_class9 = function () {
+  function StrategyResolver(strategy, state) {
+    
+
+    this.strategy = strategy;
+    this.state = state;
+  }
+
+  StrategyResolver.prototype.get = function get(container, key) {
+    switch (this.strategy) {
+      case 0:
+        return this.state;
+      case 1:
+        var singleton = container.invoke(this.state);
+        this.state = singleton;
+        this.strategy = 0;
+        return singleton;
+      case 2:
+        return container.invoke(this.state);
+      case 3:
+        return this.state(container, key, this);
+      case 4:
+        return this.state[0].get(container, key);
+      case 5:
+        return container.get(this.state);
+      default:
+        throw new Error('Invalid strategy: ' + this.strategy);
+    }
+  };
+
+  return StrategyResolver;
+}()) || _class9);
+var Factory = exports.Factory = (_dec6 = resolver(), _dec6(_class11 = function () {
+  function Factory(key) {
+    
+
+    this._key = key;
+  }
+
+  Factory.prototype.get = function get(container) {
+    var _this2 = this;
+
+    return function () {
+      for (var _len = arguments.length, rest = Array(_len), _key = 0; _key < _len; _key++) {
+        rest[_key] = arguments[_key];
+      }
+
+      return container.invoke(_this2._key, rest);
+    };
+  };
+
+  Factory.of = function of(key) {
+    return new Factory(key);
+  };
+
+  return Factory;
+}()) || _class11);
+var NewInstance = exports.NewInstance = (_dec7 = resolver(), _dec7(_class13 = function () {
+  function NewInstance(key) {
+    
+
+    this.key = key;
+    this.asKey = key;
+
+    for (var _len2 = arguments.length, dynamicDependencies = Array(_len2 > 1 ? _len2 - 1 : 0), _key2 = 1; _key2 < _len2; _key2++) {
+      dynamicDependencies[_key2 - 1] = arguments[_key2];
+    }
+
+    this.dynamicDependencies = dynamicDependencies;
+  }
+
+  NewInstance.prototype.get = function get(container) {
+    var dynamicDependencies = this.dynamicDependencies.length > 0 ? this.dynamicDependencies.map(function (dependency) {
+      return dependency['protocol:aurelia:resolver'] ? dependency.get(container) : container.get(dependency);
+    }) : undefined;
+    var instance = container.invoke(this.key, dynamicDependencies);
+    container.registerInstance(this.asKey, instance);
+    return instance;
+  };
+
+  NewInstance.prototype.as = function as(key) {
+    this.asKey = key;
+    return this;
+  };
+
+  NewInstance.of = function of(key) {
+    for (var _len3 = arguments.length, dynamicDependencies = Array(_len3 > 1 ? _len3 - 1 : 0), _key3 = 1; _key3 < _len3; _key3++) {
+      dynamicDependencies[_key3 - 1] = arguments[_key3];
+    }
+
+    return new (Function.prototype.bind.apply(NewInstance, [null].concat([key], dynamicDependencies)))();
+  };
+
+  return NewInstance;
+}()) || _class13);
+function getDecoratorDependencies(target, name) {
+  var dependencies = target.inject;
+  if (typeof dependencies === 'function') {
+    throw new Error('Decorator ' + name + ' cannot be used with "inject()".  Please use an array instead.');
+  }
+  if (!dependencies) {
+    dependencies = _aureliaMetadata.metadata.getOwn(_aureliaMetadata.metadata.paramTypes, target).slice();
+    target.inject = dependencies;
+  }
+
+  return dependencies;
+}
+
+function lazy(keyValue) {
+  return function (target, key, index) {
+    var params = getDecoratorDependencies(target, 'lazy');
+    params[index] = Lazy.of(keyValue);
+  };
+}
+
+function all(keyValue) {
+  return function (target, key, index) {
+    var params = getDecoratorDependencies(target, 'all');
+    params[index] = All.of(keyValue);
+  };
+}
+
+function optional() {
+  var checkParentOrTarget = arguments.length <= 0 || arguments[0] === undefined ? true : arguments[0];
+
+  var deco = function deco(checkParent) {
+    return function (target, key, index) {
+      var params = getDecoratorDependencies(target, 'optional');
+      params[index] = Optional.of(params[index], checkParent);
+    };
+  };
+  if (typeof checkParentOrTarget === 'boolean') {
+    return deco(checkParentOrTarget);
+  }
+  return deco(true);
+}
+
+function parent(target, key, index) {
+  var params = getDecoratorDependencies(target, 'parent');
+  params[index] = Parent.of(params[index]);
+}
+
+function factory(keyValue, asValue) {
+  return function (target, key, index) {
+    var params = getDecoratorDependencies(target, 'factory');
+    var factory = Factory.of(keyValue);
+    params[index] = asValue ? factory.as(asValue) : factory;
+  };
+}
+
+function newInstance(asKeyOrTarget) {
+  for (var _len4 = arguments.length, dynamicDependencies = Array(_len4 > 1 ? _len4 - 1 : 0), _key4 = 1; _key4 < _len4; _key4++) {
+    dynamicDependencies[_key4 - 1] = arguments[_key4];
+  }
+
+  var deco = function deco(asKey) {
+    return function (target, key, index) {
+      var params = getDecoratorDependencies(target, 'newInstance');
+      params[index] = NewInstance.of.apply(NewInstance, [params[index]].concat(dynamicDependencies));
+      if (!!asKey) {
+        params[index].as(asKey);
+      }
+    };
+  };
+  if (arguments.length >= 1) {
+    return deco(asKeyOrTarget);
+  }
+  return deco();
+}
+
+function invoker(value) {
+  return function (target) {
+    _aureliaMetadata.metadata.define(_aureliaMetadata.metadata.invoker, value, target);
+  };
+}
+
+function invokeAsFactory(potentialTarget) {
+  var deco = function deco(target) {
+    _aureliaMetadata.metadata.define(_aureliaMetadata.metadata.invoker, FactoryInvoker.instance, target);
+  };
+
+  return potentialTarget ? deco(potentialTarget) : deco;
+}
+
+var FactoryInvoker = exports.FactoryInvoker = function () {
+  function FactoryInvoker() {
+    
+  }
+
+  FactoryInvoker.prototype.invoke = function invoke(container, fn, dependencies) {
+    var i = dependencies.length;
+    var args = new Array(i);
+
+    while (i--) {
+      args[i] = container.get(dependencies[i]);
+    }
+
+    return fn.apply(undefined, args);
+  };
+
+  FactoryInvoker.prototype.invokeWithDynamicDependencies = function invokeWithDynamicDependencies(container, fn, staticDependencies, dynamicDependencies) {
+    var i = staticDependencies.length;
+    var args = new Array(i);
+
+    while (i--) {
+      args[i] = container.get(staticDependencies[i]);
+    }
+
+    if (dynamicDependencies !== undefined) {
+      args = args.concat(dynamicDependencies);
+    }
+
+    return fn.apply(undefined, args);
+  };
+
+  return FactoryInvoker;
+}();
+
+FactoryInvoker.instance = new FactoryInvoker();
+
+function registration(value) {
+  return function (target) {
+    _aureliaMetadata.metadata.define(_aureliaMetadata.metadata.registration, value, target);
+  };
+}
+
+function transient(key) {
+  return registration(new TransientRegistration(key));
+}
+
+function singleton(keyOrRegisterInChild) {
+  var registerInChild = arguments.length <= 1 || arguments[1] === undefined ? false : arguments[1];
+
+  return registration(new SingletonRegistration(keyOrRegisterInChild, registerInChild));
+}
+
+var TransientRegistration = exports.TransientRegistration = function () {
+  function TransientRegistration(key) {
+    
+
+    this._key = key;
+  }
+
+  TransientRegistration.prototype.registerResolver = function registerResolver(container, key, fn) {
+    var existingResolver = container.getResolver(this._key || key);
+    return existingResolver === undefined ? container.registerTransient(this._key || key, fn) : existingResolver;
+  };
+
+  return TransientRegistration;
+}();
+
+var SingletonRegistration = exports.SingletonRegistration = function () {
+  function SingletonRegistration(keyOrRegisterInChild) {
+    var registerInChild = arguments.length <= 1 || arguments[1] === undefined ? false : arguments[1];
+
+    
+
+    if (typeof keyOrRegisterInChild === 'boolean') {
+      this._registerInChild = keyOrRegisterInChild;
+    } else {
+      this._key = keyOrRegisterInChild;
+      this._registerInChild = registerInChild;
+    }
+  }
+
+  SingletonRegistration.prototype.registerResolver = function registerResolver(container, key, fn) {
+    var targetContainer = this._registerInChild ? container : container.root;
+    var existingResolver = targetContainer.getResolver(this._key || key);
+    return existingResolver === undefined ? targetContainer.registerSingleton(this._key || key, fn) : existingResolver;
+  };
+
+  return SingletonRegistration;
+}();
+
+function validateKey(key) {
+  if (key === null || key === undefined) {
+    throw new Error('key/value cannot be null or undefined. Are you trying to inject/register something that doesn\'t exist with DI?');
+  }
+}
+var _emptyParameters = exports._emptyParameters = Object.freeze([]);
+
+_aureliaMetadata.metadata.registration = 'aurelia:registration';
+_aureliaMetadata.metadata.invoker = 'aurelia:invoker';
+
+var resolverDecorates = resolver.decorates;
+
+var InvocationHandler = exports.InvocationHandler = function () {
+  function InvocationHandler(fn, invoker, dependencies) {
+    
+
+    this.fn = fn;
+    this.invoker = invoker;
+    this.dependencies = dependencies;
+  }
+
+  InvocationHandler.prototype.invoke = function invoke(container, dynamicDependencies) {
+    return dynamicDependencies !== undefined ? this.invoker.invokeWithDynamicDependencies(container, this.fn, this.dependencies, dynamicDependencies) : this.invoker.invoke(container, this.fn, this.dependencies);
+  };
+
+  return InvocationHandler;
+}();
+
+function invokeWithDynamicDependencies(container, fn, staticDependencies, dynamicDependencies) {
+  var i = staticDependencies.length;
+  var args = new Array(i);
+  var lookup = void 0;
+
+  while (i--) {
+    lookup = staticDependencies[i];
+
+    if (lookup === null || lookup === undefined) {
+      throw new Error('Constructor Parameter with index ' + i + ' cannot be null or undefined. Are you trying to inject/register something that doesn\'t exist with DI?');
+    } else {
+      args[i] = container.get(lookup);
+    }
+  }
+
+  if (dynamicDependencies !== undefined) {
+    args = args.concat(dynamicDependencies);
+  }
+
+  return Reflect.construct(fn, args);
+}
+
+var classInvokers = (_classInvokers = {}, _classInvokers[0] = {
+  invoke: function invoke(container, Type) {
+    return new Type();
+  },
+
+  invokeWithDynamicDependencies: invokeWithDynamicDependencies
+}, _classInvokers[1] = {
+  invoke: function invoke(container, Type, deps) {
+    return new Type(container.get(deps[0]));
+  },
+
+  invokeWithDynamicDependencies: invokeWithDynamicDependencies
+}, _classInvokers[2] = {
+  invoke: function invoke(container, Type, deps) {
+    return new Type(container.get(deps[0]), container.get(deps[1]));
+  },
+
+  invokeWithDynamicDependencies: invokeWithDynamicDependencies
+}, _classInvokers[3] = {
+  invoke: function invoke(container, Type, deps) {
+    return new Type(container.get(deps[0]), container.get(deps[1]), container.get(deps[2]));
+  },
+
+  invokeWithDynamicDependencies: invokeWithDynamicDependencies
+}, _classInvokers[4] = {
+  invoke: function invoke(container, Type, deps) {
+    return new Type(container.get(deps[0]), container.get(deps[1]), container.get(deps[2]), container.get(deps[3]));
+  },
+
+  invokeWithDynamicDependencies: invokeWithDynamicDependencies
+}, _classInvokers[5] = {
+  invoke: function invoke(container, Type, deps) {
+    return new Type(container.get(deps[0]), container.get(deps[1]), container.get(deps[2]), container.get(deps[3]), container.get(deps[4]));
+  },
+
+  invokeWithDynamicDependencies: invokeWithDynamicDependencies
+}, _classInvokers.fallback = {
+  invoke: invokeWithDynamicDependencies,
+  invokeWithDynamicDependencies: invokeWithDynamicDependencies
+}, _classInvokers);
+
+function getDependencies(f) {
+  if (!f.hasOwnProperty('inject')) {
+    return [];
+  }
+
+  if (typeof f.inject === 'function') {
+    return f.inject();
+  }
+
+  return f.inject;
+}
+
+var Container = exports.Container = function () {
+  function Container(configuration) {
+    
+
+    if (configuration === undefined) {
+      configuration = {};
+    }
+
+    this._configuration = configuration;
+    this._onHandlerCreated = configuration.onHandlerCreated;
+    this._handlers = configuration.handlers || (configuration.handlers = new Map());
+    this._resolvers = new Map();
+    this.root = this;
+    this.parent = null;
+  }
+
+  Container.prototype.makeGlobal = function makeGlobal() {
+    Container.instance = this;
+    return this;
+  };
+
+  Container.prototype.setHandlerCreatedCallback = function setHandlerCreatedCallback(onHandlerCreated) {
+    this._onHandlerCreated = onHandlerCreated;
+    this._configuration.onHandlerCreated = onHandlerCreated;
+  };
+
+  Container.prototype.registerInstance = function registerInstance(key, instance) {
+    return this.registerResolver(key, new StrategyResolver(0, instance === undefined ? key : instance));
+  };
+
+  Container.prototype.registerSingleton = function registerSingleton(key, fn) {
+    return this.registerResolver(key, new StrategyResolver(1, fn === undefined ? key : fn));
+  };
+
+  Container.prototype.registerTransient = function registerTransient(key, fn) {
+    return this.registerResolver(key, new StrategyResolver(2, fn === undefined ? key : fn));
+  };
+
+  Container.prototype.registerHandler = function registerHandler(key, handler) {
+    return this.registerResolver(key, new StrategyResolver(3, handler));
+  };
+
+  Container.prototype.registerAlias = function registerAlias(originalKey, aliasKey) {
+    return this.registerResolver(aliasKey, new StrategyResolver(5, originalKey));
+  };
+
+  Container.prototype.registerResolver = function registerResolver(key, resolver) {
+    validateKey(key);
+
+    var allResolvers = this._resolvers;
+    var result = allResolvers.get(key);
+
+    if (result === undefined) {
+      allResolvers.set(key, resolver);
+    } else if (result.strategy === 4) {
+      result.state.push(resolver);
+    } else {
+      allResolvers.set(key, new StrategyResolver(4, [result, resolver]));
+    }
+
+    return resolver;
+  };
+
+  Container.prototype.autoRegister = function autoRegister(key, fn) {
+    fn = fn === undefined ? key : fn;
+
+    if (typeof fn === 'function') {
+      var _registration = _aureliaMetadata.metadata.get(_aureliaMetadata.metadata.registration, fn);
+
+      if (_registration === undefined) {
+        return this.registerResolver(key, new StrategyResolver(1, fn));
+      }
+
+      return _registration.registerResolver(this, key, fn);
+    }
+
+    return this.registerResolver(key, new StrategyResolver(0, fn));
+  };
+
+  Container.prototype.autoRegisterAll = function autoRegisterAll(fns) {
+    var i = fns.length;
+    while (i--) {
+      this.autoRegister(fns[i]);
+    }
+  };
+
+  Container.prototype.unregister = function unregister(key) {
+    this._resolvers.delete(key);
+  };
+
+  Container.prototype.hasResolver = function hasResolver(key) {
+    var checkParent = arguments.length <= 1 || arguments[1] === undefined ? false : arguments[1];
+
+    validateKey(key);
+
+    return this._resolvers.has(key) || checkParent && this.parent !== null && this.parent.hasResolver(key, checkParent);
+  };
+
+  Container.prototype.getResolver = function getResolver(key) {
+    return this._resolvers.get(key);
+  };
+
+  Container.prototype.get = function get(key) {
+    validateKey(key);
+
+    if (key === Container) {
+      return this;
+    }
+
+    if (resolverDecorates(key)) {
+      return key.get(this, key);
+    }
+
+    var resolver = this._resolvers.get(key);
+
+    if (resolver === undefined) {
+      if (this.parent === null) {
+        return this.autoRegister(key).get(this, key);
+      }
+
+      var _registration2 = _aureliaMetadata.metadata.get(_aureliaMetadata.metadata.registration, key);
+
+      if (_registration2 === undefined) {
+        return this.parent._get(key);
+      }
+
+      return _registration2.registerResolver(this, key, key).get(this, key);
+    }
+
+    return resolver.get(this, key);
+  };
+
+  Container.prototype._get = function _get(key) {
+    var resolver = this._resolvers.get(key);
+
+    if (resolver === undefined) {
+      if (this.parent === null) {
+        return this.autoRegister(key).get(this, key);
+      }
+
+      return this.parent._get(key);
+    }
+
+    return resolver.get(this, key);
+  };
+
+  Container.prototype.getAll = function getAll(key) {
+    validateKey(key);
+
+    var resolver = this._resolvers.get(key);
+
+    if (resolver === undefined) {
+      if (this.parent === null) {
+        return _emptyParameters;
+      }
+
+      return this.parent.getAll(key);
+    }
+
+    if (resolver.strategy === 4) {
+      var state = resolver.state;
+      var i = state.length;
+      var results = new Array(i);
+
+      while (i--) {
+        results[i] = state[i].get(this, key);
+      }
+
+      return results;
+    }
+
+    return [resolver.get(this, key)];
+  };
+
+  Container.prototype.createChild = function createChild() {
+    var child = new Container(this._configuration);
+    child.root = this.root;
+    child.parent = this;
+    return child;
+  };
+
+  Container.prototype.invoke = function invoke(fn, dynamicDependencies) {
+    try {
+      var _handler = this._handlers.get(fn);
+
+      if (_handler === undefined) {
+        _handler = this._createInvocationHandler(fn);
+        this._handlers.set(fn, _handler);
+      }
+
+      return _handler.invoke(this, dynamicDependencies);
+    } catch (e) {
+      throw new _aureliaPal.AggregateError('Error invoking ' + fn.name + '. Check the inner error for details.', e, true);
+    }
+  };
+
+  Container.prototype._createInvocationHandler = function _createInvocationHandler(fn) {
+    var dependencies = void 0;
+
+    if (fn.inject === undefined) {
+      dependencies = _aureliaMetadata.metadata.getOwn(_aureliaMetadata.metadata.paramTypes, fn) || _emptyParameters;
+    } else {
+      dependencies = [];
+      var ctor = fn;
+      while (typeof ctor === 'function') {
+        var _dependencies;
+
+        (_dependencies = dependencies).push.apply(_dependencies, getDependencies(ctor));
+        ctor = Object.getPrototypeOf(ctor);
+      }
+    }
+
+    var invoker = _aureliaMetadata.metadata.getOwn(_aureliaMetadata.metadata.invoker, fn) || classInvokers[dependencies.length] || classInvokers.fallback;
+
+    var handler = new InvocationHandler(fn, invoker, dependencies);
+    return this._onHandlerCreated !== undefined ? this._onHandlerCreated(handler) : handler;
+  };
+
+  return Container;
+}();
+
+function autoinject(potentialTarget) {
+  var deco = function deco(target) {
+    var previousInject = target.inject ? target.inject.slice() : null;
+    var autoInject = _aureliaMetadata.metadata.getOwn(_aureliaMetadata.metadata.paramTypes, target) || _emptyParameters;
+    if (!previousInject) {
+      target.inject = autoInject;
+    } else {
+      for (var i = 0; i < autoInject.length; i++) {
+        if (previousInject[i] && previousInject[i] !== autoInject[i]) {
+          var prevIndex = previousInject.indexOf(autoInject[i]);
+          if (prevIndex > -1) {
+            previousInject.splice(prevIndex, 1);
+          }
+          previousInject.splice(prevIndex > -1 && prevIndex < i ? i - 1 : i, 0, autoInject[i]);
+        } else if (!previousInject[i]) {
+          previousInject[i] = autoInject[i];
+        }
+      }
+      target.inject = previousInject;
+    }
+  };
+
+  return potentialTarget ? deco(potentialTarget) : deco;
+}
+
+function inject() {
+  for (var _len5 = arguments.length, rest = Array(_len5), _key5 = 0; _key5 < _len5; _key5++) {
+    rest[_key5] = arguments[_key5];
+  }
+
+  return function (target, key, descriptor) {
+    if (typeof descriptor === 'number' && rest.length === 1) {
+      var params = target.inject;
+      if (typeof params === 'function') {
+        throw new Error('Decorator inject cannot be used with "inject()".  Please use an array instead.');
+      }
+      if (!params) {
+        params = _aureliaMetadata.metadata.getOwn(_aureliaMetadata.metadata.paramTypes, target).slice();
+        target.inject = params;
+      }
+      params[descriptor] = rest[0];
+      return;
+    }
+
+    if (descriptor) {
+      var _fn = descriptor.value;
+      _fn.inject = rest;
+    } else {
+      target.inject = rest;
+    }
+  };
+}
+});
+return ___scope___.entry = "dist/commonjs/aurelia-dependency-injection.js";
+});
 FuseBox.pkg("aurelia-binding", {}, function(___scope___){
 ___scope___.file("dist/commonjs/aurelia-binding.js", function(exports, require, module, __filename, __dirname){
 
@@ -3722,7 +3678,7 @@ ___scope___.file("dist/commonjs/aurelia-binding.js", function(exports, require, 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.getSetObserver = exports.BindingEngine = exports.NameExpression = exports.Listener = exports.ListenerExpression = exports.BindingBehaviorResource = exports.ValueConverterResource = exports.Call = exports.CallExpression = exports.Binding = exports.BindingExpression = exports.ObjectObservationAdapter = exports.ObserverLocator = exports.SVGAnalyzer = exports.presentationAttributes = exports.presentationElements = exports.elements = exports.ComputedExpression = exports.ClassObserver = exports.SelectValueObserver = exports.CheckedObserver = exports.ValueAttributeObserver = exports.StyleObserver = exports.DataAttributeObserver = exports.dataAttributeAccessor = exports.XLinkAttributeObserver = exports.SetterObserver = exports.PrimitiveObserver = exports.propertyAccessor = exports.DirtyCheckProperty = exports.DirtyChecker = exports.EventManager = exports.delegationStrategy = exports.getMapObserver = exports.ParserImplementation = exports.Parser = exports.Scanner = exports.Lexer = exports.Token = exports.bindingMode = exports.ExpressionCloner = exports.Unparser = exports.LiteralObject = exports.LiteralArray = exports.LiteralString = exports.LiteralPrimitive = exports.PrefixNot = exports.Binary = exports.CallFunction = exports.CallMember = exports.CallScope = exports.AccessKeyed = exports.AccessMember = exports.AccessScope = exports.AccessThis = exports.Conditional = exports.Assign = exports.ValueConverter = exports.BindingBehavior = exports.Chain = exports.Expression = exports.getArrayObserver = exports.CollectionLengthObserver = exports.ModifyCollectionObserver = exports.ExpressionObserver = exports.sourceContext = undefined;
+exports.getSetObserver = exports.BindingEngine = exports.NameExpression = exports.Listener = exports.ListenerExpression = exports.BindingBehaviorResource = exports.ValueConverterResource = exports.Call = exports.CallExpression = exports.Binding = exports.BindingExpression = exports.ObjectObservationAdapter = exports.ObserverLocator = exports.SVGAnalyzer = exports.presentationAttributes = exports.presentationElements = exports.elements = exports.ComputedExpression = exports.ClassObserver = exports.SelectValueObserver = exports.CheckedObserver = exports.ValueAttributeObserver = exports.StyleObserver = exports.DataAttributeObserver = exports.dataAttributeAccessor = exports.XLinkAttributeObserver = exports.SetterObserver = exports.PrimitiveObserver = exports.propertyAccessor = exports.DirtyCheckProperty = exports.DirtyChecker = exports.EventManager = exports.delegationStrategy = exports.getMapObserver = exports.ParserImplementation = exports.Parser = exports.Scanner = exports.Lexer = exports.Token = exports.bindingMode = exports.ExpressionCloner = exports.Unparser = exports.LiteralObject = exports.LiteralArray = exports.LiteralString = exports.LiteralPrimitive = exports.PrefixNot = exports.Binary = exports.CallFunction = exports.CallMember = exports.CallScope = exports.AccessKeyed = exports.AccessMember = exports.AccessScope = exports.AccessThis = exports.Conditional = exports.Assign = exports.ValueConverter = exports.BindingBehavior = exports.Chain = exports.Expression = exports.getArrayObserver = exports.CollectionLengthObserver = exports.ModifyCollectionObserver = exports.ExpressionObserver = exports.sourceContext = exports.targetContext = undefined;
 
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
 
@@ -3749,6 +3705,8 @@ exports.createComputedObserver = createComputedObserver;
 exports.valueConverter = valueConverter;
 exports.bindingBehavior = bindingBehavior;
 exports.observable = observable;
+exports.connectBindingToSignal = connectBindingToSignal;
+exports.signalBindings = signalBindings;
 
 var _aureliaLogging = require('aurelia-logging');
 
@@ -3767,6 +3725,9 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 
+
+var targetContext = exports.targetContext = 'Binding:target';
+var sourceContext = exports.sourceContext = 'Binding:source';
 
 var map = Object.create(null);
 
@@ -3825,7 +3786,6 @@ function createScopeForTest(bindingContext, parentBindingContext) {
   };
 }
 
-var sourceContext = exports.sourceContext = 'Binding:source';
 var slotNames = [];
 var versionSlotNames = [];
 
@@ -3990,13 +3950,20 @@ function removeSubscriber(context, callable) {
     this._callable2 = null;
     return true;
   }
-  var rest = this._contextsRest;
-  var index = void 0;
-  if (!rest || !rest.length || (index = rest.indexOf(context)) === -1 || this._callablesRest[index] !== callable) {
+  var callables = this._callablesRest;
+  if (callables === undefined || callables.length === 0) {
     return false;
   }
-  rest.splice(index, 1);
-  this._callablesRest.splice(index, 1);
+  var contexts = this._contextsRest;
+  var i = 0;
+  while (!(callables[i] === callable && contexts[i] === context) && callables.length > i) {
+    i++;
+  }
+  if (i >= callables.length) {
+    return false;
+  }
+  contexts.splice(i, 1);
+  callables.splice(i, 1);
   return true;
 }
 
@@ -5003,6 +4970,18 @@ var ValueConverter = exports.ValueConverter = function (_Expression3) {
     while (i--) {
       expressions[i].connect(binding, scope);
     }
+    var converter = binding.lookupFunctions.valueConverters(this.name);
+    if (!converter) {
+      throw new Error('No ValueConverter named "' + this.name + '" was found!');
+    }
+    var signals = converter.signals;
+    if (signals === undefined) {
+      return;
+    }
+    i = signals.length;
+    while (i--) {
+      connectBindingToSignal(binding, signals[i]);
+    }
   };
 
   return ValueConverter;
@@ -5972,8 +5951,10 @@ function cloneExpression(expression) {
 
 var bindingMode = exports.bindingMode = {
   oneTime: 0,
+  toView: 1,
   oneWay: 1,
-  twoWay: 2
+  twoWay: 2,
+  fromView: 3
 };
 
 var Token = exports.Token = function () {
@@ -6698,7 +6679,7 @@ var ParserImplementation = exports.ParserImplementation = function () {
       if (this.optional('.')) {
         name = this.peek.key;
         this.advance();
-      } else if (this.peek === EOF || this.peek.text === '(' || this.peek.text === ')' || this.peek.text === '[' || this.peek.text === '}' || this.peek.text === ',') {
+      } else if (this.peek === EOF || this.peek.text === '(' || this.peek.text === ')' || this.peek.text === '[' || this.peek.text === '}' || this.peek.text === ',' || this.peek.text === '|' || this.peek.text === '&') {
         return new AccessThis(ancestor);
       } else {
         this.error('Unexpected token ' + this.peek.text);
@@ -6912,7 +6893,11 @@ function handleCapturedEvent(event) {
   }
   for (var _i22 = orderedCallbacks.length - 1; _i22 >= 0; _i22--) {
     var orderedCallback = orderedCallbacks[_i22];
-    orderedCallback(event);
+    if ('handleEvent' in orderedCallback) {
+      orderedCallback.handleEvent(event);
+    } else {
+      orderedCallback(event);
+    }
     if (event.propagationStopped) {
       break;
     }
@@ -6959,7 +6944,11 @@ function handleDelegatedEvent(event) {
           interceptStopPropagation(event);
           interceptInstalled = true;
         }
-        callback(event);
+        if ('handleEvent' in callback) {
+          callback.handleEvent(event);
+        } else {
+          callback(event);
+        }
       }
     }
 
@@ -7132,14 +7121,14 @@ var EventManager = exports.EventManager = function () {
 
   EventManager.prototype.createElementHandler = function createElementHandler(events) {
     return {
-      subscribe: function subscribe(target, callback) {
+      subscribe: function subscribe(target, callbackOrListener) {
         events.forEach(function (changeEvent) {
-          target.addEventListener(changeEvent, callback, false);
+          target.addEventListener(changeEvent, callbackOrListener, false);
         });
 
         return function () {
           events.forEach(function (changeEvent) {
-            target.removeEventListener(changeEvent, callback);
+            target.removeEventListener(changeEvent, callbackOrListener, false);
           });
         };
       }
@@ -7177,8 +7166,8 @@ var EventManager = exports.EventManager = function () {
     return null;
   };
 
-  EventManager.prototype.addEventListener = function addEventListener(target, targetEvent, callback, delegate) {
-    return (this.eventStrategyLookup[targetEvent] || this.defaultEventStrategy).subscribe(target, targetEvent, callback, delegate);
+  EventManager.prototype.addEventListener = function addEventListener(target, targetEvent, callbackOrListener, delegate) {
+    return (this.eventStrategyLookup[targetEvent] || this.defaultEventStrategy).subscribe(target, targetEvent, callbackOrListener, delegate);
   };
 
   return EventManager;
@@ -7425,7 +7414,11 @@ var dataAttributeAccessor = exports.dataAttributeAccessor = {
     return obj.getAttribute(propertyName);
   },
   setValue: function setValue(value, obj, propertyName) {
-    return obj.setAttribute(propertyName, value);
+    if (value === null || value === undefined) {
+      obj.removeAttribute(propertyName);
+    } else {
+      obj.setAttribute(propertyName, value);
+    }
   }
 };
 
@@ -7442,6 +7435,9 @@ var DataAttributeObserver = exports.DataAttributeObserver = function () {
   };
 
   DataAttributeObserver.prototype.setValue = function setValue(newValue) {
+    if (newValue === null || newValue === undefined) {
+      return this.element.removeAttribute(this.propertyName);
+    }
     return this.element.setAttribute(this.propertyName, newValue);
   };
 
@@ -7567,10 +7563,14 @@ var ValueAttributeObserver = exports.ValueAttributeObserver = (_dec7 = subscribe
     this.oldValue = newValue;
   };
 
+  ValueAttributeObserver.prototype.handleEvent = function handleEvent() {
+    this.notify();
+  };
+
   ValueAttributeObserver.prototype.subscribe = function subscribe(context, callable) {
     if (!this.hasSubscribers()) {
       this.oldValue = this.getValue();
-      this.disposeHandler = this.handler.subscribe(this.element, this.notify.bind(this));
+      this.disposeHandler = this.handler.subscribe(this.element, this);
     }
 
     this.addSubscriber(context, callable);
@@ -7700,9 +7700,13 @@ var CheckedObserver = exports.CheckedObserver = (_dec8 = subscriberCollection(),
     this.callSubscribers(newValue, oldValue);
   };
 
+  CheckedObserver.prototype.handleEvent = function handleEvent() {
+    this.synchronizeValue();
+  };
+
   CheckedObserver.prototype.subscribe = function subscribe(context, callable) {
     if (!this.hasSubscribers()) {
-      this.disposeHandler = this.handler.subscribe(this.element, this.synchronizeValue.bind(this, false));
+      this.disposeHandler = this.handler.subscribe(this.element, this);
     }
     this.addSubscriber(context, callable);
   };
@@ -7893,9 +7897,13 @@ var SelectValueObserver = exports.SelectValueObserver = (_dec9 = subscriberColle
     this.callSubscribers(newValue, oldValue);
   };
 
+  SelectValueObserver.prototype.handleEvent = function handleEvent() {
+    this.synchronizeValue();
+  };
+
   SelectValueObserver.prototype.subscribe = function subscribe(context, callable) {
     if (!this.hasSubscribers()) {
-      this.disposeHandler = this.handler.subscribe(this.element, this.synchronizeValue.bind(this, false));
+      this.disposeHandler = this.handler.subscribe(this.element, this);
     }
     this.addSubscriber(context, callable);
   };
@@ -8462,7 +8470,7 @@ var ObserverLocator = exports.ObserverLocator = (_temp = _class12 = function () 
       if (propertyName === 'class' || propertyName === 'style' || propertyName === 'css' || propertyName === 'value' && (obj.tagName.toLowerCase() === 'input' || obj.tagName.toLowerCase() === 'select') || propertyName === 'checked' && obj.tagName.toLowerCase() === 'input' || propertyName === 'model' && obj.tagName.toLowerCase() === 'input' || /^xlink:.+$/.exec(propertyName)) {
         return this.getObserver(obj, propertyName);
       }
-      if (/^\w+:|^data-|^aria-/.test(propertyName) || obj instanceof _aureliaPal.DOM.SVGElement && this.svgAnalyzer.isStandardSvgAttribute(obj.nodeName, propertyName)) {
+      if (/^\w+:|^data-|^aria-/.test(propertyName) || obj instanceof _aureliaPal.DOM.SVGElement && this.svgAnalyzer.isStandardSvgAttribute(obj.nodeName, propertyName) || obj.tagName.toLowerCase() === 'img' && propertyName === 'src' || obj.tagName.toLowerCase() === 'a' && propertyName === 'href') {
         return dataAttributeAccessor;
       }
     }
@@ -8515,8 +8523,6 @@ var BindingExpression = exports.BindingExpression = function () {
 
   return BindingExpression;
 }();
-
-var targetContext = 'Binding:target';
 
 var Binding = exports.Binding = (_dec10 = connectable(), _dec10(_class13 = function () {
   function Binding(observerLocator, sourceExpression, target, targetProperty, mode, lookupFunctions) {
@@ -8580,20 +8586,24 @@ var Binding = exports.Binding = (_dec10 = connectable(), _dec10(_class13 = funct
 
     var mode = this.mode;
     if (!this.targetObserver) {
-      var method = mode === bindingMode.twoWay ? 'getObserver' : 'getAccessor';
+      var method = mode === bindingMode.twoWay || mode === bindingMode.fromView ? 'getObserver' : 'getAccessor';
       this.targetObserver = this.observerLocator[method](this.target, this.targetProperty);
     }
 
     if ('bind' in this.targetObserver) {
       this.targetObserver.bind();
     }
-    var value = this.sourceExpression.evaluate(source, this.lookupFunctions);
-    this.updateTarget(value);
+    if (this.mode !== bindingMode.fromView) {
+      var value = this.sourceExpression.evaluate(source, this.lookupFunctions);
+      this.updateTarget(value);
+    }
 
-    if (mode === bindingMode.oneWay) {
+    if (mode === bindingMode.toView) {
       enqueueBindingConnect(this);
     } else if (mode === bindingMode.twoWay) {
       this.sourceExpression.connect(this, source);
+      this.targetObserver.subscribe(targetContext, this);
+    } else if (mode === bindingMode.fromView) {
       this.targetObserver.subscribe(targetContext, this);
     }
   };
@@ -8822,9 +8832,11 @@ var Listener = exports.Listener = function () {
     return result;
   };
 
-  Listener.prototype.bind = function bind(source) {
-    var _this28 = this;
+  Listener.prototype.handleEvent = function handleEvent(event) {
+    this.callSource(event);
+  };
 
+  Listener.prototype.bind = function bind(source) {
     if (this.isBound) {
       if (this.source === source) {
         return;
@@ -8837,9 +8849,7 @@ var Listener = exports.Listener = function () {
     if (this.sourceExpression.bind) {
       this.sourceExpression.bind(this, source, this.lookupFunctions);
     }
-    this._disposeListener = this.eventManager.addEventListener(this.target, this.targetEvent, function (event) {
-      return _this28.callSource(event);
-    }, this.delegationStrategy);
+    this._disposeListener = this.eventManager.addEventListener(this.target, this.targetEvent, this, this.delegationStrategy);
   };
 
   Listener.prototype.unbind = function unbind() {
@@ -8965,18 +8975,18 @@ var BindingEngine = exports.BindingEngine = (_temp2 = _class14 = function () {
   }
 
   BindingEngine.prototype.createBindingExpression = function createBindingExpression(targetProperty, sourceExpression) {
-    var mode = arguments.length <= 2 || arguments[2] === undefined ? bindingMode.oneWay : arguments[2];
+    var mode = arguments.length <= 2 || arguments[2] === undefined ? bindingMode.toView : arguments[2];
     var lookupFunctions = arguments.length <= 3 || arguments[3] === undefined ? LookupFunctions : arguments[3];
 
     return new BindingExpression(this.observerLocator, targetProperty, this.parser.parse(sourceExpression), mode, lookupFunctions);
   };
 
   BindingEngine.prototype.propertyObserver = function propertyObserver(obj, propertyName) {
-    var _this29 = this;
+    var _this28 = this;
 
     return {
       subscribe: function subscribe(callback) {
-        var observer = _this29.observerLocator.getObserver(obj, propertyName);
+        var observer = _this28.observerLocator.getObserver(obj, propertyName);
         observer.subscribe(callback);
         return {
           dispose: function dispose() {
@@ -8988,17 +8998,17 @@ var BindingEngine = exports.BindingEngine = (_temp2 = _class14 = function () {
   };
 
   BindingEngine.prototype.collectionObserver = function collectionObserver(collection) {
-    var _this30 = this;
+    var _this29 = this;
 
     return {
       subscribe: function subscribe(callback) {
         var observer = void 0;
         if (collection instanceof Array) {
-          observer = _this30.observerLocator.getArrayObserver(collection);
+          observer = _this29.observerLocator.getArrayObserver(collection);
         } else if (collection instanceof Map) {
-          observer = _this30.observerLocator.getMapObserver(collection);
+          observer = _this29.observerLocator.getMapObserver(collection);
         } else if (collection instanceof Set) {
-          observer = _this30.observerLocator.getSetObserver(collection);
+          observer = _this29.observerLocator.getSetObserver(collection);
         } else {
           throw new Error('collection must be an instance of Array, Map or Set.');
         }
@@ -9179,6 +9189,21 @@ function observable(targetOrConfig, key, descriptor) {
   }
   return deco(targetOrConfig, key, descriptor);
 }
+
+var signals = {};
+
+function connectBindingToSignal(binding, name) {
+  if (!signals.hasOwnProperty(name)) {
+    signals[name] = 0;
+  }
+  binding.observeProperty(signals, name);
+}
+
+function signalBindings(name) {
+  if (signals.hasOwnProperty(name)) {
+    signals[name]++;
+  }
+}
 });
 return ___scope___.entry = "dist/commonjs/aurelia-binding.js";
 });
@@ -9272,55 +9297,7 @@ var TaskQueue = exports.TaskQueue = function () {
     });
   }
 
-  TaskQueue.prototype.queueMicroTask = function queueMicroTask(task) {
-    if (this.microTaskQueue.length < 1) {
-      this.requestFlushMicroTaskQueue();
-    }
-
-    if (this.longStacks) {
-      task.stack = this.prepareQueueStack(microStackSeparator);
-    }
-    this.microTaskQueue.push(task);
-  };
-
-  TaskQueue.prototype.queueTask = function queueTask(task) {
-    if (this.taskQueue.length < 1) {
-      this.requestFlushTaskQueue();
-    }
-
-    if (this.longStacks) {
-      task.stack = this.prepareQueueStack(stackSeparator);
-    }
-    this.taskQueue.push(task);
-  };
-
-  TaskQueue.prototype.flushTaskQueue = function flushTaskQueue() {
-    var queue = this.taskQueue;
-    var index = 0;
-    var task = void 0;
-
-    this.taskQueue = [];
-
-    try {
-      this.flushing = true;
-      while (index < queue.length) {
-        task = queue[index];
-        if (this.longStacks) {
-          this.stack = typeof task.stack === 'string' ? task.stack : undefined;
-        }
-        task.call();
-        index++;
-      }
-    } catch (error) {
-      onError(error, task, this.longStacks);
-    } finally {
-      this.flushing = false;
-    }
-  };
-
-  TaskQueue.prototype.flushMicroTaskQueue = function flushMicroTaskQueue() {
-    var queue = this.microTaskQueue;
-    var capacity = this.microTaskQueueCapacity;
+  TaskQueue.prototype._flushQueue = function _flushQueue(queue, capacity) {
     var index = 0;
     var task = void 0;
 
@@ -9348,15 +9325,51 @@ var TaskQueue = exports.TaskQueue = function () {
     } finally {
       this.flushing = false;
     }
+  };
 
+  TaskQueue.prototype.queueMicroTask = function queueMicroTask(task) {
+    if (this.microTaskQueue.length < 1) {
+      this.requestFlushMicroTaskQueue();
+    }
+
+    if (this.longStacks) {
+      task.stack = this.prepareQueueStack(microStackSeparator);
+    }
+
+    this.microTaskQueue.push(task);
+  };
+
+  TaskQueue.prototype.queueTask = function queueTask(task) {
+    if (this.taskQueue.length < 1) {
+      this.requestFlushTaskQueue();
+    }
+
+    if (this.longStacks) {
+      task.stack = this.prepareQueueStack(stackSeparator);
+    }
+
+    this.taskQueue.push(task);
+  };
+
+  TaskQueue.prototype.flushTaskQueue = function flushTaskQueue() {
+    var queue = this.taskQueue;
+    this.taskQueue = [];
+    this._flushQueue(queue, Number.MAX_VALUE);
+  };
+
+  TaskQueue.prototype.flushMicroTaskQueue = function flushMicroTaskQueue() {
+    var queue = this.microTaskQueue;
+    this._flushQueue(queue, this.microTaskQueueCapacity);
     queue.length = 0;
   };
 
   TaskQueue.prototype.prepareQueueStack = function prepareQueueStack(separator) {
     var stack = separator + filterQueueStack(captureStack());
+
     if (typeof this.stack === 'string') {
       stack = filterFlushStack(stack) + this.stack;
     }
+
     return stack;
   };
 
@@ -9383,13 +9396,16 @@ function filterQueueStack(stack) {
 
 function filterFlushStack(stack) {
   var index = stack.lastIndexOf('flushMicroTaskQueue');
+
   if (index < 0) {
     index = stack.lastIndexOf('flushTaskQueue');
     if (index < 0) {
       return stack;
     }
   }
+
   index = stack.lastIndexOf('\n', index);
+
   return index < 0 ? stack : stack.substr(0, index);
 }
 });
@@ -12086,6 +12102,7 @@ var ViewCompiler = exports.ViewCompiler = (_dec7 = (0, _aureliaDependencyInjecti
     var attr = void 0;
     var attrName = void 0;
     var attrValue = void 0;
+    var originalAttrName = void 0;
     var instruction = void 0;
     var info = void 0;
     var property = void 0;
@@ -12099,6 +12116,9 @@ var ViewCompiler = exports.ViewCompiler = (_dec7 = (0, _aureliaDependencyInjecti
       }
       return node.nextSibling;
     } else if (tagName === 'template') {
+      if (!('content' in node)) {
+        throw new Error('You cannot place a template element within ' + node.namespaceURI + ' namespace');
+      }
       viewFactory = this.compile(node, resources);
       viewFactory.part = node.getAttribute('part');
     } else {
@@ -12112,7 +12132,7 @@ var ViewCompiler = exports.ViewCompiler = (_dec7 = (0, _aureliaDependencyInjecti
 
     for (i = 0, ii = attributes.length; i < ii; ++i) {
       attr = attributes[i];
-      attrName = attr.name;
+      originalAttrName = attrName = attr.name;
       attrValue = attr.value;
       info = bindingLanguage.inspectAttribute(resources, tagName, attrName, attrValue);
 
@@ -12169,7 +12189,7 @@ var ViewCompiler = exports.ViewCompiler = (_dec7 = (0, _aureliaDependencyInjecti
             this._configureProperties(instruction, resources);
 
             if (type.liftsContent) {
-              instruction.originalAttrName = attrName;
+              instruction.originalAttrName = originalAttrName;
               liftingInstruction = instruction;
               break;
             } else {
@@ -12187,7 +12207,7 @@ var ViewCompiler = exports.ViewCompiler = (_dec7 = (0, _aureliaDependencyInjecti
           instruction.attributes[resources.mapAttribute(attrName)] = attrValue;
 
           if (type.liftsContent) {
-            instruction.originalAttrName = attrName;
+            instruction.originalAttrName = originalAttrName;
             liftingInstruction = instruction;
             break;
           } else {
@@ -12205,6 +12225,8 @@ var ViewCompiler = exports.ViewCompiler = (_dec7 = (0, _aureliaDependencyInjecti
       auTargetID = makeIntoInstructionTarget(node);
       instructions[auTargetID] = TargetInstruction.lifting(parentInjectorId, liftingInstruction);
     } else {
+      var skipContentProcessing = false;
+
       if (expressions.length || behaviorInstructions.length) {
         injectorId = behaviorInstructions.length ? getNextInjectorId() : false;
 
@@ -12212,6 +12234,7 @@ var ViewCompiler = exports.ViewCompiler = (_dec7 = (0, _aureliaDependencyInjecti
           instruction = behaviorInstructions[i];
           instruction.type.compile(this, resources, node, instruction, parentNode);
           providers.push(instruction.type.target);
+          skipContentProcessing = skipContentProcessing || instruction.skipContentProcessing;
         }
 
         for (i = 0, ii = expressions.length; i < ii; ++i) {
@@ -12225,7 +12248,7 @@ var ViewCompiler = exports.ViewCompiler = (_dec7 = (0, _aureliaDependencyInjecti
         instructions[auTargetID] = TargetInstruction.normal(injectorId, parentInjectorId, providers, behaviorInstructions, expressions, elementInstruction);
       }
 
-      if (elementInstruction && elementInstruction.skipContentProcessing) {
+      if (skipContentProcessing) {
         return node.nextSibling;
       }
 
@@ -12544,6 +12567,8 @@ var ProxyViewFactory = function () {
   return ProxyViewFactory;
 }();
 
+var auSlotBehavior = null;
+
 var ViewEngine = exports.ViewEngine = (_dec8 = (0, _aureliaDependencyInjection.inject)(_aureliaLoader.Loader, _aureliaDependencyInjection.Container, ViewCompiler, ModuleAnalyzer, ViewResources), _dec8(_class14 = (_temp4 = _class15 = function () {
   function ViewEngine(loader, container, viewCompiler, moduleAnalyzer, appResources) {
     
@@ -12555,8 +12580,12 @@ var ViewEngine = exports.ViewEngine = (_dec8 = (0, _aureliaDependencyInjection.i
     this.appResources = appResources;
     this._pluginMap = {};
 
-    var auSlotBehavior = new HtmlBehaviorResource();
-    auSlotBehavior.attributeName = 'au-slot';
+    if (auSlotBehavior === null) {
+      auSlotBehavior = new HtmlBehaviorResource();
+      auSlotBehavior.attributeName = 'au-slot';
+      _aureliaMetadata.metadata.define(_aureliaMetadata.metadata.resource, auSlotBehavior, SlotCustomAttribute);
+    }
+
     auSlotBehavior.initialize(container, SlotCustomAttribute);
     auSlotBehavior.register(appResources);
   }
@@ -12573,9 +12602,11 @@ var ViewEngine = exports.ViewEngine = (_dec8 = (0, _aureliaDependencyInjection.i
     loadContext = loadContext || new ResourceLoadContext();
 
     return ensureRegistryEntry(this.loader, urlOrRegistryEntry).then(function (registryEntry) {
+      var url = registryEntry.address;
+
       if (registryEntry.onReady) {
-        if (!loadContext.hasDependency(urlOrRegistryEntry)) {
-          loadContext.addDependency(urlOrRegistryEntry);
+        if (!loadContext.hasDependency(url)) {
+          loadContext.addDependency(url);
           return registryEntry.onReady;
         }
 
@@ -12586,7 +12617,7 @@ var ViewEngine = exports.ViewEngine = (_dec8 = (0, _aureliaDependencyInjection.i
         return Promise.resolve(new ProxyViewFactory(registryEntry.onReady));
       }
 
-      loadContext.addDependency(urlOrRegistryEntry);
+      loadContext.addDependency(url);
 
       registryEntry.onReady = _this10.loadTemplateResources(registryEntry, compileInstruction, loadContext, target).then(function (resources) {
         registryEntry.resources = resources;
@@ -12965,16 +12996,18 @@ var BehaviorPropertyObserver = exports.BehaviorPropertyObserver = (_dec9 = (0, _
 }()) || _class16);
 
 
-function getObserver(behavior, instance, name) {
+function getObserver(instance, name) {
   var lookup = instance.__observers__;
 
   if (lookup === undefined) {
-    if (!behavior.isInitialized) {
-      behavior.initialize(_aureliaDependencyInjection.Container.instance || new _aureliaDependencyInjection.Container(), instance.constructor);
+    var ctor = Object.getPrototypeOf(instance).constructor;
+    var _behavior = _aureliaMetadata.metadata.get(_aureliaMetadata.metadata.resource, ctor);
+    if (!_behavior.isInitialized) {
+      _behavior.initialize(_aureliaDependencyInjection.Container.instance || new _aureliaDependencyInjection.Container(), instance.constructor);
     }
 
-    lookup = behavior.observerLocator.getOrCreateObserversLookup(instance);
-    behavior._ensurePropertiesDefined(instance, lookup);
+    lookup = _behavior.observerLocator.getOrCreateObserversLookup(instance);
+    _behavior._ensurePropertiesDefined(instance, lookup);
   }
 
   return lookup[name];
@@ -13006,13 +13039,13 @@ var BindableProperty = exports.BindableProperty = function () {
 
     if (descriptor) {
       this.descriptor = descriptor;
-      return this._configureDescriptor(behavior, descriptor);
+      return this._configureDescriptor(descriptor);
     }
 
     return undefined;
   };
 
-  BindableProperty.prototype._configureDescriptor = function _configureDescriptor(behavior, descriptor) {
+  BindableProperty.prototype._configureDescriptor = function _configureDescriptor(descriptor) {
     var name = this.name;
 
     descriptor.configurable = true;
@@ -13031,15 +13064,15 @@ var BindableProperty = exports.BindableProperty = function () {
     }
 
     descriptor.get = function () {
-      return getObserver(behavior, this, name).getValue();
+      return getObserver(this, name).getValue();
     };
 
     descriptor.set = function (value) {
-      getObserver(behavior, this, name).setValue(value);
+      getObserver(this, name).setValue(value);
     };
 
     descriptor.get.getObserver = function (obj) {
-      return getObserver(behavior, obj, name);
+      return getObserver(obj, name);
     };
 
     return descriptor;
@@ -13311,6 +13344,8 @@ var HtmlBehaviorResource = exports.HtmlBehaviorResource = function () {
       for (i = 0, ii = properties.length; i < ii; ++i) {
         properties[i].defineOn(target, this);
       }
+
+      this._copyInheritedProperties(container, target);
     }
   };
 
@@ -13417,6 +13452,8 @@ var HtmlBehaviorResource = exports.HtmlBehaviorResource = function () {
       } else {
         instruction.skipContentProcessing = true;
       }
+    } else if (!this.processContent(compiler, resources, node, instruction)) {
+      instruction.skipContentProcessing = true;
     }
 
     return node;
@@ -13539,6 +13576,44 @@ var HtmlBehaviorResource = exports.HtmlBehaviorResource = function () {
     }
   };
 
+  HtmlBehaviorResource.prototype._copyInheritedProperties = function _copyInheritedProperties(container, target) {
+    var _this15 = this;
+
+    var behavior = void 0;
+    var derived = target;
+
+    while (true) {
+      var proto = Object.getPrototypeOf(target.prototype);
+      target = proto && proto.constructor;
+      if (!target) {
+        return;
+      }
+      behavior = _aureliaMetadata.metadata.getOwn(_aureliaMetadata.metadata.resource, target);
+      if (behavior) {
+        break;
+      }
+    }
+    behavior.initialize(container, target);
+
+    var _loop = function _loop(_i8, _ii8) {
+      var prop = behavior.properties[_i8];
+
+      if (_this15.properties.some(function (p) {
+        return p.name === prop.name;
+      })) {
+        return 'continue';
+      }
+
+      new BindableProperty(prop).registerWith(derived, _this15);
+    };
+
+    for (var _i8 = 0, _ii8 = behavior.properties.length; _i8 < _ii8; ++_i8) {
+      var _ret2 = _loop(_i8, _ii8);
+
+      if (_ret2 === 'continue') continue;
+    }
+  };
+
   return HtmlBehaviorResource;
 }();
 
@@ -13607,8 +13682,8 @@ function onChildChange(mutations, observer) {
   var bindersLength = binders.length;
   var groupedMutations = new Map();
 
-  for (var _i8 = 0, _ii8 = mutations.length; _i8 < _ii8; ++_i8) {
-    var record = mutations[_i8];
+  for (var _i9 = 0, _ii9 = mutations.length; _i9 < _ii9; ++_i9) {
+    var record = mutations[_i9];
     var added = record.addedNodes;
     var removed = record.removedNodes;
 
@@ -13676,8 +13751,8 @@ var ChildObserverBinder = function () {
       if (assignedSlot && assignedSlot.projectFromAnchors) {
         var anchors = assignedSlot.projectFromAnchors;
 
-        for (var _i9 = 0, _ii9 = anchors.length; _i9 < _ii9; ++_i9) {
-          if (anchors[_i9].auOwnerView === contentView) {
+        for (var _i10 = 0, _ii10 = anchors.length; _i10 < _ii10; ++_i10) {
+          if (anchors[_i10].auOwnerView === contentView) {
             return true;
           }
         }
@@ -13865,27 +13940,27 @@ var CompositionEngine = exports.CompositionEngine = (_dec10 = (0, _aureliaDepend
   };
 
   CompositionEngine.prototype._createControllerAndSwap = function _createControllerAndSwap(context) {
-    var _this15 = this;
+    var _this16 = this;
 
     return this.createController(context).then(function (controller) {
       controller.automate(context.overrideContext, context.owningView);
 
       if (context.compositionTransactionOwnershipToken) {
         return context.compositionTransactionOwnershipToken.waitForCompositionComplete().then(function () {
-          return _this15._swap(context, controller.view);
+          return _this16._swap(context, controller.view);
         }).then(function () {
           return controller;
         });
       }
 
-      return _this15._swap(context, controller.view).then(function () {
+      return _this16._swap(context, controller.view).then(function () {
         return controller;
       });
     });
   };
 
   CompositionEngine.prototype.createController = function createController(context) {
-    var _this16 = this;
+    var _this17 = this;
 
     var childContainer = void 0;
     var viewModel = void 0;
@@ -13898,7 +13973,7 @@ var CompositionEngine = exports.CompositionEngine = (_dec10 = (0, _aureliaDepend
       viewModelResource = context.viewModelResource;
       m = viewModelResource.metadata;
 
-      var viewStrategy = _this16.viewLocator.getViewStrategy(context.view || viewModel);
+      var viewStrategy = _this17.viewLocator.getViewStrategy(context.view || viewModel);
 
       if (context.viewResources) {
         viewStrategy.makeRelativeTo(context.viewResources.viewUrl);
@@ -13938,7 +14013,7 @@ var CompositionEngine = exports.CompositionEngine = (_dec10 = (0, _aureliaDepend
   };
 
   CompositionEngine.prototype.compose = function compose(context) {
-    var _this17 = this;
+    var _this18 = this;
 
     context.childContainer = context.childContainer || context.container.createChild();
     context.view = this.viewLocator.getViewStrategy(context.view);
@@ -13965,13 +14040,13 @@ var CompositionEngine = exports.CompositionEngine = (_dec10 = (0, _aureliaDepend
 
         if (context.compositionTransactionOwnershipToken) {
           return context.compositionTransactionOwnershipToken.waitForCompositionComplete().then(function () {
-            return _this17._swap(context, result);
+            return _this18._swap(context, result);
           }).then(function () {
             return result;
           });
         }
 
-        return _this17._swap(context, result).then(function () {
+        return _this18._swap(context, result).then(function () {
           return result;
         });
       });
@@ -14253,7 +14328,6 @@ ___scope___.file("collection.js", function(exports, require, module, __filename,
 Object.defineProperty(exports, "__esModule", { value: true });
 var Collection = (function () {
     function Collection(datasource) {
-        this.datasource = datasource;
         this.key = datasource.getKey();
         this.rowHeight = datasource.rowHeight || 25;
         this.groupHeight = datasource.groupHeight || 25;
@@ -14343,7 +14417,7 @@ var DataSource = (function () {
         this.key = null;
         this.mainArray = null;
         this.config = config;
-        if (config) {
+        if (this.config) {
             this.key = config.key || '__avgKey';
             this.rowHeight = config.rowHeight || 25;
             this.groupHeight = config.groupHeight || 25;
@@ -14633,13 +14707,13 @@ var VGridAttributesOnChange = (function () {
         this.bindingContext = bindingContext;
         this.overrideContext = overrideContext;
     };
+    VGridAttributesOnChange = __decorate([
+        aurelia_framework_1.customAttribute('v-onchange'),
+        aurelia_framework_1.inject(Element, v_grid_1.VGrid),
+        __metadata("design:paramtypes", [HTMLElement, v_grid_1.VGrid])
+    ], VGridAttributesOnChange);
     return VGridAttributesOnChange;
 }());
-VGridAttributesOnChange = __decorate([
-    aurelia_framework_1.customAttribute('v-onchange'),
-    aurelia_framework_1.inject(Element, v_grid_1.VGrid),
-    __metadata("design:paramtypes", [HTMLElement, v_grid_1.VGrid])
-], VGridAttributesOnChange);
 exports.VGridAttributesOnChange = VGridAttributesOnChange;
 
 });
@@ -14707,29 +14781,29 @@ var VGridAttributesDataHandler = (function () {
         var valueConverter = this.vGrid.viewResources.getValueConverter.bind(this.vGrid.viewResources);
         return valueConverter(value);
     };
+    __decorate([
+        aurelia_framework_1.bindable,
+        __metadata("design:type", String)
+    ], VGridAttributesDataHandler.prototype, "field", void 0);
+    __decorate([
+        aurelia_framework_1.bindable,
+        __metadata("design:type", String)
+    ], VGridAttributesDataHandler.prototype, "value", void 0);
+    __decorate([
+        aurelia_framework_1.bindable,
+        __metadata("design:type", String)
+    ], VGridAttributesDataHandler.prototype, "display", void 0);
+    __decorate([
+        aurelia_framework_1.bindable,
+        __metadata("design:type", String)
+    ], VGridAttributesDataHandler.prototype, "edit", void 0);
+    VGridAttributesDataHandler = __decorate([
+        aurelia_framework_1.customAttribute('v-data-handler'),
+        aurelia_framework_1.inject(Element, v_grid_1.VGrid),
+        __metadata("design:paramtypes", [HTMLElement, v_grid_1.VGrid])
+    ], VGridAttributesDataHandler);
     return VGridAttributesDataHandler;
 }());
-__decorate([
-    aurelia_framework_1.bindable,
-    __metadata("design:type", String)
-], VGridAttributesDataHandler.prototype, "field", void 0);
-__decorate([
-    aurelia_framework_1.bindable,
-    __metadata("design:type", String)
-], VGridAttributesDataHandler.prototype, "value", void 0);
-__decorate([
-    aurelia_framework_1.bindable,
-    __metadata("design:type", String)
-], VGridAttributesDataHandler.prototype, "display", void 0);
-__decorate([
-    aurelia_framework_1.bindable,
-    __metadata("design:type", String)
-], VGridAttributesDataHandler.prototype, "edit", void 0);
-VGridAttributesDataHandler = __decorate([
-    aurelia_framework_1.customAttribute('v-data-handler'),
-    aurelia_framework_1.inject(Element, v_grid_1.VGrid),
-    __metadata("design:paramtypes", [HTMLElement, v_grid_1.VGrid])
-], VGridAttributesDataHandler);
 exports.VGridAttributesDataHandler = VGridAttributesDataHandler;
 
 });
@@ -15105,21 +15179,21 @@ var VGridDragDropCol = (function () {
             panel: isPanel
         };
     };
+    __decorate([
+        aurelia_framework_1.bindable,
+        __metadata("design:type", String)
+    ], VGridDragDropCol.prototype, "title", void 0);
+    __decorate([
+        aurelia_framework_1.bindable,
+        __metadata("design:type", String)
+    ], VGridDragDropCol.prototype, "field", void 0);
+    VGridDragDropCol = __decorate([
+        aurelia_framework_1.customAttribute('v-drag-drop-col'),
+        aurelia_framework_1.inject(Element, v_grid_1.VGrid),
+        __metadata("design:paramtypes", [Element, v_grid_1.VGrid])
+    ], VGridDragDropCol);
     return VGridDragDropCol;
 }());
-__decorate([
-    aurelia_framework_1.bindable,
-    __metadata("design:type", String)
-], VGridDragDropCol.prototype, "title", void 0);
-__decorate([
-    aurelia_framework_1.bindable,
-    __metadata("design:type", String)
-], VGridDragDropCol.prototype, "field", void 0);
-VGridDragDropCol = __decorate([
-    aurelia_framework_1.customAttribute('v-drag-drop-col'),
-    aurelia_framework_1.inject(Element, v_grid_1.VGrid),
-    __metadata("design:paramtypes", [Element, v_grid_1.VGrid])
-], VGridDragDropCol);
 exports.VGridDragDropCol = VGridDragDropCol;
 
 });
@@ -15143,7 +15217,7 @@ var VGridAttributesFilterObserver = (function () {
         this.element = element;
     }
     VGridAttributesFilterObserver.prototype.valueChanged = function (newValue) {
-        if (this.attribute && newValue) {
+        if (this.attribute && (typeof newValue !== 'undefined')) {
             this.updateFilter();
         }
     };
@@ -15192,29 +15266,29 @@ var VGridAttributesFilterObserver = (function () {
         var valueConverter = this.vGrid.viewResources.getValueConverter.bind(this.vGrid.viewResources);
         return valueConverter(value);
     };
+    __decorate([
+        aurelia_framework_1.bindable,
+        __metadata("design:type", String)
+    ], VGridAttributesFilterObserver.prototype, "field", void 0);
+    __decorate([
+        aurelia_framework_1.bindable,
+        __metadata("design:type", String)
+    ], VGridAttributesFilterObserver.prototype, "operator", void 0);
+    __decorate([
+        aurelia_framework_1.bindable,
+        __metadata("design:type", String)
+    ], VGridAttributesFilterObserver.prototype, "converter", void 0);
+    __decorate([
+        aurelia_framework_1.bindable,
+        __metadata("design:type", String)
+    ], VGridAttributesFilterObserver.prototype, "value", void 0);
+    VGridAttributesFilterObserver = __decorate([
+        aurelia_framework_1.customAttribute('v-filter-observer'),
+        aurelia_framework_1.inject(Element, v_grid_1.VGrid),
+        __metadata("design:paramtypes", [HTMLElement, v_grid_1.VGrid])
+    ], VGridAttributesFilterObserver);
     return VGridAttributesFilterObserver;
 }());
-__decorate([
-    aurelia_framework_1.bindable,
-    __metadata("design:type", String)
-], VGridAttributesFilterObserver.prototype, "field", void 0);
-__decorate([
-    aurelia_framework_1.bindable,
-    __metadata("design:type", String)
-], VGridAttributesFilterObserver.prototype, "operator", void 0);
-__decorate([
-    aurelia_framework_1.bindable,
-    __metadata("design:type", String)
-], VGridAttributesFilterObserver.prototype, "converter", void 0);
-__decorate([
-    aurelia_framework_1.bindable,
-    __metadata("design:type", String)
-], VGridAttributesFilterObserver.prototype, "value", void 0);
-VGridAttributesFilterObserver = __decorate([
-    aurelia_framework_1.customAttribute('v-filter-observer'),
-    aurelia_framework_1.inject(Element, v_grid_1.VGrid),
-    __metadata("design:paramtypes", [HTMLElement, v_grid_1.VGrid])
-], VGridAttributesFilterObserver);
 exports.VGridAttributesFilterObserver = VGridAttributesFilterObserver;
 
 });
@@ -15386,33 +15460,33 @@ var VGridAttributesFilter = (function () {
         var valueConverter = this.vGrid.viewResources.getValueConverter.bind(this.vGrid.viewResources);
         return valueConverter(value);
     };
+    __decorate([
+        aurelia_framework_1.bindable,
+        __metadata("design:type", String)
+    ], VGridAttributesFilter.prototype, "field", void 0);
+    __decorate([
+        aurelia_framework_1.bindable,
+        __metadata("design:type", String)
+    ], VGridAttributesFilter.prototype, "operator", void 0);
+    __decorate([
+        aurelia_framework_1.bindable,
+        __metadata("design:type", String)
+    ], VGridAttributesFilter.prototype, "converter", void 0);
+    __decorate([
+        aurelia_framework_1.bindable,
+        __metadata("design:type", String)
+    ], VGridAttributesFilter.prototype, "keydown", void 0);
+    __decorate([
+        aurelia_framework_1.bindable,
+        __metadata("design:type", String)
+    ], VGridAttributesFilter.prototype, "key", void 0);
+    VGridAttributesFilter = __decorate([
+        aurelia_framework_1.customAttribute('v-filter'),
+        aurelia_framework_1.inject(Element, v_grid_1.VGrid),
+        __metadata("design:paramtypes", [HTMLElement, v_grid_1.VGrid])
+    ], VGridAttributesFilter);
     return VGridAttributesFilter;
 }());
-__decorate([
-    aurelia_framework_1.bindable,
-    __metadata("design:type", String)
-], VGridAttributesFilter.prototype, "field", void 0);
-__decorate([
-    aurelia_framework_1.bindable,
-    __metadata("design:type", String)
-], VGridAttributesFilter.prototype, "operator", void 0);
-__decorate([
-    aurelia_framework_1.bindable,
-    __metadata("design:type", String)
-], VGridAttributesFilter.prototype, "converter", void 0);
-__decorate([
-    aurelia_framework_1.bindable,
-    __metadata("design:type", String)
-], VGridAttributesFilter.prototype, "keydown", void 0);
-__decorate([
-    aurelia_framework_1.bindable,
-    __metadata("design:type", String)
-], VGridAttributesFilter.prototype, "key", void 0);
-VGridAttributesFilter = __decorate([
-    aurelia_framework_1.customAttribute('v-filter'),
-    aurelia_framework_1.inject(Element, v_grid_1.VGrid),
-    __metadata("design:paramtypes", [HTMLElement, v_grid_1.VGrid])
-], VGridAttributesFilter);
 exports.VGridAttributesFilter = VGridAttributesFilter;
 
 });
@@ -15446,13 +15520,13 @@ var VGridAttributesImageFix = (function () {
         this.element.src = '';
         this.element.src = this.value || '';
     };
+    VGridAttributesImageFix = __decorate([
+        aurelia_framework_1.customAttribute('v-image-fix'),
+        aurelia_framework_1.inject(Element, v_grid_1.VGrid),
+        __metadata("design:paramtypes", [HTMLImageElement, v_grid_1.VGrid])
+    ], VGridAttributesImageFix);
     return VGridAttributesImageFix;
 }());
-VGridAttributesImageFix = __decorate([
-    aurelia_framework_1.customAttribute('v-image-fix'),
-    aurelia_framework_1.inject(Element, v_grid_1.VGrid),
-    __metadata("design:paramtypes", [HTMLImageElement, v_grid_1.VGrid])
-], VGridAttributesImageFix);
 exports.VGridAttributesImageFix = VGridAttributesImageFix;
 
 });
@@ -15694,45 +15768,45 @@ var VGridAttributeMenu = (function () {
         }
         return { curColType: curColType, curColNo: curColNo, curContext: curContext, curColumnsArray: curColumnsArray };
     };
+    __decorate([
+        aurelia_framework_1.bindable,
+        __metadata("design:type", String)
+    ], VGridAttributeMenu.prototype, "filter", void 0);
+    __decorate([
+        aurelia_framework_1.bindable,
+        __metadata("design:type", String)
+    ], VGridAttributeMenu.prototype, "filterkey", void 0);
+    __decorate([
+        aurelia_framework_1.bindable,
+        __metadata("design:type", String)
+    ], VGridAttributeMenu.prototype, "sort", void 0);
+    __decorate([
+        aurelia_framework_1.bindable,
+        __metadata("design:type", String)
+    ], VGridAttributeMenu.prototype, "pinned", void 0);
+    __decorate([
+        aurelia_framework_1.bindable,
+        __metadata("design:type", String)
+    ], VGridAttributeMenu.prototype, "groupby", void 0);
+    __decorate([
+        aurelia_framework_1.bindable,
+        __metadata("design:type", String)
+    ], VGridAttributeMenu.prototype, "hideshow", void 0);
+    __decorate([
+        aurelia_framework_1.bindable,
+        __metadata("design:type", String)
+    ], VGridAttributeMenu.prototype, "groupbytitle", void 0);
+    __decorate([
+        aurelia_framework_1.bindable,
+        __metadata("design:type", String)
+    ], VGridAttributeMenu.prototype, "copypaste", void 0);
+    VGridAttributeMenu = __decorate([
+        aurelia_framework_1.customAttribute('v-menu'),
+        aurelia_framework_1.inject(Element, v_grid_1.VGrid),
+        __metadata("design:paramtypes", [Element, v_grid_1.VGrid])
+    ], VGridAttributeMenu);
     return VGridAttributeMenu;
 }());
-__decorate([
-    aurelia_framework_1.bindable,
-    __metadata("design:type", String)
-], VGridAttributeMenu.prototype, "filter", void 0);
-__decorate([
-    aurelia_framework_1.bindable,
-    __metadata("design:type", String)
-], VGridAttributeMenu.prototype, "filterkey", void 0);
-__decorate([
-    aurelia_framework_1.bindable,
-    __metadata("design:type", String)
-], VGridAttributeMenu.prototype, "sort", void 0);
-__decorate([
-    aurelia_framework_1.bindable,
-    __metadata("design:type", String)
-], VGridAttributeMenu.prototype, "pinned", void 0);
-__decorate([
-    aurelia_framework_1.bindable,
-    __metadata("design:type", String)
-], VGridAttributeMenu.prototype, "groupby", void 0);
-__decorate([
-    aurelia_framework_1.bindable,
-    __metadata("design:type", String)
-], VGridAttributeMenu.prototype, "hideshow", void 0);
-__decorate([
-    aurelia_framework_1.bindable,
-    __metadata("design:type", String)
-], VGridAttributeMenu.prototype, "groupbytitle", void 0);
-__decorate([
-    aurelia_framework_1.bindable,
-    __metadata("design:type", String)
-], VGridAttributeMenu.prototype, "copypaste", void 0);
-VGridAttributeMenu = __decorate([
-    aurelia_framework_1.customAttribute('v-menu'),
-    aurelia_framework_1.inject(Element, v_grid_1.VGrid),
-    __metadata("design:paramtypes", [Element, v_grid_1.VGrid])
-], VGridAttributeMenu);
 exports.VGridAttributeMenu = VGridAttributeMenu;
 
 });
@@ -15889,13 +15963,13 @@ var VGridAttributesResizeCol = (function () {
         document.addEventListener('mousemove', this.onmousemoveBinded);
         document.addEventListener('mouseup', this.onmouseupBinded);
     };
+    VGridAttributesResizeCol = __decorate([
+        aurelia_framework_1.customAttribute('v-resize-col'),
+        aurelia_framework_1.inject(Element, v_grid_1.VGrid),
+        __metadata("design:paramtypes", [Element, v_grid_1.VGrid])
+    ], VGridAttributesResizeCol);
     return VGridAttributesResizeCol;
 }());
-VGridAttributesResizeCol = __decorate([
-    aurelia_framework_1.customAttribute('v-resize-col'),
-    aurelia_framework_1.inject(Element, v_grid_1.VGrid),
-    __metadata("design:paramtypes", [Element, v_grid_1.VGrid])
-], VGridAttributesResizeCol);
 exports.VGridAttributesResizeCol = VGridAttributesResizeCol;
 
 });
@@ -15955,21 +16029,21 @@ var VGridAttributesSelection = (function () {
             }
         };
     };
+    __decorate([
+        aurelia_framework_1.bindable,
+        __metadata("design:type", Boolean)
+    ], VGridAttributesSelection.prototype, "selected", void 0);
+    __decorate([
+        aurelia_framework_1.bindable,
+        __metadata("design:type", String)
+    ], VGridAttributesSelection.prototype, "type", void 0);
+    VGridAttributesSelection = __decorate([
+        aurelia_framework_1.customAttribute('v-selection'),
+        aurelia_framework_1.inject(Element, v_grid_1.VGrid),
+        __metadata("design:paramtypes", [HTMLInputElement, v_grid_1.VGrid])
+    ], VGridAttributesSelection);
     return VGridAttributesSelection;
 }());
-__decorate([
-    aurelia_framework_1.bindable,
-    __metadata("design:type", Boolean)
-], VGridAttributesSelection.prototype, "selected", void 0);
-__decorate([
-    aurelia_framework_1.bindable,
-    __metadata("design:type", String)
-], VGridAttributesSelection.prototype, "type", void 0);
-VGridAttributesSelection = __decorate([
-    aurelia_framework_1.customAttribute('v-selection'),
-    aurelia_framework_1.inject(Element, v_grid_1.VGrid),
-    __metadata("design:paramtypes", [HTMLInputElement, v_grid_1.VGrid])
-], VGridAttributesSelection);
 exports.VGridAttributesSelection = VGridAttributesSelection;
 
 });
@@ -16044,21 +16118,21 @@ var VGridAttributesSort = (function () {
         });
         return markup;
     };
+    __decorate([
+        aurelia_framework_1.bindable,
+        __metadata("design:type", String)
+    ], VGridAttributesSort.prototype, "field", void 0);
+    __decorate([
+        aurelia_framework_1.bindable,
+        __metadata("design:type", String)
+    ], VGridAttributesSort.prototype, "asc", void 0);
+    VGridAttributesSort = __decorate([
+        aurelia_framework_1.customAttribute('v-sort'),
+        aurelia_framework_1.inject(Element, v_grid_1.VGrid),
+        __metadata("design:paramtypes", [HTMLElement, v_grid_1.VGrid])
+    ], VGridAttributesSort);
     return VGridAttributesSort;
 }());
-__decorate([
-    aurelia_framework_1.bindable,
-    __metadata("design:type", String)
-], VGridAttributesSort.prototype, "field", void 0);
-__decorate([
-    aurelia_framework_1.bindable,
-    __metadata("design:type", String)
-], VGridAttributesSort.prototype, "asc", void 0);
-VGridAttributesSort = __decorate([
-    aurelia_framework_1.customAttribute('v-sort'),
-    aurelia_framework_1.inject(Element, v_grid_1.VGrid),
-    __metadata("design:paramtypes", [HTMLElement, v_grid_1.VGrid])
-], VGridAttributesSort);
 exports.VGridAttributesSort = VGridAttributesSort;
 
 });
@@ -16185,7 +16259,7 @@ var ColumnMarkup = (function () {
                         default:
                     }
                     var template = this.colConfig[i].__colRowTemplateGenerated;
-                    var colMarkup = "<avg-col                               class=\"avg-col\"                               if.bind=\"setup" + type + "[" + i + "].show && rowRef.__group !== true\" " + style + ">" + template + "                          </avg-col>";
+                    var colMarkup = "<avg-col                               class=\"avg-col\"                               data-avg-type=\"" + type + "\"                               data-avg-config-col=\"" + i + "\"                               if.bind=\"setup" + type + "[" + i + "].show && rowRef.__group !== true\" " + style + ">" + template + "                          </avg-col>";
                     viewMarkup = viewMarkup + colMarkup;
                 }
             }
@@ -16276,10 +16350,10 @@ var ColumnMarkup = (function () {
         var viewFactoryRight = this.getRowViews('right');
         var viewFactoryGroup = this.getRowViews('group');
         for (var i = 0; i < this.rowLength; i++) {
-            this.viewSlots.leftRowViewSlots[i] = this.createViewSlot(this.leftRows[i], viewFactoryLeft);
-            this.viewSlots.mainRowViewSlots[i] = this.createViewSlot(this.mainRows[i], viewFactoryMain);
-            this.viewSlots.rightRowViewSlots[i] = this.createViewSlot(this.rightRows[i], viewFactoryRight);
-            this.viewSlots.groupRowViewSlots[i] = this.createViewSlot(this.groupRows[i], viewFactoryGroup);
+            this.viewSlots.leftRowViewSlots[i] = this.createViewSlot(this.htmlCache.rowCache[i].left, viewFactoryLeft);
+            this.viewSlots.mainRowViewSlots[i] = this.createViewSlot(this.htmlCache.rowCache[i].main, viewFactoryMain);
+            this.viewSlots.rightRowViewSlots[i] = this.createViewSlot(this.htmlCache.rowCache[i].right, viewFactoryRight);
+            this.viewSlots.groupRowViewSlots[i] = this.createViewSlot(this.htmlCache.rowCache[i].group, viewFactoryGroup);
             this.htmlCache.rowCache[i].leftRowViewSlot = this.viewSlots.leftRowViewSlots[i];
             this.htmlCache.rowCache[i].mainRowViewSlot = this.viewSlots.mainRowViewSlots[i];
             this.htmlCache.rowCache[i].rightRowViewSlot = this.viewSlots.rightRowViewSlots[i];
@@ -16364,7 +16438,7 @@ var ColumnMarkupHelper = (function () {
             switch (col.colType) {
                 case 'selection':
                     labelHeader = '';
-                    inputHeader = "<input \n            class=\"avg-row-checkbox-100\" \n            v-selection=\"type:header;selected.bind:selected\" \n            type=\"checkbox\">";
+                    inputHeader = "<input\n            class=\"avg-row-checkbox-100\"\n            v-selection=\"type:header;selected.bind:selected\"\n            type=\"checkbox\">";
                     break;
                 case 'image':
                     inputHeader = '<p class="avg-label-top"></p>';
@@ -16390,7 +16464,7 @@ var ColumnMarkupHelper = (function () {
         if (!col.colRowTemplate) {
             switch (col.colType) {
                 case 'selection':
-                    col.colRowTemplate = "<input \n            v-key-move \n            class=\"avg-row-checkbox-100\"  \n            v-selection=\"type:row;selected.bind:selected\" \n            type=\"checkbox\" >";
+                    col.colRowTemplate = "<input\n            v-key-move\n            class=\"avg-row-checkbox-100\"\n            v-selection=\"type:row;selected.bind:selected\"\n            type=\"checkbox\" >";
                     break;
                 case 'image':
                     this.createImageRowMarkup(col);
@@ -16426,7 +16500,6 @@ var ColumnMarkupHelper = (function () {
         }
         return returnValue;
     };
-    ;
     ColumnMarkupHelper.prototype.checkAttribute = function (attribute) {
         var value = attribute;
         if (attribute) {
@@ -16450,14 +16523,14 @@ var ColumnMarkupHelper = (function () {
         var colRowMenu = col.colRowMenu ? "v-menu=\"" + col.colRowMenu + "\"" : '';
         var colCss = col.colCss ? "css=\"" + col.colCss + "\"" : '';
         if (col.colType === 'checkbox') {
-            col.__colRowTemplateGenerated = "<input \n        " + colCss + " \n        " + colClass + " \n        " + colType + " \n        " + colAddRowAttributes + " \n        " + colRowMenu + "  \n        checked.bind=\"" + col.colField + "\">";
+            col.__colRowTemplateGenerated = "<input\n        " + colCss + "\n        " + colClass + "\n        " + colType + "\n        " + colAddRowAttributes + "\n        " + colRowMenu + "\n        checked.bind=\"" + col.colField + "\">";
         }
         else {
             var binding = "value.bind=\"" + col.colField + "\"";
             if (col.colDisplayEdit) {
                 binding = "v-data-handler=\"value.bind:" + col.colField + ";" + col.colDisplayEdit + "\"";
             }
-            col.__colRowTemplateGenerated = "<input \n        " + colCss + " \n        " + colClass + " \n        " + colType + " \n        " + colRowMenu + "\n        " + colAddRowAttributes + "  \n        " + binding + ">";
+            col.__colRowTemplateGenerated = "<input\n        " + colCss + "\n        " + colClass + "\n        " + colType + "\n        " + colRowMenu + "\n        " + colAddRowAttributes + "\n        " + binding + ">";
         }
     };
     ColumnMarkupHelper.prototype.createInputHeaderMarkup = function (col) {
@@ -16491,7 +16564,7 @@ var ColumnMarkupHelper = (function () {
         var colDragDrop = col.colDragDrop !== 'false' ? "v-drag-drop-col=\"" + col.colDragDrop + "\"" : '';
         var colResizeable = col.colResizeable !== 'false' ? "v-resize-col" : '';
         var extraAttributes = colDragDrop + " " + colResizeable + " " + colLabelMenu;
-        return "<p \n      " + extraAttributes + " \n      " + classname + " \n      " + sort + " \n      " + colAddLabelAttributes + ">\n      " + col.colHeaderName + "\n      </p>";
+        return "<p\n      " + extraAttributes + "\n      " + classname + "\n      " + sort + "\n      " + colAddLabelAttributes + ">\n      " + col.colHeaderName + "\n      </p>";
     };
     return ColumnMarkupHelper;
 }());
@@ -16626,7 +16699,7 @@ var ContextMenu = (function () {
     };
     ContextMenu.prototype.updateMenuStrings = function (key, text) {
         if (this.menuStrings[key]) {
-            this.menuStrings[key] = text;
+            this.menuStrings[key] = text || this.menuStrings[key];
         }
     };
     ContextMenu.prototype.closeMenuEvent = function () {
@@ -16772,7 +16845,8 @@ var Controller = (function () {
         if (this.attI18N) {
             keys.forEach(function (key) {
                 if (_this.vGrid.filterOperatorTranslationKeys[key]) {
-                    _this.vGrid.filterOperatorNames[_this.vGrid.filterOperatorTranslationKeys[key]] = _this.attI18N(key);
+                    _this.vGrid.filterOperatorNames[_this.vGrid.filterOperatorTranslationKeys[key]] =
+                        _this.attI18N(key) || _this.vGrid.filterOperatorNames[_this.vGrid.filterOperatorTranslationKeys[key]];
                 }
                 _this.contextMenu.updateMenuStrings(key, _this.attI18N(key));
             });
@@ -17135,7 +17209,7 @@ var GroupingElements = (function () {
             this.lastAdded = field;
             this.groupContext[field] = new GroupContext(name, field, this);
             var viewMarkup = this.colGroupElement ||
-                "<div class=\"avg-grouping\">  \n          <p class=\"avg-grouping-element\" v-sort=\"field.bind:field\">" + name + " \n            <i><svg click.delegate=\"remove()\" class=\"icon iconhidden\" xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 16 16\">\n              <path d=\"M3 4l4.3 4L3 12h1.4L8 8.7l3.5 3.3H13L8.6 8 13 4h-1.5L8 7.3 4.4 4H3z\"/>\n            </svg></i>\n          </p>\n         </div>";
+                "<div class=\"avg-grouping\">\n          <p class=\"avg-grouping-element\" v-sort=\"field.bind:field\">" + name + "\n            <i><svg click.delegate=\"remove()\" class=\"icon iconhidden\" xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 16 16\">\n              <path d=\"M3 4l4.3 4L3 12h1.4L8 8.7l3.5 3.3H13L8.6 8 13 4h-1.5L8 7.3 4.4 4H3z\"/>\n            </svg></i>\n          </p>\n         </div>";
             var viewFactory = this.viewCompiler.compile("<template>" + viewMarkup + "</template>", this.viewResources);
             var view = viewFactory.create(this.container);
             var viewSlot = new aurelia_framework_1.ViewSlot(this.avgTopPanel, true);
@@ -17615,7 +17689,7 @@ exports.MainMarkup = MainMarkup;
 ___scope___.file("grid/mainMarkupHtmlString.js", function(exports, require, module, __filename, __dirname){
 
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.MainMarkupHtmlString = "\n        <avg-top-panel v-drag-drop-col class=\"avg-top-panel\" css=\"height:$au{avgPanel_Height}px\">\n\n        </avg-top-panel>\n\n        <avg-header class=\"avg-header\" css=\"height:$au{avgHeader_Height}px;top:$au{avgHeader_Top}px\">\n\n          <avg-header-left class=\"avg-header-left\" css=\"width:$au{avgHeaderLeft_Width}px\">\n           </avg-header-left>  \n\n           <avg-header-main class=\"avg-header-main\" css=\"left:$au{avgHeaderMain_Left}px;right:$au{avgHeaderMain_Right}px\">\n             <avg-header-main-scroll css=\"width:$au{avgHeaderMainScroll_Width}px;height:$au{avgHeaderMainScroll_Height}px\"> \n             </avg-header-main-scroll> \n           </avg-header-main> \n\n           <avg-header-right class=\"avg-header-right\" css=\"right:$au{avgHeaderRight_Right}px;width:$au{avgHeaderRight_Width}px\">\n           </avg-header-right> \n\n        </avg-header>\n\n        <avg-content class=\"avg-content\" css=\"top:$au{avgContent_Top}px;bottom:$au{avgContent_Bottom}px\">\n           \n            <avg-content-left  class=\"avg-content-left\" css=\"width:$au{avgContentLeft_Width}px\">\n              <avg-content-left-scroll css=\"width:$au{avgContentLeftScroll_Width};height:$au{avgContentLeftScroll_Height}px\">  \n              </avg-content-left-scroll> \n            </avg-content-left>  \n\n            <avg-content-main  class=\"avg-content-main\" css=\"left:$au{avgContentMain_Left}px;right:$au{avgContentMain_Right}px\">\n              <avg-content-main-scroll css=\"min-width: 100%;width:$au{avgContentMainScroll_Width}px;height:$au{avgContentMainScroll_Height}px\"> \n              </avg-content-main-scroll> \n            </avg-content-main> \n\n            <avg-content-right  class=\"avg-content-right\" css=\"right:$au{avgContentRight_Right}px;width:$au{avgContentRight_Width}px\">\n              <avg-content-right-scroll css=\"width:$au{avgContentRightScroll_Width};height:$au{avgContentRightScroll_Height}px\">  \n              </avg-content-right-scroll> \n            </avg-content-right>  \n            \n        </avg-content>\n\n       <avg-footer class=\"avg-footer\" css=\"height:$au{avgFooter_Height}px\">\n       </avg-footer> \n\n       <avg-content-group css=\"left:0;right:0;top:$au{avgContentGroup_Top}px;bottom:$au{avgContentGroup_Bottom}px\">\n          <avg-content-group-scroll css=\"left:0;right:0;height:$au{avgContentGroup_Height}px\">  \n          </avg-content-group-scroll> \n        </avg-content-group> \n\n        <avg-content-vhandle css=\"right:0;bottom:$au{avgContentVhandle_Bottom}px;right:$au{avgContentVhandle_Right}px;left:$au{avgContentVhandle_Left}px;top:$au{avgContentVhandle_Top}px\">\n          <avg-content-vhandle-scroll css=\"width:5px;height:$au{avgContentVhandleScroll_Height}px\"> \n          </avg-content-vhandle-scroll> \n        </avg-content-vhandle> \n\n        <avg-content-hhandle css=\"bottom:$au{avgContentHhandle_Bottom}px;right:$au{avgContentHhandle_Right}px;left:$au{avgContentHhandle_Left}px;height:$au{avgContentHhandle_Height}px\">\n          <avg-content-hhandle-scroll css=\"height:7px;width:$au{avgContentHhandleScroll_Width}px\"> \n          </avg-content-hhandle-scroll> \n        </avg-content-hhandle> \n\n        ".replace(/\$(au{)/g, '${');
+exports.MainMarkupHtmlString = "\n        <avg-top-panel v-drag-drop-col class=\"avg-top-panel\" css=\"height:$au{avgPanel_Height}px\">\n\n        </avg-top-panel>\n\n        <avg-header class=\"avg-header\" css=\"height:$au{avgHeader_Height}px;top:$au{avgHeader_Top}px\">\n\n          <avg-header-left class=\"avg-header-left\" css=\"width:$au{avgHeaderLeft_Width}px\">\n           </avg-header-left>\n\n           <avg-header-main class=\"avg-header-main\" css=\"left:$au{avgHeaderMain_Left}px;right:$au{avgHeaderMain_Right}px\">\n             <avg-header-main-scroll css=\"width:$au{avgHeaderMainScroll_Width}px;height:$au{avgHeaderMainScroll_Height}px\">\n             </avg-header-main-scroll>\n           </avg-header-main>\n\n           <avg-header-right class=\"avg-header-right\" css=\"right:$au{avgHeaderRight_Right}px;width:$au{avgHeaderRight_Width}px\">\n           </avg-header-right>\n\n        </avg-header>\n\n        <avg-content class=\"avg-content\" css=\"top:$au{avgContent_Top}px;bottom:$au{avgContent_Bottom}px\">\n\n            <avg-content-left  class=\"avg-content-left\" css=\"width:$au{avgContentLeft_Width}px\">\n              <avg-content-left-scroll css=\"width:$au{avgContentLeftScroll_Width};height:$au{avgContentLeftScroll_Height}px\">\n              </avg-content-left-scroll>\n            </avg-content-left>\n\n            <avg-content-main  class=\"avg-content-main\" css=\"left:$au{avgContentMain_Left}px;right:$au{avgContentMain_Right}px\">\n              <avg-content-main-scroll css=\"min-width: 100%;width:$au{avgContentMainScroll_Width}px;height:$au{avgContentMainScroll_Height}px\">\n              </avg-content-main-scroll>\n            </avg-content-main>\n\n            <avg-content-right  class=\"avg-content-right\" css=\"right:$au{avgContentRight_Right}px;width:$au{avgContentRight_Width}px\">\n              <avg-content-right-scroll css=\"width:$au{avgContentRightScroll_Width};height:$au{avgContentRightScroll_Height}px\">\n              </avg-content-right-scroll>\n            </avg-content-right>\n\n        </avg-content>\n\n       <avg-footer class=\"avg-footer\" css=\"height:$au{avgFooter_Height}px\">\n       </avg-footer>\n\n       <avg-content-group css=\"left:0;right:0;top:$au{avgContentGroup_Top}px;bottom:$au{avgContentGroup_Bottom}px\">\n          <avg-content-group-scroll css=\"left:0;right:0;height:$au{avgContentGroup_Height}px\">\n          </avg-content-group-scroll>\n        </avg-content-group>\n\n        <avg-content-vhandle css=\"right:0;bottom:$au{avgContentVhandle_Bottom}px;right:$au{avgContentVhandle_Right}px;left:$au{avgContentVhandle_Left}px;top:$au{avgContentVhandle_Top}px\">\n          <avg-content-vhandle-scroll css=\"width:5px;height:$au{avgContentVhandleScroll_Height}px\">\n          </avg-content-vhandle-scroll>\n        </avg-content-vhandle>\n\n        <avg-content-hhandle css=\"bottom:$au{avgContentHhandle_Bottom}px;right:$au{avgContentHhandle_Right}px;left:$au{avgContentHhandle_Left}px;height:$au{avgContentHhandle_Height}px\">\n          <avg-content-hhandle-scroll css=\"height:7px;width:$au{avgContentHhandleScroll_Width}px\">\n          </avg-content-hhandle-scroll>\n        </avg-content-hhandle>\n\n        ".replace(/\$(au{)/g, '${');
 
 });
 ___scope___.file("grid/mainScrollEvents.js", function(exports, require, module, __filename, __dirname){
@@ -18262,8 +18336,8 @@ var RowMarkup = (function () {
         var markupGroup = '';
         for (var i = 0; i < 40; i++) {
             var translateY = this.rowHeight * i;
-            var avgRowMarkup = "\n        <avg-row \n          class=\"avg-row\" \n          style=\"height:" + this.rowHeight + "px; \n            transform:translate3d(0px, " + translateY + "px, 0px);\n            z-index:5;\" \n          row=\"" + i + "\">\n        </avg-row>";
-            var avgRowMarkupGroup = "\n        <avg-row \n          class=\"avg-row-helper\" \n          style=\"height:" + this.rowHeight + "px; \n            transform:translate3d(0px, " + translateY + "px, 0px);\n            z-index:5;\" \n          row=\"" + i + "\">\n        </avg-row>";
+            var avgRowMarkup = "\n        <avg-row\n          class=\"avg-row\"\n          style=\"height:" + this.rowHeight + "px;\n            transform:translate3d(0px, " + translateY + "px, 0px);\n            z-index:5;\"\n          row=\"" + i + "\">\n        </avg-row>";
+            var avgRowMarkupGroup = "\n        <avg-row\n          class=\"avg-row-helper\"\n          style=\"height:" + this.rowHeight + "px;\n            transform:translate3d(0px, " + translateY + "px, 0px);\n            z-index:5;\"\n          row=\"" + i + "\">\n        </avg-row>";
             markupLeft = markupLeft + avgRowMarkup;
             markupMain = markupMain + avgRowMarkup;
             markupRight = markupRight + avgRowMarkup;
@@ -18562,8 +18636,9 @@ var RowScrollEvents = (function () {
         };
         var setBefore = function (no) {
             var row = _this.rowCache[no];
-            _this.setRowHeight(row, currentRow);
-            firstRowTop = firstRowTop - rowHeightState.rows[currentRow];
+            firstRow--;
+            firstRowTop = firstRowTop - rowHeightState.rows[firstRow];
+            _this.setRowHeight(row, rowHeightState.top[firstRow]);
             _this.setRowTopValueVariableRowHeight(row, firstRowTop);
         };
         var setHiddenFromView = function (no) {
@@ -18632,7 +18707,7 @@ exports.RowScrollEvents = RowScrollEvents;
 });
 ___scope___.file("grid/styles/cellsAndLabels.css", function(exports, require, module, __filename, __dirname){
 
-module.exports = "/*here we can have utility classes the users can use to simply fy use, and that we can use with future markup generator*/\r\n\r\n.avg-default .avg-header-input-top {\r\n  box-sizing: border-box;\r\n  border: 0;\r\n  border-bottom: 1px solid rgb(230, 230, 230) !important;\r\n  border-radius: initial;\r\n  box-shadow: initial;\r\n  height: 50% !important;\r\n  width: 100%;\r\n  background-color: white !important;\r\n  padding: 5px 10px;\r\n  margin: initial !important;\r\n  transition: initial !important;\r\n}\r\n\r\n.avg-default .avg-header-input-bottom {\r\n  box-sizing: border-box;\r\n  border: 0;\r\n  border-radius: initial;\r\n  box-shadow: initial;\r\n  border-top: 1px solid rgb(230, 230, 230) !important;\r\n  height: 50% !important;\r\n  width: 100%;\r\n  background-color: white !important;\r\n  padding: 5px 10px;\r\n  margin: initial !important;\r\n  transition: initial !important;\r\n}\r\n\r\n.avg-default .avg-row-checkbox-100 {\r\n  height: 100% !important;\r\n  width: initial;\r\n  left: initial !important;\r\n  position: initial !important;\r\n  display: block;\r\n  opacity: initial !important;\r\n  margin: auto !important;\r\n}\r\n\r\n.avg-default .avg-row-checkbox-50 {\r\n  height: 50% !important;\r\n  width: initial;\r\n  opacity: initial;\r\n  left: initial !important;\r\n  position: initial !important;\r\n  display: block;\r\n  margin: auto !important;\r\n}\r\n\r\n.avg-default .avg-row-input {\r\n  box-sizing: border-box;\r\n  border: 0;\r\n  border-radius: initial;\r\n  box-shadow: initial;\r\n  height: 100% !important;\r\n  width: 100%;\r\n  background-color: transparent;\r\n  padding: 5px 10px !important;\r\n}\r\n\r\n.avg-default .avg-image-round {\r\n  border-radius: 50%;\r\n  height: 100%;\r\n  box-sizing: border-box;\r\n  position: relative;\r\n  left: 50%;\r\n  transform: translateX(-50%);\r\n  padding-top: 5px;\r\n}\r\n\r\n.avg-default .avg-label-bottom {\r\n  box-sizing: border-box;\r\n  border: 0;\r\n  border-radius: initial;\r\n  box-shadow: initial;\r\n  height: 50%;\r\n  width: 100%;\r\n  position: relative;\r\n  margin: 0 !important;\r\n  padding-top: 5px;\r\n  text-align: center;\r\n  overflow: hidden;\r\n}\r\n\r\n.avg-default .avg-label-top {\r\n  box-sizing: border-box;\r\n  border: 0;\r\n  border-radius: initial;\r\n  box-shadow: initial;\r\n  height: 50%;\r\n  width: 100%;\r\n  position: relative;\r\n  margin: 0 !important;\r\n  padding-top: 5px;\r\n  text-align: center;\r\n  overflow: hidden;\r\n}\r\n\r\n/*.avg-default .avg-label-top p {\r\n  margin: 0 !important;\r\n}\r\n\r\n.avg-default .avg-label-bottom p {\r\n  margin: 0 !important;\r\n}*/\r\n\r\n.avg-default .avg-label-full {\r\n  box-sizing: border-box;\r\n  border: 0;\r\n  border-radius: initial;\r\n  box-shadow: initial;\r\n  height: 100%;\r\n  width: 100%;\r\n  position: relative;\r\n  margin: 0 !important;\r\n  padding-top: 5px;\r\n  text-align: center;\r\n}\r\n"
+module.exports = "/*here we can have utility classes the users can use to simply fy use, and that we can use with future markup generator*/\r\n\r\n.avg-default .avg-header-input-top {\r\n  box-sizing: border-box;\r\n  border: 0;\r\n  border-bottom: 1px solid rgb(230, 230, 230) !important;\r\n  border-radius: initial;\r\n  box-shadow: initial;\r\n  height: 50% !important;\r\n  width: 100%;\r\n  background-color: white !important;\r\n  padding: 5px 10px;\r\n  margin: initial !important;\r\n  transition: initial !important;\r\n}\r\n\r\n.avg-default .avg-header-input-bottom {\r\n  box-sizing: border-box;\r\n  border: 0;\r\n  border-radius: initial;\r\n  box-shadow: initial;\r\n  border-top: 1px solid rgb(230, 230, 230) !important;\r\n  height: 50% !important;\r\n  width: 100%;\r\n  background-color: white !important;\r\n  padding: 5px 10px;\r\n  margin: initial !important;\r\n  transition: initial !important;\r\n}\r\n\r\n.avg-default .avg-row-checkbox-100 {\r\n  height: 100% !important;\r\n  width: initial;\r\n  left: initial !important;\r\n  position: initial !important;\r\n  display: block;\r\n  opacity: initial !important;\r\n  margin: auto !important;\r\n}\r\n\r\n.avg-default .avg-row-checkbox-50 {\r\n  height: 50% !important;\r\n  width: initial;\r\n  opacity: initial;\r\n  left: initial !important;\r\n  position: initial !important;\r\n  display: block;\r\n  margin: auto !important;\r\n}\r\n\r\n.avg-default .avg-row-input {\r\n  box-sizing: border-box;\r\n  border: 0;\r\n  border-radius: initial;\r\n  box-shadow: initial;\r\n  height: 100% !important;\r\n  width: 100%;\r\n  background-color: transparent;\r\n  padding: 5px 10px !important;\r\n}\r\n\r\n.avg-default .avg-image-round {\r\n  border-radius: 50%;\r\n  height: 100%;\r\n  box-sizing: border-box;\r\n  position: relative;\r\n  left: 50%;\r\n  transform: translateX(-50%);\r\n  padding-top: 5px;\r\n}\r\n\r\n.avg-default .avg-label-bottom {\r\n  box-sizing: border-box;\r\n  border: 0;\r\n  border-radius: initial;\r\n  box-shadow: initial;\r\n  height: 50%;\r\n  width: 100%;\r\n  position: relative;\r\n  margin: 0 !important;\r\n  padding-top: 5px;\r\n  text-align: center;\r\n  overflow: hidden;\r\n  user-select: none;\r\n}\r\n\r\n.avg-default .avg-label-top {\r\n  box-sizing: border-box;\r\n  border: 0;\r\n  border-radius: initial;\r\n  box-shadow: initial;\r\n  height: 50%;\r\n  width: 100%;\r\n  position: relative;\r\n  margin: 0 !important;\r\n  padding-top: 5px;\r\n  text-align: center;\r\n  overflow: hidden;\r\n  user-select: none;\r\n}\r\n\r\n/*.avg-default .avg-label-top p {\r\n  margin: 0 !important;\r\n}\r\n\r\n.avg-default .avg-label-bottom p {\r\n  margin: 0 !important;\r\n}*/\r\n\r\n.avg-default .avg-label-full {\r\n  box-sizing: border-box;\r\n  border: 0;\r\n  border-radius: initial;\r\n  box-shadow: initial;\r\n  height: 100%;\r\n  width: 100%;\r\n  position: relative;\r\n  margin: 0 !important;\r\n  padding-top: 5px;\r\n  text-align: center;\r\n  user-select: none;\r\n}\r\n"
 });
 ___scope___.file("grid/styles/contextmenu.css", function(exports, require, module, __filename, __dirname){
 
@@ -18687,30 +18762,32 @@ var VGridElementColConfig = (function () {
     VGridElementColConfig.prototype.bind = function (bindingContext, overrideContext) {
         this.bindingContext = bindingContext;
         this.overrideContext = overrideContext;
-        this.vGrid.colConfig.push({
-            colWidth: this.colWidth ? this.colWidth * 1 : 100,
-            colRowTemplate: this.colRowTemplate,
-            colHeaderTemplate: this.colHeaderTemplate,
-            colField: this.colField,
-            colPinLeft: this.checkBool(this.colPinLeft),
-            colPinRight: this.checkBool(this.colPinRight),
-            colHeaderName: this.colHeaderName,
-            colFilterMenu: this.colFilterMenu,
-            colLabelMenu: this.colLabelMenu,
-            colRowMenu: this.colRowMenu,
-            colHidden: this.checkBool(this.colHidden),
-            colDragDrop: this.colDragDrop,
-            colResizeable: this.colResizeable,
-            colAddLabelAttributes: this.colAddLabelAttributes,
-            colAddFilterAttributes: this.colAddFilterAttributes,
-            colAddRowAttributes: this.colAddRowAttributes,
-            colSort: this.colSort,
-            colDisplayEdit: this.colDisplayEdit,
-            colFilter: this.colFilter,
-            colFilterTop: this.checkBool(this.colFilterTop),
-            colCss: this.colCss,
-            colType: this.colType || 'text'
-        });
+        if (this.vGrid.newGrid) {
+            this.vGrid.colConfig.push({
+                colWidth: this.colWidth ? this.colWidth * 1 : 100,
+                colRowTemplate: this.colRowTemplate,
+                colHeaderTemplate: this.colHeaderTemplate,
+                colField: this.colField,
+                colPinLeft: this.checkBool(this.colPinLeft),
+                colPinRight: this.checkBool(this.colPinRight),
+                colHeaderName: this.colHeaderName,
+                colFilterMenu: this.colFilterMenu,
+                colLabelMenu: this.colLabelMenu,
+                colRowMenu: this.colRowMenu,
+                colHidden: this.checkBool(this.colHidden),
+                colDragDrop: this.colDragDrop,
+                colResizeable: this.colResizeable,
+                colAddLabelAttributes: this.colAddLabelAttributes,
+                colAddFilterAttributes: this.colAddFilterAttributes,
+                colAddRowAttributes: this.colAddRowAttributes,
+                colSort: this.colSort,
+                colDisplayEdit: this.colDisplayEdit,
+                colFilter: this.colFilter,
+                colFilterTop: this.checkBool(this.colFilterTop),
+                colCss: this.colCss,
+                colType: this.colType || 'text'
+            });
+        }
     };
     VGridElementColConfig.prototype.checkBool = function (value) {
         if (typeof value === 'string') {
@@ -18731,109 +18808,109 @@ var VGridElementColConfig = (function () {
         }
         return value;
     };
+    __decorate([
+        aurelia_framework_1.bindable({ attribute: 'col-width' }),
+        __metadata("design:type", Number)
+    ], VGridElementColConfig.prototype, "colWidth", void 0);
+    __decorate([
+        aurelia_framework_1.bindable({ attribute: 'col-field' }),
+        __metadata("design:type", String)
+    ], VGridElementColConfig.prototype, "colField", void 0);
+    __decorate([
+        aurelia_framework_1.bindable({ attribute: 'col-header-name' }),
+        __metadata("design:type", String)
+    ], VGridElementColConfig.prototype, "colHeaderName", void 0);
+    __decorate([
+        aurelia_framework_1.bindable({ attribute: 'col-sort' }),
+        __metadata("design:type", String)
+    ], VGridElementColConfig.prototype, "colSort", void 0);
+    __decorate([
+        aurelia_framework_1.bindable({ attribute: 'col-pin-left' }),
+        __metadata("design:type", Boolean)
+    ], VGridElementColConfig.prototype, "colPinLeft", void 0);
+    __decorate([
+        aurelia_framework_1.bindable({ attribute: 'col-pin-right' }),
+        __metadata("design:type", Boolean)
+    ], VGridElementColConfig.prototype, "colPinRight", void 0);
+    __decorate([
+        aurelia_framework_1.bindable({ attribute: 'col-filter' }),
+        __metadata("design:type", String)
+    ], VGridElementColConfig.prototype, "colFilter", void 0);
+    __decorate([
+        aurelia_framework_1.bindable({ attribute: 'col-filter-top' }),
+        __metadata("design:type", Boolean)
+    ], VGridElementColConfig.prototype, "colFilterTop", void 0);
+    __decorate([
+        aurelia_framework_1.bindable({ attribute: 'col-add-label-attributes' }),
+        __metadata("design:type", String)
+    ], VGridElementColConfig.prototype, "colAddLabelAttributes", void 0);
+    __decorate([
+        aurelia_framework_1.bindable({ attribute: 'col-add-filter-attributes' }),
+        __metadata("design:type", String)
+    ], VGridElementColConfig.prototype, "colAddFilterAttributes", void 0);
+    __decorate([
+        aurelia_framework_1.bindable({ attribute: 'col-add-row-attributes' }),
+        __metadata("design:type", String)
+    ], VGridElementColConfig.prototype, "colAddRowAttributes", void 0);
+    __decorate([
+        aurelia_framework_1.bindable({ attribute: 'col-type' }),
+        __metadata("design:type", String)
+    ], VGridElementColConfig.prototype, "colType", void 0);
+    __decorate([
+        aurelia_framework_1.bindable({ attribute: 'col-filter-menu' }),
+        __metadata("design:type", String)
+    ], VGridElementColConfig.prototype, "colFilterMenu", void 0);
+    __decorate([
+        aurelia_framework_1.bindable({ attribute: 'col-label-menu' }),
+        __metadata("design:type", String)
+    ], VGridElementColConfig.prototype, "colLabelMenu", void 0);
+    __decorate([
+        aurelia_framework_1.bindable({ attribute: 'col-row-menu' }),
+        __metadata("design:type", String)
+    ], VGridElementColConfig.prototype, "colRowMenu", void 0);
+    __decorate([
+        aurelia_framework_1.bindable({ attribute: 'col-hidden' }),
+        __metadata("design:type", Boolean)
+    ], VGridElementColConfig.prototype, "colHidden", void 0);
+    __decorate([
+        aurelia_framework_1.bindable({ attribute: 'col-drag-drop' }),
+        __metadata("design:type", String)
+    ], VGridElementColConfig.prototype, "colDragDrop", void 0);
+    __decorate([
+        aurelia_framework_1.bindable({ attribute: 'col-resizeable' }),
+        __metadata("design:type", String)
+    ], VGridElementColConfig.prototype, "colResizeable", void 0);
+    __decorate([
+        aurelia_framework_1.bindable({ attribute: 'col-display-edit' }),
+        __metadata("design:type", String)
+    ], VGridElementColConfig.prototype, "colDisplayEdit", void 0);
+    VGridElementColConfig = __decorate([
+        aurelia_framework_1.noView(),
+        aurelia_framework_1.processContent(function (compiler, resources, element, instruction) {
+            compiler = compiler;
+            resources = resources;
+            var headerTemplateElement = element.getElementsByTagName('V-HEADER-TEMPLATE')[0];
+            var headerTemplateHtml = headerTemplateElement ? headerTemplateElement.innerHTML : null;
+            if (headerTemplateHtml !== '') {
+                instruction.colHeaderTemplate = headerTemplateHtml;
+            }
+            var rowTemplateElement = element.getElementsByTagName('V-ROW-TEMPLATE')[0];
+            var rowTemplateHtml = rowTemplateElement ? rowTemplateElement.innerHTML : null;
+            if (rowTemplateHtml !== '') {
+                instruction.colRowTemplate = rowTemplateHtml;
+            }
+            element.innerHTML = '';
+            var css = element.getAttribute('col-css');
+            if (css) {
+                instruction.colCss = css;
+            }
+        }),
+        aurelia_framework_1.customElement('v-grid-col'),
+        aurelia_framework_1.inject(Element, v_grid_1.VGrid, aurelia_framework_1.TargetInstruction),
+        __metadata("design:paramtypes", [Element, v_grid_1.VGrid, Object])
+    ], VGridElementColConfig);
     return VGridElementColConfig;
 }());
-__decorate([
-    aurelia_framework_1.bindable({ attribute: 'col-width' }),
-    __metadata("design:type", Number)
-], VGridElementColConfig.prototype, "colWidth", void 0);
-__decorate([
-    aurelia_framework_1.bindable({ attribute: 'col-field' }),
-    __metadata("design:type", String)
-], VGridElementColConfig.prototype, "colField", void 0);
-__decorate([
-    aurelia_framework_1.bindable({ attribute: 'col-header-name' }),
-    __metadata("design:type", String)
-], VGridElementColConfig.prototype, "colHeaderName", void 0);
-__decorate([
-    aurelia_framework_1.bindable({ attribute: 'col-sort' }),
-    __metadata("design:type", String)
-], VGridElementColConfig.prototype, "colSort", void 0);
-__decorate([
-    aurelia_framework_1.bindable({ attribute: 'col-pin-left' }),
-    __metadata("design:type", Boolean)
-], VGridElementColConfig.prototype, "colPinLeft", void 0);
-__decorate([
-    aurelia_framework_1.bindable({ attribute: 'col-pin-right' }),
-    __metadata("design:type", Boolean)
-], VGridElementColConfig.prototype, "colPinRight", void 0);
-__decorate([
-    aurelia_framework_1.bindable({ attribute: 'col-filter' }),
-    __metadata("design:type", String)
-], VGridElementColConfig.prototype, "colFilter", void 0);
-__decorate([
-    aurelia_framework_1.bindable({ attribute: 'col-filter-top' }),
-    __metadata("design:type", Boolean)
-], VGridElementColConfig.prototype, "colFilterTop", void 0);
-__decorate([
-    aurelia_framework_1.bindable({ attribute: 'col-add-label-attributes' }),
-    __metadata("design:type", String)
-], VGridElementColConfig.prototype, "colAddLabelAttributes", void 0);
-__decorate([
-    aurelia_framework_1.bindable({ attribute: 'col-add-filter-attributes' }),
-    __metadata("design:type", String)
-], VGridElementColConfig.prototype, "colAddFilterAttributes", void 0);
-__decorate([
-    aurelia_framework_1.bindable({ attribute: 'col-add-row-attributes' }),
-    __metadata("design:type", String)
-], VGridElementColConfig.prototype, "colAddRowAttributes", void 0);
-__decorate([
-    aurelia_framework_1.bindable({ attribute: 'col-type' }),
-    __metadata("design:type", String)
-], VGridElementColConfig.prototype, "colType", void 0);
-__decorate([
-    aurelia_framework_1.bindable({ attribute: 'col-filter-menu' }),
-    __metadata("design:type", String)
-], VGridElementColConfig.prototype, "colFilterMenu", void 0);
-__decorate([
-    aurelia_framework_1.bindable({ attribute: 'col-label-menu' }),
-    __metadata("design:type", String)
-], VGridElementColConfig.prototype, "colLabelMenu", void 0);
-__decorate([
-    aurelia_framework_1.bindable({ attribute: 'col-row-menu' }),
-    __metadata("design:type", String)
-], VGridElementColConfig.prototype, "colRowMenu", void 0);
-__decorate([
-    aurelia_framework_1.bindable({ attribute: 'col-hidden' }),
-    __metadata("design:type", Boolean)
-], VGridElementColConfig.prototype, "colHidden", void 0);
-__decorate([
-    aurelia_framework_1.bindable({ attribute: 'col-drag-drop' }),
-    __metadata("design:type", String)
-], VGridElementColConfig.prototype, "colDragDrop", void 0);
-__decorate([
-    aurelia_framework_1.bindable({ attribute: 'col-resizeable' }),
-    __metadata("design:type", String)
-], VGridElementColConfig.prototype, "colResizeable", void 0);
-__decorate([
-    aurelia_framework_1.bindable({ attribute: 'col-display-edit' }),
-    __metadata("design:type", String)
-], VGridElementColConfig.prototype, "colDisplayEdit", void 0);
-VGridElementColConfig = __decorate([
-    aurelia_framework_1.noView(),
-    aurelia_framework_1.processContent(function (compiler, resources, element, instruction) {
-        compiler = null;
-        resources = null;
-        var headerTemplateElement = element.getElementsByTagName('V-HEADER-TEMPLATE')[0];
-        var headerTemplateHtml = headerTemplateElement ? headerTemplateElement.innerHTML : null;
-        if (headerTemplateHtml !== '') {
-            instruction.colHeaderTemplate = headerTemplateHtml;
-        }
-        var rowTemplateElement = element.getElementsByTagName('V-ROW-TEMPLATE')[0];
-        var rowTemplateHtml = rowTemplateElement ? rowTemplateElement.innerHTML : null;
-        if (rowTemplateHtml !== '') {
-            instruction.colRowTemplate = rowTemplateHtml;
-        }
-        element.innerHTML = '';
-        var css = element.getAttribute('col-css');
-        if (css) {
-            instruction.colCss = css;
-        }
-    }),
-    aurelia_framework_1.customElement('v-grid-col'),
-    aurelia_framework_1.inject(Element, v_grid_1.VGrid, aurelia_framework_1.TargetInstruction),
-    __metadata("design:paramtypes", [Element, v_grid_1.VGrid, Object])
-], VGridElementColConfig);
 exports.VGridElementColConfig = VGridElementColConfig;
 
 });
@@ -18860,77 +18937,77 @@ var VGridContextmenu = (function () {
     VGridContextmenu.prototype.bind = function () {
         this.vGrid.customMenuTemplates = this.customMenuTemplates;
     };
+    VGridContextmenu = __decorate([
+        aurelia_framework_1.noView(),
+        aurelia_framework_1.customElement('v-grid-contextmenu'),
+        aurelia_framework_1.processContent(function (compiler, resources, element, instruction) {
+            compiler = compiler;
+            resources = resources;
+            instruction.menuTemplates = {};
+            var template;
+            var templateHTML;
+            template = element.getElementsByTagName('V-MENU-CLOSE')[0];
+            templateHTML = template ? template.innerHTML : null;
+            if (templateHTML !== '') {
+                instruction.menuTemplates.close = templateHTML;
+            }
+            template = element.getElementsByTagName('V-MENU-PINNED')[0];
+            templateHTML = template ? template.innerHTML : null;
+            if (templateHTML !== '') {
+                instruction.menuTemplates.pinned = templateHTML;
+            }
+            template = element.getElementsByTagName('V-MENU-GROUPBY')[0];
+            templateHTML = template ? template.innerHTML : null;
+            if (templateHTML !== '') {
+                instruction.menuTemplates.groupby = templateHTML;
+            }
+            template = element.getElementsByTagName('V-MENU-HIDE')[0];
+            templateHTML = template ? template.innerHTML : null;
+            if (templateHTML !== '') {
+                instruction.menuTemplates.hide = templateHTML;
+            }
+            template = element.getElementsByTagName('V-MENU-COPYPASTE')[0];
+            templateHTML = template ? template.innerHTML : null;
+            if (templateHTML !== '') {
+                instruction.menuTemplates.copypaste = templateHTML;
+            }
+            template = element.getElementsByTagName('V-MENU-CHOOSER')[0];
+            templateHTML = template ? template.innerHTML : null;
+            if (templateHTML !== '') {
+                instruction.menuTemplates.chooser = templateHTML;
+            }
+            template = element.getElementsByTagName('V-MENU-CHOOSER-OPTIONS')[0];
+            templateHTML = template ? template.innerHTML : null;
+            if (templateHTML !== '') {
+                instruction.menuTemplates.chooserOptions = templateHTML;
+            }
+            template = element.getElementsByTagName('V-MENU-SORT')[0];
+            templateHTML = template ? template.innerHTML : null;
+            if (templateHTML !== '') {
+                instruction.menuTemplates.sort = templateHTML;
+            }
+            template = element.getElementsByTagName('V-MENU-FILTER')[0];
+            templateHTML = template ? template.innerHTML : null;
+            if (templateHTML !== '') {
+                instruction.menuTemplates.filter = templateHTML;
+            }
+            template = element.getElementsByTagName('V-MENU-FILTER-OPTIONS')[0];
+            templateHTML = template ? template.innerHTML : null;
+            if (templateHTML !== '') {
+                instruction.menuTemplates.filterOptions = templateHTML;
+            }
+            template = element.getElementsByTagName('V-MENU-ALL')[0];
+            templateHTML = template ? template.innerHTML : null;
+            if (templateHTML !== '') {
+                instruction.menuTemplates.all = templateHTML;
+            }
+            element.innerHTML = '';
+        }),
+        aurelia_framework_1.inject(Element, v_grid_1.VGrid, aurelia_framework_1.TargetInstruction),
+        __metadata("design:paramtypes", [Element, v_grid_1.VGrid, Object])
+    ], VGridContextmenu);
     return VGridContextmenu;
 }());
-VGridContextmenu = __decorate([
-    aurelia_framework_1.noView(),
-    aurelia_framework_1.customElement('v-grid-contextmenu'),
-    aurelia_framework_1.processContent(function (compiler, resources, element, instruction) {
-        compiler = null;
-        resources = null;
-        instruction.menuTemplates = {};
-        var template;
-        var templateHTML;
-        template = element.getElementsByTagName('V-MENU-CLOSE')[0];
-        templateHTML = template ? template.innerHTML : null;
-        if (templateHTML !== '') {
-            instruction.menuTemplates.close = templateHTML;
-        }
-        template = element.getElementsByTagName('V-MENU-PINNED')[0];
-        templateHTML = template ? template.innerHTML : null;
-        if (templateHTML !== '') {
-            instruction.menuTemplates.pinned = templateHTML;
-        }
-        template = element.getElementsByTagName('V-MENU-GROUPBY')[0];
-        templateHTML = template ? template.innerHTML : null;
-        if (templateHTML !== '') {
-            instruction.menuTemplates.groupby = templateHTML;
-        }
-        template = element.getElementsByTagName('V-MENU-HIDE')[0];
-        templateHTML = template ? template.innerHTML : null;
-        if (templateHTML !== '') {
-            instruction.menuTemplates.hide = templateHTML;
-        }
-        template = element.getElementsByTagName('V-MENU-COPYPASTE')[0];
-        templateHTML = template ? template.innerHTML : null;
-        if (templateHTML !== '') {
-            instruction.menuTemplates.copypaste = templateHTML;
-        }
-        template = element.getElementsByTagName('V-MENU-CHOOSER')[0];
-        templateHTML = template ? template.innerHTML : null;
-        if (templateHTML !== '') {
-            instruction.menuTemplates.chooser = templateHTML;
-        }
-        template = element.getElementsByTagName('V-MENU-CHOOSER-OPTIONS')[0];
-        templateHTML = template ? template.innerHTML : null;
-        if (templateHTML !== '') {
-            instruction.menuTemplates.chooserOptions = templateHTML;
-        }
-        template = element.getElementsByTagName('V-MENU-SORT')[0];
-        templateHTML = template ? template.innerHTML : null;
-        if (templateHTML !== '') {
-            instruction.menuTemplates.sort = templateHTML;
-        }
-        template = element.getElementsByTagName('V-MENU-FILTER')[0];
-        templateHTML = template ? template.innerHTML : null;
-        if (templateHTML !== '') {
-            instruction.menuTemplates.filter = templateHTML;
-        }
-        template = element.getElementsByTagName('V-MENU-FILTER-OPTIONS')[0];
-        templateHTML = template ? template.innerHTML : null;
-        if (templateHTML !== '') {
-            instruction.menuTemplates.filterOptions = templateHTML;
-        }
-        template = element.getElementsByTagName('V-MENU-ALL')[0];
-        templateHTML = template ? template.innerHTML : null;
-        if (templateHTML !== '') {
-            instruction.menuTemplates.all = templateHTML;
-        }
-        element.innerHTML = '';
-    }),
-    aurelia_framework_1.inject(Element, v_grid_1.VGrid, aurelia_framework_1.TargetInstruction),
-    __metadata("design:paramtypes", [Element, v_grid_1.VGrid, Object])
-], VGridContextmenu);
 exports.VGridContextmenu = VGridContextmenu;
 
 });
@@ -18957,20 +19034,20 @@ var VGridFooter = (function () {
     VGridFooter.prototype.bind = function () {
         this.vGrid.footerTemplate = this.template;
     };
+    VGridFooter = __decorate([
+        aurelia_framework_1.noView(),
+        aurelia_framework_1.customElement('v-grid-footer'),
+        aurelia_framework_1.processContent(function (compiler, resources, element, instruction) {
+            compiler = compiler;
+            resources = resources;
+            instruction.template = element.innerHTML;
+            element.innerHTML = '';
+        }),
+        aurelia_framework_1.inject(Element, v_grid_1.VGrid, aurelia_framework_1.TargetInstruction),
+        __metadata("design:paramtypes", [Element, v_grid_1.VGrid, Object])
+    ], VGridFooter);
     return VGridFooter;
 }());
-VGridFooter = __decorate([
-    aurelia_framework_1.noView(),
-    aurelia_framework_1.customElement('v-grid-footer'),
-    aurelia_framework_1.processContent(function (compiler, resources, element, instruction) {
-        compiler = null;
-        resources = null;
-        instruction.template = element.innerHTML;
-        element.innerHTML = '';
-    }),
-    aurelia_framework_1.inject(Element, v_grid_1.VGrid, aurelia_framework_1.TargetInstruction),
-    __metadata("design:paramtypes", [Element, v_grid_1.VGrid, Object])
-], VGridFooter);
 exports.VGridFooter = VGridFooter;
 
 });
@@ -18997,20 +19074,20 @@ var VGridGroupElement = (function () {
     VGridGroupElement.prototype.bind = function () {
         this.vGrid.colGroupElement = this.rowTemplate;
     };
+    VGridGroupElement = __decorate([
+        aurelia_framework_1.noView(),
+        aurelia_framework_1.customElement('v-grid-group-element'),
+        aurelia_framework_1.processContent(function (compiler, resources, element, instruction) {
+            compiler = compiler;
+            resources = resources;
+            instruction.rowTemplate = element.innerHTML;
+            element.innerHTML = '';
+        }),
+        aurelia_framework_1.inject(Element, v_grid_1.VGrid, aurelia_framework_1.TargetInstruction),
+        __metadata("design:paramtypes", [Element, v_grid_1.VGrid, Object])
+    ], VGridGroupElement);
     return VGridGroupElement;
 }());
-VGridGroupElement = __decorate([
-    aurelia_framework_1.noView(),
-    aurelia_framework_1.customElement('v-grid-group-element'),
-    aurelia_framework_1.processContent(function (compiler, resources, element, instruction) {
-        compiler = null;
-        resources = null;
-        instruction.rowTemplate = element.innerHTML;
-        element.innerHTML = '';
-    }),
-    aurelia_framework_1.inject(Element, v_grid_1.VGrid, aurelia_framework_1.TargetInstruction),
-    __metadata("design:paramtypes", [Element, v_grid_1.VGrid, Object])
-], VGridGroupElement);
 exports.VGridGroupElement = VGridGroupElement;
 
 });
@@ -19037,20 +19114,20 @@ var VGridGroupRow = (function () {
     VGridGroupRow.prototype.bind = function () {
         this.vGrid.colGroupRow = this.rowTemplate;
     };
+    VGridGroupRow = __decorate([
+        aurelia_framework_1.noView(),
+        aurelia_framework_1.customElement('v-grid-group-row'),
+        aurelia_framework_1.processContent(function (compiler, resources, element, instruction) {
+            compiler = compiler;
+            resources = resources;
+            instruction.rowTemplate = element.innerHTML;
+            element.innerHTML = '';
+        }),
+        aurelia_framework_1.inject(Element, v_grid_1.VGrid, aurelia_framework_1.TargetInstruction),
+        __metadata("design:paramtypes", [Element, v_grid_1.VGrid, Object])
+    ], VGridGroupRow);
     return VGridGroupRow;
 }());
-VGridGroupRow = __decorate([
-    aurelia_framework_1.noView(),
-    aurelia_framework_1.customElement('v-grid-group-row'),
-    aurelia_framework_1.processContent(function (compiler, resources, element, instruction) {
-        compiler = null;
-        resources = null;
-        instruction.rowTemplate = element.innerHTML;
-        element.innerHTML = '';
-    }),
-    aurelia_framework_1.inject(Element, v_grid_1.VGrid, aurelia_framework_1.TargetInstruction),
-    __metadata("design:paramtypes", [Element, v_grid_1.VGrid, Object])
-], VGridGroupRow);
 exports.VGridGroupRow = VGridGroupRow;
 
 });
@@ -19077,20 +19154,20 @@ var VGridLoadingScreen = (function () {
     VGridLoadingScreen.prototype.bind = function () {
         this.vGrid.loadingScreenTemplate = this.template;
     };
+    VGridLoadingScreen = __decorate([
+        aurelia_framework_1.noView(),
+        aurelia_framework_1.customElement('v-grid-loadingscreen'),
+        aurelia_framework_1.processContent(function (compiler, resources, element, instruction) {
+            compiler = compiler;
+            resources = resources;
+            instruction.template = element.innerHTML;
+            element.innerHTML = '';
+        }),
+        aurelia_framework_1.inject(Element, v_grid_1.VGrid, aurelia_framework_1.TargetInstruction),
+        __metadata("design:paramtypes", [Element, v_grid_1.VGrid, Object])
+    ], VGridLoadingScreen);
     return VGridLoadingScreen;
 }());
-VGridLoadingScreen = __decorate([
-    aurelia_framework_1.noView(),
-    aurelia_framework_1.customElement('v-grid-loadingscreen'),
-    aurelia_framework_1.processContent(function (compiler, resources, element, instruction) {
-        compiler = null;
-        resources = null;
-        instruction.template = element.innerHTML;
-        element.innerHTML = '';
-    }),
-    aurelia_framework_1.inject(Element, v_grid_1.VGrid, aurelia_framework_1.TargetInstruction),
-    __metadata("design:paramtypes", [Element, v_grid_1.VGrid, Object])
-], VGridLoadingScreen);
 exports.VGridLoadingScreen = VGridLoadingScreen;
 
 });
@@ -19120,32 +19197,32 @@ var VGridElementRowRepeat = (function () {
         this.vGrid.colRepeatRowTemplate = this.rowTemplate;
         this.vGrid.colRepeatRowHeaderTemplate = this.headerTemplate;
     };
+    VGridElementRowRepeat = __decorate([
+        aurelia_framework_1.noView(),
+        aurelia_framework_1.customElement('v-grid-row-repeat'),
+        aurelia_framework_1.processContent(function (compiler, resources, element, instruction) {
+            compiler = compiler;
+            resources = resources;
+            var headerTemplateElement = element.getElementsByTagName('V-HEADER-TEMPLATE')[0];
+            var headerTemplateHtml = headerTemplateElement ? headerTemplateElement.innerHTML : null;
+            if (headerTemplateHtml !== '') {
+                instruction.headerTemplate = headerTemplateHtml;
+            }
+            var rowTemplateElement = element.getElementsByTagName('V-ROW-TEMPLATE')[0];
+            var rowTemplateHtml = rowTemplateElement ? rowTemplateElement.innerHTML : null;
+            if (rowTemplateHtml !== '') {
+                instruction.rowTemplate = rowTemplateHtml;
+            }
+            if (!rowTemplateHtml) {
+                instruction.rowTemplate = element.innerHTML;
+            }
+            element.innerHTML = '';
+        }),
+        aurelia_framework_1.inject(Element, v_grid_1.VGrid, aurelia_framework_1.TargetInstruction),
+        __metadata("design:paramtypes", [Element, v_grid_1.VGrid, Object])
+    ], VGridElementRowRepeat);
     return VGridElementRowRepeat;
 }());
-VGridElementRowRepeat = __decorate([
-    aurelia_framework_1.noView(),
-    aurelia_framework_1.customElement('v-grid-row-repeat'),
-    aurelia_framework_1.processContent(function (compiler, resources, element, instruction) {
-        compiler = null;
-        resources = null;
-        var headerTemplateElement = element.getElementsByTagName('V-HEADER-TEMPLATE')[0];
-        var headerTemplateHtml = headerTemplateElement ? headerTemplateElement.innerHTML : null;
-        if (headerTemplateHtml !== '') {
-            instruction.headerTemplate = headerTemplateHtml;
-        }
-        var rowTemplateElement = element.getElementsByTagName('V-ROW-TEMPLATE')[0];
-        var rowTemplateHtml = rowTemplateElement ? rowTemplateElement.innerHTML : null;
-        if (rowTemplateHtml !== '') {
-            instruction.rowTemplate = rowTemplateHtml;
-        }
-        if (!rowTemplateHtml) {
-            instruction.rowTemplate = element.innerHTML;
-        }
-        element.innerHTML = '';
-    }),
-    aurelia_framework_1.inject(Element, v_grid_1.VGrid, aurelia_framework_1.TargetInstruction),
-    __metadata("design:paramtypes", [Element, v_grid_1.VGrid, Object])
-], VGridElementRowRepeat);
 exports.VGridElementRowRepeat = VGridElementRowRepeat;
 
 });
@@ -19274,11 +19351,14 @@ var VGrid = (function () {
                 }
                 _this.controller.getContext();
                 _this.controller.createGrid();
+                _this.viewSlots.bindAndAttachColumns(_this.overrideContext, _this.columnBindingContext, _this.attGridConnector.getSelection());
+                setTimeout(function () {
+                    _this.controller.udateHorizontalScroller();
+                }, 50);
             }
-            _this.viewSlots.bindAndAttachColumns(_this.overrideContext, _this.columnBindingContext, _this.attGridConnector.getSelection());
-            setTimeout(function () {
-                _this.controller.udateHorizontalScroller();
-            }, 50);
+            else {
+                _this.controller.setColumnConfig(_this.controller.getColumnConfig());
+            }
             _this.attGridConnector.gridCreated();
         });
     };
@@ -19301,61 +19381,61 @@ var VGrid = (function () {
         }
         return value;
     };
+    VGrid.inject = [Element, aurelia_framework_1.ViewCompiler, aurelia_framework_1.Container, aurelia_framework_1.ViewResources, aurelia_framework_1.TaskQueue];
+    __decorate([
+        aurelia_framework_1.bindable({ attribute: 'v-row-height' }),
+        __metadata("design:type", Number)
+    ], VGrid.prototype, "attRowHeight", void 0);
+    __decorate([
+        aurelia_framework_1.bindable({ attribute: 'v-header-height' }),
+        __metadata("design:type", Number)
+    ], VGrid.prototype, "attHeaderHeight", void 0);
+    __decorate([
+        aurelia_framework_1.bindable({ attribute: 'v-footer-height' }),
+        __metadata("design:type", Number)
+    ], VGrid.prototype, "attFooterHeight", void 0);
+    __decorate([
+        aurelia_framework_1.bindable({ attribute: 'v-panel-height' }),
+        __metadata("design:type", Number)
+    ], VGrid.prototype, "attPanelHeight", void 0);
+    __decorate([
+        aurelia_framework_1.bindable({ attribute: 'v-grid-connector' }),
+        __metadata("design:type", Object)
+    ], VGrid.prototype, "attGridConnector", void 0);
+    __decorate([
+        aurelia_framework_1.bindable({ attribute: 'v-multi-select' }),
+        __metadata("design:type", Boolean)
+    ], VGrid.prototype, "attMultiSelect", void 0);
+    __decorate([
+        aurelia_framework_1.bindable({ attribute: 'v-manual-sel' }),
+        __metadata("design:type", Boolean)
+    ], VGrid.prototype, "attManualSelection", void 0);
+    __decorate([
+        aurelia_framework_1.bindable({ attribute: 'v-theme' }),
+        __metadata("design:type", String)
+    ], VGrid.prototype, "attTheme", void 0);
+    __decorate([
+        aurelia_framework_1.bindable({ attribute: 'v-row-on-draw' }),
+        __metadata("design:type", Function)
+    ], VGrid.prototype, "attOnRowDraw", void 0);
+    __decorate([
+        aurelia_framework_1.bindable({ attribute: 'v-columns' }),
+        __metadata("design:type", Array)
+    ], VGrid.prototype, "attColConfig", void 0);
+    __decorate([
+        aurelia_framework_1.bindable({ attribute: 'v-i18n' }),
+        __metadata("design:type", Function)
+    ], VGrid.prototype, "attI18N", void 0);
+    __decorate([
+        aurelia_framework_1.bindable({ attribute: 'v-data-delay' }),
+        __metadata("design:type", Number)
+    ], VGrid.prototype, "attDataDelay", void 0);
+    __decorate([
+        aurelia_framework_1.bindable({ attribute: 'v-variable-row-height' }),
+        __metadata("design:type", Boolean)
+    ], VGrid.prototype, "attVariableRowHeight", void 0);
     return VGrid;
 }());
-VGrid.inject = [Element, aurelia_framework_1.ViewCompiler, aurelia_framework_1.Container, aurelia_framework_1.ViewResources, aurelia_framework_1.TaskQueue];
-__decorate([
-    aurelia_framework_1.bindable({ attribute: 'v-row-height' }),
-    __metadata("design:type", Number)
-], VGrid.prototype, "attRowHeight", void 0);
-__decorate([
-    aurelia_framework_1.bindable({ attribute: 'v-header-height' }),
-    __metadata("design:type", Number)
-], VGrid.prototype, "attHeaderHeight", void 0);
-__decorate([
-    aurelia_framework_1.bindable({ attribute: 'v-footer-height' }),
-    __metadata("design:type", Number)
-], VGrid.prototype, "attFooterHeight", void 0);
-__decorate([
-    aurelia_framework_1.bindable({ attribute: 'v-panel-height' }),
-    __metadata("design:type", Number)
-], VGrid.prototype, "attPanelHeight", void 0);
-__decorate([
-    aurelia_framework_1.bindable({ attribute: 'v-grid-connector' }),
-    __metadata("design:type", Object)
-], VGrid.prototype, "attGridConnector", void 0);
-__decorate([
-    aurelia_framework_1.bindable({ attribute: 'v-multi-select' }),
-    __metadata("design:type", Boolean)
-], VGrid.prototype, "attMultiSelect", void 0);
-__decorate([
-    aurelia_framework_1.bindable({ attribute: 'v-manual-sel' }),
-    __metadata("design:type", Boolean)
-], VGrid.prototype, "attManualSelection", void 0);
-__decorate([
-    aurelia_framework_1.bindable({ attribute: 'v-theme' }),
-    __metadata("design:type", String)
-], VGrid.prototype, "attTheme", void 0);
-__decorate([
-    aurelia_framework_1.bindable({ attribute: 'v-row-on-draw' }),
-    __metadata("design:type", Function)
-], VGrid.prototype, "attOnRowDraw", void 0);
-__decorate([
-    aurelia_framework_1.bindable({ attribute: 'v-columns' }),
-    __metadata("design:type", Array)
-], VGrid.prototype, "attColConfig", void 0);
-__decorate([
-    aurelia_framework_1.bindable({ attribute: 'v-i18n' }),
-    __metadata("design:type", Function)
-], VGrid.prototype, "attI18N", void 0);
-__decorate([
-    aurelia_framework_1.bindable({ attribute: 'v-data-delay' }),
-    __metadata("design:type", Number)
-], VGrid.prototype, "attDataDelay", void 0);
-__decorate([
-    aurelia_framework_1.bindable({ attribute: 'v-variable-row-height' }),
-    __metadata("design:type", Boolean)
-], VGrid.prototype, "attVariableRowHeight", void 0);
 exports.VGrid = VGrid;
 
 });
@@ -19467,7 +19547,7 @@ var GridConnector = (function () {
         this.controller = null;
         this.datasource = datasource;
         this.selection = selection || datasource.getSelection();
-        this.errorhandler = errorHandler || null;
+        this.errorhandler = errorHandler || this.errorhandler;
     }
     GridConnector.prototype.setInitTop = function (top) {
         this.initTop = top;
@@ -20819,7 +20899,8 @@ var Controller = (function () {
         if (this.attI18N) {
             keys.forEach(function (key) {
                 if (_this.vGrid.filterOperatorTranslationKeys[key]) {
-                    _this.vGrid.filterOperatorNames[_this.vGrid.filterOperatorTranslationKeys[key]] = _this.attI18N(key);
+                    _this.vGrid.filterOperatorNames[_this.vGrid.filterOperatorTranslationKeys[key]] =
+                        _this.attI18N(key) || _this.vGrid.filterOperatorNames[_this.vGrid.filterOperatorTranslationKeys[key]];
                 }
                 _this.contextMenu.updateMenuStrings(key, _this.attI18N(key));
             });
@@ -21137,7 +21218,7 @@ exports.MainMarkup = MainMarkup;
 ___scope___.file("grid/mainMarkupHtmlString.js", function(exports, require, module, __filename, __dirname){
 
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.MainMarkupHtmlString = "\n        <avg-top-panel v-drag-drop-col class=\"avg-top-panel\" css=\"height:$au{avgPanel_Height}px\">\n\n        </avg-top-panel>\n\n        <avg-header class=\"avg-header\" css=\"height:$au{avgHeader_Height}px;top:$au{avgHeader_Top}px\">\n\n          <avg-header-left class=\"avg-header-left\" css=\"width:$au{avgHeaderLeft_Width}px\">\n           </avg-header-left>  \n\n           <avg-header-main class=\"avg-header-main\" css=\"left:$au{avgHeaderMain_Left}px;right:$au{avgHeaderMain_Right}px\">\n             <avg-header-main-scroll css=\"width:$au{avgHeaderMainScroll_Width}px;height:$au{avgHeaderMainScroll_Height}px\"> \n             </avg-header-main-scroll> \n           </avg-header-main> \n\n           <avg-header-right class=\"avg-header-right\" css=\"right:$au{avgHeaderRight_Right}px;width:$au{avgHeaderRight_Width}px\">\n           </avg-header-right> \n\n        </avg-header>\n\n        <avg-content class=\"avg-content\" css=\"top:$au{avgContent_Top}px;bottom:$au{avgContent_Bottom}px\">\n           \n            <avg-content-left  class=\"avg-content-left\" css=\"width:$au{avgContentLeft_Width}px\">\n              <avg-content-left-scroll css=\"width:$au{avgContentLeftScroll_Width};height:$au{avgContentLeftScroll_Height}px\">  \n              </avg-content-left-scroll> \n            </avg-content-left>  \n\n            <avg-content-main  class=\"avg-content-main\" css=\"left:$au{avgContentMain_Left}px;right:$au{avgContentMain_Right}px\">\n              <avg-content-main-scroll css=\"min-width: 100%;width:$au{avgContentMainScroll_Width}px;height:$au{avgContentMainScroll_Height}px\"> \n              </avg-content-main-scroll> \n            </avg-content-main> \n\n            <avg-content-right  class=\"avg-content-right\" css=\"right:$au{avgContentRight_Right}px;width:$au{avgContentRight_Width}px\">\n              <avg-content-right-scroll css=\"width:$au{avgContentRightScroll_Width};height:$au{avgContentRightScroll_Height}px\">  \n              </avg-content-right-scroll> \n            </avg-content-right>  \n            \n        </avg-content>\n\n       <avg-footer class=\"avg-footer\" css=\"height:$au{avgFooter_Height}px\">\n       </avg-footer> \n\n       <avg-content-group css=\"left:0;right:0;top:$au{avgContentGroup_Top}px;bottom:$au{avgContentGroup_Bottom}px\">\n          <avg-content-group-scroll css=\"left:0;right:0;height:$au{avgContentGroup_Height}px\">  \n          </avg-content-group-scroll> \n        </avg-content-group> \n\n        <avg-content-vhandle css=\"right:0;bottom:$au{avgContentVhandle_Bottom}px;right:$au{avgContentVhandle_Right}px;left:$au{avgContentVhandle_Left}px;top:$au{avgContentVhandle_Top}px\">\n          <avg-content-vhandle-scroll css=\"width:5px;height:$au{avgContentVhandleScroll_Height}px\"> \n          </avg-content-vhandle-scroll> \n        </avg-content-vhandle> \n\n        <avg-content-hhandle css=\"bottom:$au{avgContentHhandle_Bottom}px;right:$au{avgContentHhandle_Right}px;left:$au{avgContentHhandle_Left}px;height:$au{avgContentHhandle_Height}px\">\n          <avg-content-hhandle-scroll css=\"height:7px;width:$au{avgContentHhandleScroll_Width}px\"> \n          </avg-content-hhandle-scroll> \n        </avg-content-hhandle> \n\n        ".replace(/\$(au{)/g, '${');
+exports.MainMarkupHtmlString = "\n        <avg-top-panel v-drag-drop-col class=\"avg-top-panel\" css=\"height:$au{avgPanel_Height}px\">\n\n        </avg-top-panel>\n\n        <avg-header class=\"avg-header\" css=\"height:$au{avgHeader_Height}px;top:$au{avgHeader_Top}px\">\n\n          <avg-header-left class=\"avg-header-left\" css=\"width:$au{avgHeaderLeft_Width}px\">\n           </avg-header-left>\n\n           <avg-header-main class=\"avg-header-main\" css=\"left:$au{avgHeaderMain_Left}px;right:$au{avgHeaderMain_Right}px\">\n             <avg-header-main-scroll css=\"width:$au{avgHeaderMainScroll_Width}px;height:$au{avgHeaderMainScroll_Height}px\">\n             </avg-header-main-scroll>\n           </avg-header-main>\n\n           <avg-header-right class=\"avg-header-right\" css=\"right:$au{avgHeaderRight_Right}px;width:$au{avgHeaderRight_Width}px\">\n           </avg-header-right>\n\n        </avg-header>\n\n        <avg-content class=\"avg-content\" css=\"top:$au{avgContent_Top}px;bottom:$au{avgContent_Bottom}px\">\n\n            <avg-content-left  class=\"avg-content-left\" css=\"width:$au{avgContentLeft_Width}px\">\n              <avg-content-left-scroll css=\"width:$au{avgContentLeftScroll_Width};height:$au{avgContentLeftScroll_Height}px\">\n              </avg-content-left-scroll>\n            </avg-content-left>\n\n            <avg-content-main  class=\"avg-content-main\" css=\"left:$au{avgContentMain_Left}px;right:$au{avgContentMain_Right}px\">\n              <avg-content-main-scroll css=\"min-width: 100%;width:$au{avgContentMainScroll_Width}px;height:$au{avgContentMainScroll_Height}px\">\n              </avg-content-main-scroll>\n            </avg-content-main>\n\n            <avg-content-right  class=\"avg-content-right\" css=\"right:$au{avgContentRight_Right}px;width:$au{avgContentRight_Width}px\">\n              <avg-content-right-scroll css=\"width:$au{avgContentRightScroll_Width};height:$au{avgContentRightScroll_Height}px\">\n              </avg-content-right-scroll>\n            </avg-content-right>\n\n        </avg-content>\n\n       <avg-footer class=\"avg-footer\" css=\"height:$au{avgFooter_Height}px\">\n       </avg-footer>\n\n       <avg-content-group css=\"left:0;right:0;top:$au{avgContentGroup_Top}px;bottom:$au{avgContentGroup_Bottom}px\">\n          <avg-content-group-scroll css=\"left:0;right:0;height:$au{avgContentGroup_Height}px\">\n          </avg-content-group-scroll>\n        </avg-content-group>\n\n        <avg-content-vhandle css=\"right:0;bottom:$au{avgContentVhandle_Bottom}px;right:$au{avgContentVhandle_Right}px;left:$au{avgContentVhandle_Left}px;top:$au{avgContentVhandle_Top}px\">\n          <avg-content-vhandle-scroll css=\"width:5px;height:$au{avgContentVhandleScroll_Height}px\">\n          </avg-content-vhandle-scroll>\n        </avg-content-vhandle>\n\n        <avg-content-hhandle css=\"bottom:$au{avgContentHhandle_Bottom}px;right:$au{avgContentHhandle_Right}px;left:$au{avgContentHhandle_Left}px;height:$au{avgContentHhandle_Height}px\">\n          <avg-content-hhandle-scroll css=\"height:7px;width:$au{avgContentHhandleScroll_Width}px\">\n          </avg-content-hhandle-scroll>\n        </avg-content-hhandle>\n\n        ".replace(/\$(au{)/g, '${');
 
 });
 ___scope___.file("grid/mainScrollEvents.js", function(exports, require, module, __filename, __dirname){
@@ -21368,8 +21449,8 @@ var RowMarkup = (function () {
         var markupGroup = '';
         for (var i = 0; i < 40; i++) {
             var translateY = this.rowHeight * i;
-            var avgRowMarkup = "\n        <avg-row \n          class=\"avg-row\" \n          style=\"height:" + this.rowHeight + "px; \n            transform:translate3d(0px, " + translateY + "px, 0px);\n            z-index:5;\" \n          row=\"" + i + "\">\n        </avg-row>";
-            var avgRowMarkupGroup = "\n        <avg-row \n          class=\"avg-row-helper\" \n          style=\"height:" + this.rowHeight + "px; \n            transform:translate3d(0px, " + translateY + "px, 0px);\n            z-index:5;\" \n          row=\"" + i + "\">\n        </avg-row>";
+            var avgRowMarkup = "\n        <avg-row\n          class=\"avg-row\"\n          style=\"height:" + this.rowHeight + "px;\n            transform:translate3d(0px, " + translateY + "px, 0px);\n            z-index:5;\"\n          row=\"" + i + "\">\n        </avg-row>";
+            var avgRowMarkupGroup = "\n        <avg-row\n          class=\"avg-row-helper\"\n          style=\"height:" + this.rowHeight + "px;\n            transform:translate3d(0px, " + translateY + "px, 0px);\n            z-index:5;\"\n          row=\"" + i + "\">\n        </avg-row>";
             markupLeft = markupLeft + avgRowMarkup;
             markupMain = markupMain + avgRowMarkup;
             markupRight = markupRight + avgRowMarkup;
@@ -21668,8 +21749,9 @@ var RowScrollEvents = (function () {
         };
         var setBefore = function (no) {
             var row = _this.rowCache[no];
-            _this.setRowHeight(row, currentRow);
-            firstRowTop = firstRowTop - rowHeightState.rows[currentRow];
+            firstRow--;
+            firstRowTop = firstRowTop - rowHeightState.rows[firstRow];
+            _this.setRowHeight(row, rowHeightState.top[firstRow]);
             _this.setRowTopValueVariableRowHeight(row, firstRowTop);
         };
         var setHiddenFromView = function (no) {
@@ -21813,7 +21895,7 @@ var ColumnMarkup = (function () {
                         default:
                     }
                     var template = this.colConfig[i].__colRowTemplateGenerated;
-                    var colMarkup = "<avg-col                               class=\"avg-col\"                               if.bind=\"setup" + type + "[" + i + "].show && rowRef.__group !== true\" " + style + ">" + template + "                          </avg-col>";
+                    var colMarkup = "<avg-col                               class=\"avg-col\"                               data-avg-type=\"" + type + "\"                               data-avg-config-col=\"" + i + "\"                               if.bind=\"setup" + type + "[" + i + "].show && rowRef.__group !== true\" " + style + ">" + template + "                          </avg-col>";
                     viewMarkup = viewMarkup + colMarkup;
                 }
             }
@@ -21904,10 +21986,10 @@ var ColumnMarkup = (function () {
         var viewFactoryRight = this.getRowViews('right');
         var viewFactoryGroup = this.getRowViews('group');
         for (var i = 0; i < this.rowLength; i++) {
-            this.viewSlots.leftRowViewSlots[i] = this.createViewSlot(this.leftRows[i], viewFactoryLeft);
-            this.viewSlots.mainRowViewSlots[i] = this.createViewSlot(this.mainRows[i], viewFactoryMain);
-            this.viewSlots.rightRowViewSlots[i] = this.createViewSlot(this.rightRows[i], viewFactoryRight);
-            this.viewSlots.groupRowViewSlots[i] = this.createViewSlot(this.groupRows[i], viewFactoryGroup);
+            this.viewSlots.leftRowViewSlots[i] = this.createViewSlot(this.htmlCache.rowCache[i].left, viewFactoryLeft);
+            this.viewSlots.mainRowViewSlots[i] = this.createViewSlot(this.htmlCache.rowCache[i].main, viewFactoryMain);
+            this.viewSlots.rightRowViewSlots[i] = this.createViewSlot(this.htmlCache.rowCache[i].right, viewFactoryRight);
+            this.viewSlots.groupRowViewSlots[i] = this.createViewSlot(this.htmlCache.rowCache[i].group, viewFactoryGroup);
             this.htmlCache.rowCache[i].leftRowViewSlot = this.viewSlots.leftRowViewSlots[i];
             this.htmlCache.rowCache[i].mainRowViewSlot = this.viewSlots.mainRowViewSlots[i];
             this.htmlCache.rowCache[i].rightRowViewSlot = this.viewSlots.rightRowViewSlots[i];
@@ -21992,7 +22074,7 @@ var ColumnMarkupHelper = (function () {
             switch (col.colType) {
                 case 'selection':
                     labelHeader = '';
-                    inputHeader = "<input \n            class=\"avg-row-checkbox-100\" \n            v-selection=\"type:header;selected.bind:selected\" \n            type=\"checkbox\">";
+                    inputHeader = "<input\n            class=\"avg-row-checkbox-100\"\n            v-selection=\"type:header;selected.bind:selected\"\n            type=\"checkbox\">";
                     break;
                 case 'image':
                     inputHeader = '<p class="avg-label-top"></p>';
@@ -22018,7 +22100,7 @@ var ColumnMarkupHelper = (function () {
         if (!col.colRowTemplate) {
             switch (col.colType) {
                 case 'selection':
-                    col.colRowTemplate = "<input \n            v-key-move \n            class=\"avg-row-checkbox-100\"  \n            v-selection=\"type:row;selected.bind:selected\" \n            type=\"checkbox\" >";
+                    col.colRowTemplate = "<input\n            v-key-move\n            class=\"avg-row-checkbox-100\"\n            v-selection=\"type:row;selected.bind:selected\"\n            type=\"checkbox\" >";
                     break;
                 case 'image':
                     this.createImageRowMarkup(col);
@@ -22054,7 +22136,6 @@ var ColumnMarkupHelper = (function () {
         }
         return returnValue;
     };
-    ;
     ColumnMarkupHelper.prototype.checkAttribute = function (attribute) {
         var value = attribute;
         if (attribute) {
@@ -22078,14 +22159,14 @@ var ColumnMarkupHelper = (function () {
         var colRowMenu = col.colRowMenu ? "v-menu=\"" + col.colRowMenu + "\"" : '';
         var colCss = col.colCss ? "css=\"" + col.colCss + "\"" : '';
         if (col.colType === 'checkbox') {
-            col.__colRowTemplateGenerated = "<input \n        " + colCss + " \n        " + colClass + " \n        " + colType + " \n        " + colAddRowAttributes + " \n        " + colRowMenu + "  \n        checked.bind=\"" + col.colField + "\">";
+            col.__colRowTemplateGenerated = "<input\n        " + colCss + "\n        " + colClass + "\n        " + colType + "\n        " + colAddRowAttributes + "\n        " + colRowMenu + "\n        checked.bind=\"" + col.colField + "\">";
         }
         else {
             var binding = "value.bind=\"" + col.colField + "\"";
             if (col.colDisplayEdit) {
                 binding = "v-data-handler=\"value.bind:" + col.colField + ";" + col.colDisplayEdit + "\"";
             }
-            col.__colRowTemplateGenerated = "<input \n        " + colCss + " \n        " + colClass + " \n        " + colType + " \n        " + colRowMenu + "\n        " + colAddRowAttributes + "  \n        " + binding + ">";
+            col.__colRowTemplateGenerated = "<input\n        " + colCss + "\n        " + colClass + "\n        " + colType + "\n        " + colRowMenu + "\n        " + colAddRowAttributes + "\n        " + binding + ">";
         }
     };
     ColumnMarkupHelper.prototype.createInputHeaderMarkup = function (col) {
@@ -22119,7 +22200,7 @@ var ColumnMarkupHelper = (function () {
         var colDragDrop = col.colDragDrop !== 'false' ? "v-drag-drop-col=\"" + col.colDragDrop + "\"" : '';
         var colResizeable = col.colResizeable !== 'false' ? "v-resize-col" : '';
         var extraAttributes = colDragDrop + " " + colResizeable + " " + colLabelMenu;
-        return "<p \n      " + extraAttributes + " \n      " + classname + " \n      " + sort + " \n      " + colAddLabelAttributes + ">\n      " + col.colHeaderName + "\n      </p>";
+        return "<p\n      " + extraAttributes + "\n      " + classname + "\n      " + sort + "\n      " + colAddLabelAttributes + ">\n      " + col.colHeaderName + "\n      </p>";
     };
     return ColumnMarkupHelper;
 }());
@@ -23001,7 +23082,7 @@ var GroupingElements = (function () {
             this.lastAdded = field;
             this.groupContext[field] = new GroupContext(name, field, this);
             var viewMarkup = this.colGroupElement ||
-                "<div class=\"avg-grouping\">  \n          <p class=\"avg-grouping-element\" v-sort=\"field.bind:field\">" + name + " \n            <i><svg click.delegate=\"remove()\" class=\"icon iconhidden\" xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 16 16\">\n              <path d=\"M3 4l4.3 4L3 12h1.4L8 8.7l3.5 3.3H13L8.6 8 13 4h-1.5L8 7.3 4.4 4H3z\"/>\n            </svg></i>\n          </p>\n         </div>";
+                "<div class=\"avg-grouping\">\n          <p class=\"avg-grouping-element\" v-sort=\"field.bind:field\">" + name + "\n            <i><svg click.delegate=\"remove()\" class=\"icon iconhidden\" xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 16 16\">\n              <path d=\"M3 4l4.3 4L3 12h1.4L8 8.7l3.5 3.3H13L8.6 8 13 4h-1.5L8 7.3 4.4 4H3z\"/>\n            </svg></i>\n          </p>\n         </div>";
             var viewFactory = this.viewCompiler.compile("<template>" + viewMarkup + "</template>", this.viewResources);
             var view = viewFactory.create(this.container);
             var viewSlot = new aurelia_framework_1.ViewSlot(this.avgTopPanel, true);
@@ -23232,7 +23313,7 @@ var ContextMenu = (function () {
     };
     ContextMenu.prototype.updateMenuStrings = function (key, text) {
         if (this.menuStrings[key]) {
-            this.menuStrings[key] = text;
+            this.menuStrings[key] = text || this.menuStrings[key];
         }
     };
     ContextMenu.prototype.closeMenuEvent = function () {
@@ -23416,11 +23497,14 @@ var VGrid = (function () {
                 }
                 _this.controller.getContext();
                 _this.controller.createGrid();
+                _this.viewSlots.bindAndAttachColumns(_this.overrideContext, _this.columnBindingContext, _this.attGridConnector.getSelection());
+                setTimeout(function () {
+                    _this.controller.udateHorizontalScroller();
+                }, 50);
             }
-            _this.viewSlots.bindAndAttachColumns(_this.overrideContext, _this.columnBindingContext, _this.attGridConnector.getSelection());
-            setTimeout(function () {
-                _this.controller.udateHorizontalScroller();
-            }, 50);
+            else {
+                _this.controller.setColumnConfig(_this.controller.getColumnConfig());
+            }
             _this.attGridConnector.gridCreated();
         });
     };
@@ -23443,61 +23527,61 @@ var VGrid = (function () {
         }
         return value;
     };
+    VGrid.inject = [Element, aurelia_framework_1.ViewCompiler, aurelia_framework_1.Container, aurelia_framework_1.ViewResources, aurelia_framework_1.TaskQueue];
+    __decorate([
+        aurelia_framework_1.bindable({ attribute: 'v-row-height' }),
+        __metadata("design:type", Number)
+    ], VGrid.prototype, "attRowHeight", void 0);
+    __decorate([
+        aurelia_framework_1.bindable({ attribute: 'v-header-height' }),
+        __metadata("design:type", Number)
+    ], VGrid.prototype, "attHeaderHeight", void 0);
+    __decorate([
+        aurelia_framework_1.bindable({ attribute: 'v-footer-height' }),
+        __metadata("design:type", Number)
+    ], VGrid.prototype, "attFooterHeight", void 0);
+    __decorate([
+        aurelia_framework_1.bindable({ attribute: 'v-panel-height' }),
+        __metadata("design:type", Number)
+    ], VGrid.prototype, "attPanelHeight", void 0);
+    __decorate([
+        aurelia_framework_1.bindable({ attribute: 'v-grid-connector' }),
+        __metadata("design:type", Object)
+    ], VGrid.prototype, "attGridConnector", void 0);
+    __decorate([
+        aurelia_framework_1.bindable({ attribute: 'v-multi-select' }),
+        __metadata("design:type", Boolean)
+    ], VGrid.prototype, "attMultiSelect", void 0);
+    __decorate([
+        aurelia_framework_1.bindable({ attribute: 'v-manual-sel' }),
+        __metadata("design:type", Boolean)
+    ], VGrid.prototype, "attManualSelection", void 0);
+    __decorate([
+        aurelia_framework_1.bindable({ attribute: 'v-theme' }),
+        __metadata("design:type", String)
+    ], VGrid.prototype, "attTheme", void 0);
+    __decorate([
+        aurelia_framework_1.bindable({ attribute: 'v-row-on-draw' }),
+        __metadata("design:type", Function)
+    ], VGrid.prototype, "attOnRowDraw", void 0);
+    __decorate([
+        aurelia_framework_1.bindable({ attribute: 'v-columns' }),
+        __metadata("design:type", Array)
+    ], VGrid.prototype, "attColConfig", void 0);
+    __decorate([
+        aurelia_framework_1.bindable({ attribute: 'v-i18n' }),
+        __metadata("design:type", Function)
+    ], VGrid.prototype, "attI18N", void 0);
+    __decorate([
+        aurelia_framework_1.bindable({ attribute: 'v-data-delay' }),
+        __metadata("design:type", Number)
+    ], VGrid.prototype, "attDataDelay", void 0);
+    __decorate([
+        aurelia_framework_1.bindable({ attribute: 'v-variable-row-height' }),
+        __metadata("design:type", Boolean)
+    ], VGrid.prototype, "attVariableRowHeight", void 0);
     return VGrid;
 }());
-VGrid.inject = [Element, aurelia_framework_1.ViewCompiler, aurelia_framework_1.Container, aurelia_framework_1.ViewResources, aurelia_framework_1.TaskQueue];
-__decorate([
-    aurelia_framework_1.bindable({ attribute: 'v-row-height' }),
-    __metadata("design:type", Number)
-], VGrid.prototype, "attRowHeight", void 0);
-__decorate([
-    aurelia_framework_1.bindable({ attribute: 'v-header-height' }),
-    __metadata("design:type", Number)
-], VGrid.prototype, "attHeaderHeight", void 0);
-__decorate([
-    aurelia_framework_1.bindable({ attribute: 'v-footer-height' }),
-    __metadata("design:type", Number)
-], VGrid.prototype, "attFooterHeight", void 0);
-__decorate([
-    aurelia_framework_1.bindable({ attribute: 'v-panel-height' }),
-    __metadata("design:type", Number)
-], VGrid.prototype, "attPanelHeight", void 0);
-__decorate([
-    aurelia_framework_1.bindable({ attribute: 'v-grid-connector' }),
-    __metadata("design:type", Object)
-], VGrid.prototype, "attGridConnector", void 0);
-__decorate([
-    aurelia_framework_1.bindable({ attribute: 'v-multi-select' }),
-    __metadata("design:type", Boolean)
-], VGrid.prototype, "attMultiSelect", void 0);
-__decorate([
-    aurelia_framework_1.bindable({ attribute: 'v-manual-sel' }),
-    __metadata("design:type", Boolean)
-], VGrid.prototype, "attManualSelection", void 0);
-__decorate([
-    aurelia_framework_1.bindable({ attribute: 'v-theme' }),
-    __metadata("design:type", String)
-], VGrid.prototype, "attTheme", void 0);
-__decorate([
-    aurelia_framework_1.bindable({ attribute: 'v-row-on-draw' }),
-    __metadata("design:type", Function)
-], VGrid.prototype, "attOnRowDraw", void 0);
-__decorate([
-    aurelia_framework_1.bindable({ attribute: 'v-columns' }),
-    __metadata("design:type", Array)
-], VGrid.prototype, "attColConfig", void 0);
-__decorate([
-    aurelia_framework_1.bindable({ attribute: 'v-i18n' }),
-    __metadata("design:type", Function)
-], VGrid.prototype, "attI18N", void 0);
-__decorate([
-    aurelia_framework_1.bindable({ attribute: 'v-data-delay' }),
-    __metadata("design:type", Number)
-], VGrid.prototype, "attDataDelay", void 0);
-__decorate([
-    aurelia_framework_1.bindable({ attribute: 'v-variable-row-height' }),
-    __metadata("design:type", Boolean)
-], VGrid.prototype, "attVariableRowHeight", void 0);
 exports.VGrid = VGrid;
 
 });
@@ -23541,7 +23625,7 @@ var GridConnector = (function () {
         this.controller = null;
         this.datasource = datasource;
         this.selection = selection || datasource.getSelection();
-        this.errorhandler = errorHandler || null;
+        this.errorhandler = errorHandler || this.errorhandler;
     }
     GridConnector.prototype.setInitTop = function (top) {
         this.initTop = top;
@@ -23770,7 +23854,7 @@ var DataSource = (function () {
         this.key = null;
         this.mainArray = null;
         this.config = config;
-        if (config) {
+        if (this.config) {
             this.key = config.key || '__avgKey';
             this.rowHeight = config.rowHeight || 25;
             this.groupHeight = config.groupHeight || 25;
@@ -24167,7 +24251,6 @@ ___scope___.file("collection.js", function(exports, require, module, __filename,
 Object.defineProperty(exports, "__esModule", { value: true });
 var Collection = (function () {
     function Collection(datasource) {
-        this.datasource = datasource;
         this.key = datasource.getKey();
         this.rowHeight = datasource.rowHeight || 25;
         this.groupHeight = datasource.groupHeight || 25;
@@ -25131,24 +25214,13 @@ if (!_aureliaPal.PLATFORM.global.System || !_aureliaPal.PLATFORM.global.System.i
 } else {
   _aureliaPal.PLATFORM.eachModule = function (callback) {
     if (System.registry) {
-      for (var _iterator = System.registry.entries(), _isArray = Array.isArray(_iterator), _i = 0, _iterator = _isArray ? _iterator : _iterator[Symbol.iterator]();;) {
-        var _ref;
-
-        if (_isArray) {
-          if (_i >= _iterator.length) break;
-          _ref = _iterator[_i++];
-        } else {
-          _i = _iterator.next();
-          if (_i.done) break;
-          _ref = _i.value;
-        }
-
-        var _ref2 = _ref;
-        var k = _ref2[0];
-        var m = _ref2[1];
-
+      var keys = Array.from(System.registry.keys());
+      for (var i = 0; i < keys.length; i++) {
         try {
-          if (callback(k, m)) return;
+          var key = keys[i];
+          if (callback(key, System.registry.get(key))) {
+            return;
+          }
         } catch (e) {}
       }
       return;
@@ -25156,9 +25228,9 @@ if (!_aureliaPal.PLATFORM.global.System || !_aureliaPal.PLATFORM.global.System.i
 
     var modules = System._loader.modules;
 
-    for (var key in modules) {
+    for (var _key in modules) {
       try {
-        if (callback(key, modules[key].module)) return;
+        if (callback(_key, modules[_key].module)) return;
       } catch (e) {}
     }
   };
@@ -25301,7 +25373,7 @@ var HttpClient = exports.HttpClient = function () {
     this.interceptors = [];
 
     if (typeof fetch === 'undefined') {
-      throw new Error('HttpClient requires a Fetch API implementation, but the current environment doesn\'t support it. You may need to load a polyfill such as https://github.com/github/fetch.');
+      throw new Error('HttpClient requires a Fetch API implementation, but the current environment doesn\'t support it. You may need to load a polyfill such as https://github.com/github/fetch');
     }
   }
 
@@ -25843,6 +25915,9 @@ var _DOM = exports._DOM = {
   adoptNode: function adoptNode(node) {
     return document.adoptNode(node, true);
   },
+  createAttribute: function createAttribute(name) {
+    return document.createAttribute(name);
+  },
   createElement: function createElement(tagName) {
     return document.createElement(tagName);
   },
@@ -25854,6 +25929,10 @@ var _DOM = exports._DOM = {
   },
   createDocumentFragment: function createDocumentFragment() {
     return document.createDocumentFragment();
+  },
+  createTemplateElement: function createTemplateElement() {
+    var template = document.createElement('template');
+    return _FEATURE.ensureHTMLTemplateElement(template);
   },
   createMutationObserver: function createMutationObserver(callback) {
     return new (window.MutationObserver || window.WebKitMutationObserver)(callback);
@@ -26166,6 +26245,9 @@ var CssAnimator = exports.CssAnimator = function () {
       var _animStart = void 0;
       var animHasStarted = false;
       _this4._addMultipleEventListener(element, 'webkitAnimationStart animationstart', _animStart = function animStart(evAnimStart) {
+        if (evAnimStart.target !== element) {
+          return;
+        }
         animHasStarted = true;
         _this4.isAnimating = true;
 
@@ -26179,6 +26261,9 @@ var CssAnimator = exports.CssAnimator = function () {
       var _animEnd = void 0;
       _this4._addMultipleEventListener(element, 'webkitAnimationEnd animationend', _animEnd = function animEnd(evAnimEnd) {
         if (!animHasStarted) {
+          return;
+        }
+        if (evAnimEnd.target !== element) {
           return;
         }
 
@@ -26200,7 +26285,6 @@ var CssAnimator = exports.CssAnimator = function () {
       }, false);
 
       var parent = element.parentElement;
-      var delay = 0;
       var attrib = 'data-animator-pending' + direction;
 
       var cleanupAnimation = function cleanupAnimation() {
@@ -26218,10 +26302,10 @@ var CssAnimator = exports.CssAnimator = function () {
         parent && parent.setAttribute(attrib, +(parent.getAttribute(attrib) || 1) - 1);
       };
 
-      if (parent !== null && parent !== undefined && (parent.classList.contains('au-stagger') || parent.classList.contains('au-stagger-enter'))) {
+      if (parent !== null && parent !== undefined && (parent.classList.contains('au-stagger') || parent.classList.contains('au-stagger-' + direction))) {
         var offset = +(parent.getAttribute(attrib) || 0);
         parent.setAttribute(attrib, offset + 1);
-        delay = _this4._getElementAnimationDelay(parent) * offset;
+        var delay = _this4._getElementAnimationDelay(parent) * offset;
         _this4._triggerDOMEvent(_aureliaTemplating.animationEvent.staggerNext, element);
 
         setTimeout(function () {
@@ -26260,12 +26344,20 @@ var CssAnimator = exports.CssAnimator = function () {
         _this5._triggerDOMEvent(_aureliaTemplating.animationEvent.removeClassBegin, element);
       }
 
+      if (classList.contains(className + '-add')) {
+        classList.remove(className + '-add');
+        classList.add(className);
+      }
+
       classList.remove(className);
       var prevAnimationNames = _this5._getElementAnimationNames(element);
 
       var _animStart2 = void 0;
       var animHasStarted = false;
       _this5._addMultipleEventListener(element, 'webkitAnimationStart animationstart', _animStart2 = function animStart(evAnimStart) {
+        if (evAnimStart.target !== element) {
+          return;
+        }
         animHasStarted = true;
         _this5.isAnimating = true;
 
@@ -26283,8 +26375,17 @@ var CssAnimator = exports.CssAnimator = function () {
         if (!animHasStarted) {
           return;
         }
+        if (evAnimEnd.target !== element) {
+          return;
+        }
+
+        if (!element.classList.contains(className + '-remove')) {
+          resolve(true);
+        }
 
         evAnimEnd.stopPropagation();
+
+        classList.remove(className);
 
         classList.remove(className + '-remove');
 
@@ -26330,9 +26431,17 @@ var CssAnimator = exports.CssAnimator = function () {
         _this6._triggerDOMEvent(_aureliaTemplating.animationEvent.addClassBegin, element);
       }
 
+      if (classList.contains(className + '-remove')) {
+        classList.remove(className + '-remove');
+        classList.remove(className);
+      }
+
       var _animStart3 = void 0;
       var animHasStarted = false;
       _this6._addMultipleEventListener(element, 'webkitAnimationStart animationstart', _animStart3 = function animStart(evAnimStart) {
+        if (evAnimStart.target !== element) {
+          return;
+        }
         animHasStarted = true;
         _this6.isAnimating = true;
 
@@ -26349,6 +26458,13 @@ var CssAnimator = exports.CssAnimator = function () {
       _this6._addMultipleEventListener(element, 'webkitAnimationEnd animationend', _animEnd3 = function animEnd(evAnimEnd) {
         if (!animHasStarted) {
           return;
+        }
+        if (evAnimEnd.target !== element) {
+          return;
+        }
+
+        if (!element.classList.contains(className + '-add')) {
+          resolve(true);
         }
 
         evAnimEnd.stopPropagation();
@@ -26814,7 +26930,7 @@ var SyntaxInterpreter = exports.SyntaxInterpreter = (_temp2 = _class3 = function
   SyntaxInterpreter.prototype.bind = function bind(resources, element, info, existingInstruction, context) {
     var instruction = existingInstruction || _aureliaTemplating.BehaviorInstruction.attribute(info.attrName);
 
-    instruction.attributes[info.attrName] = new _aureliaBinding.BindingExpression(this.observerLocator, this.attributeMap.map(element.tagName, info.attrName), this.parser.parse(info.attrValue), info.defaultBindingMode || this.determineDefaultBindingMode(element, info.attrName, context), resources.lookupFunctions);
+    instruction.attributes[info.attrName] = new _aureliaBinding.BindingExpression(this.observerLocator, this.attributeMap.map(element.tagName, info.attrName), this.parser.parse(info.attrValue), info.defaultBindingMode === undefined || info.defaultBindingMode === null ? this.determineDefaultBindingMode(element, info.attrName, context) : info.defaultBindingMode, resources.lookupFunctions);
 
     return instruction;
   };
@@ -26949,10 +27065,18 @@ var SyntaxInterpreter = exports.SyntaxInterpreter = (_temp2 = _class3 = function
     return instruction;
   };
 
-  SyntaxInterpreter.prototype['one-way'] = function oneWay(resources, element, info, existingInstruction) {
+  SyntaxInterpreter.prototype['to-view'] = function toView(resources, element, info, existingInstruction) {
     var instruction = existingInstruction || _aureliaTemplating.BehaviorInstruction.attribute(info.attrName);
 
-    instruction.attributes[info.attrName] = new _aureliaBinding.BindingExpression(this.observerLocator, this.attributeMap.map(element.tagName, info.attrName), this.parser.parse(info.attrValue), _aureliaBinding.bindingMode.oneWay, resources.lookupFunctions);
+    instruction.attributes[info.attrName] = new _aureliaBinding.BindingExpression(this.observerLocator, this.attributeMap.map(element.tagName, info.attrName), this.parser.parse(info.attrValue), _aureliaBinding.bindingMode.toView, resources.lookupFunctions);
+
+    return instruction;
+  };
+
+  SyntaxInterpreter.prototype['from-view'] = function fromView(resources, element, info, existingInstruction) {
+    var instruction = existingInstruction || _aureliaTemplating.BehaviorInstruction.attribute(info.attrName);
+
+    instruction.attributes[info.attrName] = new _aureliaBinding.BindingExpression(this.observerLocator, this.attributeMap.map(element.tagName, info.attrName), this.parser.parse(info.attrValue), _aureliaBinding.bindingMode.fromView, resources.lookupFunctions);
 
     return instruction;
   };
@@ -26967,6 +27091,9 @@ var SyntaxInterpreter = exports.SyntaxInterpreter = (_temp2 = _class3 = function
 
   return SyntaxInterpreter;
 }(), _class3.inject = [_aureliaBinding.Parser, _aureliaBinding.ObserverLocator, _aureliaBinding.EventManager, AttributeMap], _temp2);
+
+
+SyntaxInterpreter.prototype['one-way'] = SyntaxInterpreter.prototype['to-view'];
 
 var info = {};
 
@@ -27139,13 +27266,15 @@ ___scope___.file("dist/commonjs/aurelia-templating-resources.js", function(expor
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.viewsRequireLifecycle = exports.unwrapExpression = exports.updateOneTimeBinding = exports.isOneTime = exports.getItemsSourceExpression = exports.updateOverrideContext = exports.createFullOverrideContext = exports.NumberRepeatStrategy = exports.SetRepeatStrategy = exports.MapRepeatStrategy = exports.ArrayRepeatStrategy = exports.NullRepeatStrategy = exports.RepeatStrategyLocator = exports.AbstractRepeater = exports.UpdateTriggerBindingBehavior = exports.BindingSignaler = exports.SignalBindingBehavior = exports.SelfBindingBehavior = exports.DebounceBindingBehavior = exports.ThrottleBindingBehavior = exports.TwoWayBindingBehavior = exports.OneWayBindingBehavior = exports.OneTimeBindingBehavior = exports.AttrBindingBehavior = exports.configure = exports.Focus = exports.Replaceable = exports.SanitizeHTMLValueConverter = exports.HTMLSanitizer = exports.Hide = exports.Show = exports.Repeat = exports.With = exports.If = exports.Compose = undefined;
+exports.viewsRequireLifecycle = exports.unwrapExpression = exports.updateOneTimeBinding = exports.isOneTime = exports.getItemsSourceExpression = exports.updateOverrideContext = exports.createFullOverrideContext = exports.NumberRepeatStrategy = exports.SetRepeatStrategy = exports.MapRepeatStrategy = exports.ArrayRepeatStrategy = exports.NullRepeatStrategy = exports.RepeatStrategyLocator = exports.AbstractRepeater = exports.UpdateTriggerBindingBehavior = exports.BindingSignaler = exports.SignalBindingBehavior = exports.SelfBindingBehavior = exports.DebounceBindingBehavior = exports.ThrottleBindingBehavior = exports.TwoWayBindingBehavior = exports.OneWayBindingBehavior = exports.OneTimeBindingBehavior = exports.AttrBindingBehavior = exports.configure = exports.Focus = exports.Replaceable = exports.SanitizeHTMLValueConverter = exports.HTMLSanitizer = exports.Hide = exports.Show = exports.Repeat = exports.With = exports.Else = exports.If = exports.Compose = undefined;
 
 var _aureliaPal = require('aurelia-pal');
 
 var _compose = require('./compose');
 
 var _if = require('./if');
+
+var _else = require('./else');
 
 var _with = require('./with');
 
@@ -27208,7 +27337,7 @@ var _aureliaHideStyle = require('./aurelia-hide-style');
 function configure(config) {
   (0, _aureliaHideStyle.injectAureliaHideStyleAtHead)();
 
-  config.globalResources(_aureliaPal.PLATFORM.moduleName('./compose'), _aureliaPal.PLATFORM.moduleName('./if'), _aureliaPal.PLATFORM.moduleName('./with'), _aureliaPal.PLATFORM.moduleName('./repeat'), _aureliaPal.PLATFORM.moduleName('./show'), _aureliaPal.PLATFORM.moduleName('./hide'), _aureliaPal.PLATFORM.moduleName('./replaceable'), _aureliaPal.PLATFORM.moduleName('./sanitize-html'), _aureliaPal.PLATFORM.moduleName('./focus'), _aureliaPal.PLATFORM.moduleName('./binding-mode-behaviors'), _aureliaPal.PLATFORM.moduleName('./self-binding-behavior'), _aureliaPal.PLATFORM.moduleName('./throttle-binding-behavior'), _aureliaPal.PLATFORM.moduleName('./debounce-binding-behavior'), _aureliaPal.PLATFORM.moduleName('./signal-binding-behavior'), _aureliaPal.PLATFORM.moduleName('./update-trigger-binding-behavior'), _aureliaPal.PLATFORM.moduleName('./attr-binding-behavior'));
+  config.globalResources(_aureliaPal.PLATFORM.moduleName('./compose'), _aureliaPal.PLATFORM.moduleName('./if'), _aureliaPal.PLATFORM.moduleName('./else'), _aureliaPal.PLATFORM.moduleName('./with'), _aureliaPal.PLATFORM.moduleName('./repeat'), _aureliaPal.PLATFORM.moduleName('./show'), _aureliaPal.PLATFORM.moduleName('./hide'), _aureliaPal.PLATFORM.moduleName('./replaceable'), _aureliaPal.PLATFORM.moduleName('./sanitize-html'), _aureliaPal.PLATFORM.moduleName('./focus'), _aureliaPal.PLATFORM.moduleName('./binding-mode-behaviors'), _aureliaPal.PLATFORM.moduleName('./self-binding-behavior'), _aureliaPal.PLATFORM.moduleName('./throttle-binding-behavior'), _aureliaPal.PLATFORM.moduleName('./debounce-binding-behavior'), _aureliaPal.PLATFORM.moduleName('./signal-binding-behavior'), _aureliaPal.PLATFORM.moduleName('./update-trigger-binding-behavior'), _aureliaPal.PLATFORM.moduleName('./attr-binding-behavior'));
 
   (0, _htmlResourcePlugin.configure)(config);
 
@@ -27227,6 +27356,7 @@ function configure(config) {
 
 exports.Compose = _compose.Compose;
 exports.If = _if.If;
+exports.Else = _else.Else;
 exports.With = _with.With;
 exports.Repeat = _repeat.Repeat;
 exports.Show = _show.Show;
@@ -27274,11 +27404,17 @@ var _dec, _dec2, _class, _desc, _value, _class2, _descriptor, _descriptor2, _des
 
 var _aureliaDependencyInjection = require('aurelia-dependency-injection');
 
+var _aureliaLogging = require('aurelia-logging');
+
+var LogManager = _interopRequireWildcard(_aureliaLogging);
+
 var _aureliaTaskQueue = require('aurelia-task-queue');
 
 var _aureliaTemplating = require('aurelia-templating');
 
 var _aureliaPal = require('aurelia-pal');
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
 function _initDefineProp(target, property, descriptor, context) {
   if (!descriptor) return;
@@ -27325,6 +27461,8 @@ function _initializerWarningHelper(descriptor, context) {
   throw new Error('Decorating class property failed. Please ensure that transform-class-properties is enabled.');
 }
 
+var logger = LogManager.getLogger('templating-resources');
+
 var Compose = exports.Compose = (_dec = (0, _aureliaTemplating.customElement)('compose'), _dec2 = (0, _aureliaDependencyInjection.inject)(_aureliaPal.DOM.Element, _aureliaDependencyInjection.Container, _aureliaTemplating.CompositionEngine, _aureliaTemplating.ViewSlot, _aureliaTemplating.ViewResources, _aureliaTaskQueue.TaskQueue), _dec(_class = (0, _aureliaTemplating.noView)(_class = _dec2(_class = (_class2 = function () {
   function Compose(element, container, compositionEngine, viewSlot, viewResources, taskQueue) {
     
@@ -27345,6 +27483,7 @@ var Compose = exports.Compose = (_dec = (0, _aureliaTemplating.customElement)('c
     this.taskQueue = taskQueue;
     this.currentController = null;
     this.currentViewModel = null;
+    this.changes = Object.create(null);
   }
 
   Compose.prototype.created = function created(owningView) {
@@ -27354,14 +27493,15 @@ var Compose = exports.Compose = (_dec = (0, _aureliaTemplating.customElement)('c
   Compose.prototype.bind = function bind(bindingContext, overrideContext) {
     this.bindingContext = bindingContext;
     this.overrideContext = overrideContext;
-    processInstruction(this, createInstruction(this, {
-      view: this.view,
-      viewModel: this.viewModel,
-      model: this.model
-    }));
+    this.changes.view = this.view;
+    this.changes.viewModel = this.viewModel;
+    this.changes.model = this.model;
+    processChanges(this);
   };
 
-  Compose.prototype.unbind = function unbind(bindingContext, overrideContext) {
+  Compose.prototype.unbind = function unbind() {
+    this.changes = Object.create(null);
+    this.pendingTask = null;
     this.bindingContext = null;
     this.overrideContext = null;
     var returnToCache = true;
@@ -27370,65 +27510,18 @@ var Compose = exports.Compose = (_dec = (0, _aureliaTemplating.customElement)('c
   };
 
   Compose.prototype.modelChanged = function modelChanged(newValue, oldValue) {
-    var _this = this;
-
-    if (this.currentInstruction) {
-      this.currentInstruction.model = newValue;
-      return;
-    }
-
-    this.taskQueue.queueMicroTask(function () {
-      if (_this.currentInstruction) {
-        _this.currentInstruction.model = newValue;
-        return;
-      }
-
-      var vm = _this.currentViewModel;
-
-      if (vm && typeof vm.activate === 'function') {
-        vm.activate(newValue);
-      }
-    });
+    this.changes.model = newValue;
+    requestUpdate(this);
   };
 
   Compose.prototype.viewChanged = function viewChanged(newValue, oldValue) {
-    var _this2 = this;
-
-    var instruction = createInstruction(this, {
-      view: newValue,
-      viewModel: this.currentViewModel || this.viewModel,
-      model: this.model
-    });
-
-    if (this.currentInstruction) {
-      this.currentInstruction = instruction;
-      return;
-    }
-
-    this.currentInstruction = instruction;
-    this.taskQueue.queueMicroTask(function () {
-      return processInstruction(_this2, _this2.currentInstruction);
-    });
+    this.changes.view = newValue;
+    requestUpdate(this);
   };
 
   Compose.prototype.viewModelChanged = function viewModelChanged(newValue, oldValue) {
-    var _this3 = this;
-
-    var instruction = createInstruction(this, {
-      viewModel: newValue,
-      view: this.view,
-      model: this.model
-    });
-
-    if (this.currentInstruction) {
-      this.currentInstruction = instruction;
-      return;
-    }
-
-    this.currentInstruction = instruction;
-    this.taskQueue.queueMicroTask(function () {
-      return processInstruction(_this3, _this3.currentInstruction);
-    });
+    this.changes.viewModel = newValue;
+    requestUpdate(this);
   };
 
   return Compose;
@@ -27447,6 +27540,19 @@ var Compose = exports.Compose = (_dec = (0, _aureliaTemplating.customElement)('c
 })), _class2)) || _class) || _class) || _class);
 
 
+function isEmpty(obj) {
+  for (var key in obj) {
+    return false;
+  }
+  return true;
+}
+
+function tryActivateViewModel(vm, model) {
+  if (vm && typeof vm.activate === 'function') {
+    return Promise.resolve(vm.activate(model));
+  }
+}
+
 function createInstruction(composer, instruction) {
   return Object.assign(instruction, {
     bindingContext: composer.bindingContext,
@@ -27461,11 +27567,53 @@ function createInstruction(composer, instruction) {
   });
 }
 
-function processInstruction(composer, instruction) {
-  composer.currentInstruction = null;
-  composer.compositionEngine.compose(instruction).then(function (controller) {
-    composer.currentController = controller;
-    composer.currentViewModel = controller ? controller.viewModel : null;
+function processChanges(composer) {
+  var changes = composer.changes;
+  composer.changes = Object.create(null);
+
+  if (!('view' in changes) && !('viewModel' in changes) && 'model' in changes) {
+    composer.pendingTask = tryActivateViewModel(composer.currentViewModel, changes.model);
+    if (!composer.pendingTask) {
+      return;
+    }
+  } else {
+    var instruction = {
+      view: composer.view,
+      viewModel: composer.currentViewModel || composer.viewModel,
+      model: composer.model
+    };
+
+    instruction = Object.assign(instruction, changes);
+
+    instruction = createInstruction(composer, instruction);
+    composer.pendingTask = composer.compositionEngine.compose(instruction).then(function (controller) {
+      composer.currentController = controller;
+      composer.currentViewModel = controller ? controller.viewModel : null;
+    });
+  }
+
+  composer.pendingTask = composer.pendingTask.catch(function (e) {
+    logger.error(e);
+  }).then(function () {
+    if (!composer.pendingTask) {
+      return;
+    }
+
+    composer.pendingTask = null;
+    if (!isEmpty(composer.changes)) {
+      processChanges(composer);
+    }
+  });
+}
+
+function requestUpdate(composer) {
+  if (composer.pendingTask || composer.updateRequested) {
+    return;
+  }
+  composer.updateRequested = true;
+  composer.taskQueue.queueMicroTask(function () {
+    composer.updateRequested = false;
+    processChanges(composer);
   });
 }
 });
@@ -27478,97 +27626,170 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.If = undefined;
 
-var _dec, _dec2, _class;
+var _dec, _dec2, _dec3, _class, _desc, _value, _class2, _descriptor, _descriptor2;
 
 var _aureliaTemplating = require('aurelia-templating');
 
 var _aureliaDependencyInjection = require('aurelia-dependency-injection');
 
+var _ifCore = require('./if-core');
+
+function _initDefineProp(target, property, descriptor, context) {
+  if (!descriptor) return;
+  Object.defineProperty(target, property, {
+    enumerable: descriptor.enumerable,
+    configurable: descriptor.configurable,
+    writable: descriptor.writable,
+    value: descriptor.initializer ? descriptor.initializer.call(context) : void 0
+  });
+}
 
 
-var If = exports.If = (_dec = (0, _aureliaTemplating.customAttribute)('if'), _dec2 = (0, _aureliaDependencyInjection.inject)(_aureliaTemplating.BoundViewFactory, _aureliaTemplating.ViewSlot), _dec(_class = (0, _aureliaTemplating.templateController)(_class = _dec2(_class = function () {
-  function If(viewFactory, viewSlot) {
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+function _applyDecoratedDescriptor(target, property, decorators, descriptor, context) {
+  var desc = {};
+  Object['ke' + 'ys'](descriptor).forEach(function (key) {
+    desc[key] = descriptor[key];
+  });
+  desc.enumerable = !!desc.enumerable;
+  desc.configurable = !!desc.configurable;
+
+  if ('value' in desc || desc.initializer) {
+    desc.writable = true;
+  }
+
+  desc = decorators.slice().reverse().reduce(function (desc, decorator) {
+    return decorator(target, property, desc) || desc;
+  }, desc);
+
+  if (context && desc.initializer !== void 0) {
+    desc.value = desc.initializer ? desc.initializer.call(context) : void 0;
+    desc.initializer = undefined;
+  }
+
+  if (desc.initializer === void 0) {
+    Object['define' + 'Property'](target, property, desc);
+    desc = null;
+  }
+
+  return desc;
+}
+
+function _initializerWarningHelper(descriptor, context) {
+  throw new Error('Decorating class property failed. Please ensure that transform-class-properties is enabled.');
+}
+
+var If = exports.If = (_dec = (0, _aureliaTemplating.customAttribute)('if'), _dec2 = (0, _aureliaDependencyInjection.inject)(_aureliaTemplating.BoundViewFactory, _aureliaTemplating.ViewSlot), _dec3 = (0, _aureliaTemplating.bindable)({ primaryProperty: true }), _dec(_class = (0, _aureliaTemplating.templateController)(_class = _dec2(_class = (_class2 = function (_IfCore) {
+  _inherits(If, _IfCore);
+
+  function If() {
+    var _temp, _this, _ret;
+
+    
+
+    for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
+      args[_key] = arguments[_key];
+    }
+
+    return _ret = (_temp = (_this = _possibleConstructorReturn(this, _IfCore.call.apply(_IfCore, [this].concat(args))), _this), _initDefineProp(_this, 'condition', _descriptor, _this), _initDefineProp(_this, 'swapOrder', _descriptor2, _this), _temp), _possibleConstructorReturn(_this, _ret);
+  }
+
+  If.prototype.bind = function bind(bindingContext, overrideContext) {
+    _IfCore.prototype.bind.call(this, bindingContext, overrideContext);
+    if (this.condition) {
+      this._show();
+    } else {
+      this._hide();
+    }
+  };
+
+  If.prototype.conditionChanged = function conditionChanged(newValue) {
+    this._update(newValue);
+  };
+
+  If.prototype._update = function _update(show) {
+    var _this2 = this;
+
+    if (this.animating) {
+      return;
+    }
+
+    var promise = void 0;
+    if (this.elseVm) {
+      promise = show ? this._swap(this.elseVm, this) : this._swap(this, this.elseVm);
+    } else {
+      promise = show ? this._show() : this._hide();
+    }
+
+    if (promise) {
+      this.animating = true;
+      promise.then(function () {
+        _this2.animating = false;
+        if (_this2.condition !== _this2.showing) {
+          _this2._update(_this2.condition);
+        }
+      });
+    }
+  };
+
+  If.prototype._swap = function _swap(remove, add) {
+    switch (this.swapOrder) {
+      case 'before':
+        return Promise.resolve(add._show()).then(function () {
+          return remove._hide();
+        });
+      case 'with':
+        return Promise.all([remove._hide(), add._show()]);
+      default:
+        var promise = remove._hide();
+        return promise ? promise.then(function () {
+          return add._show();
+        }) : add._show();
+    }
+  };
+
+  return If;
+}(_ifCore.IfCore), (_descriptor = _applyDecoratedDescriptor(_class2.prototype, 'condition', [_dec3], {
+  enumerable: true,
+  initializer: null
+}), _descriptor2 = _applyDecoratedDescriptor(_class2.prototype, 'swapOrder', [_aureliaTemplating.bindable], {
+  enumerable: true,
+  initializer: null
+})), _class2)) || _class) || _class) || _class);
+});
+___scope___.file("dist/commonjs/if-core.js", function(exports, require, module, __filename, __dirname){
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+
+
+var IfCore = exports.IfCore = function () {
+  function IfCore(viewFactory, viewSlot) {
     
 
     this.viewFactory = viewFactory;
     this.viewSlot = viewSlot;
-    this.showing = false;
     this.view = null;
     this.bindingContext = null;
     this.overrideContext = null;
+
+    this.showing = false;
   }
 
-  If.prototype.bind = function bind(bindingContext, overrideContext) {
+  IfCore.prototype.bind = function bind(bindingContext, overrideContext) {
     this.bindingContext = bindingContext;
     this.overrideContext = overrideContext;
-    this.valueChanged(this.value);
   };
 
-  If.prototype.valueChanged = function valueChanged(newValue) {
-    var _this = this;
-
-    if (this.__queuedChanges) {
-      this.__queuedChanges.push(newValue);
-      return;
-    }
-
-    var maybePromise = this._runValueChanged(newValue);
-    if (maybePromise instanceof Promise) {
-      (function () {
-        var queuedChanges = _this.__queuedChanges = [];
-
-        var runQueuedChanges = function runQueuedChanges() {
-          if (!queuedChanges.length) {
-            _this.__queuedChanges = undefined;
-            return;
-          }
-
-          var nextPromise = _this._runValueChanged(queuedChanges.shift()) || Promise.resolve();
-          nextPromise.then(runQueuedChanges);
-        };
-
-        maybePromise.then(runQueuedChanges);
-      })();
-    }
-  };
-
-  If.prototype._runValueChanged = function _runValueChanged(newValue) {
-    var _this2 = this;
-
-    if (!newValue) {
-      var viewOrPromise = void 0;
-      if (this.view !== null && this.showing) {
-        viewOrPromise = this.viewSlot.remove(this.view);
-        if (viewOrPromise instanceof Promise) {
-          viewOrPromise.then(function () {
-            return _this2.view.unbind();
-          });
-        } else {
-          this.view.unbind();
-        }
-      }
-
-      this.showing = false;
-      return viewOrPromise;
-    }
-
-    if (this.view === null) {
-      this.view = this.viewFactory.create();
-    }
-
-    if (!this.view.isBound) {
-      this.view.bind(this.bindingContext, this.overrideContext);
-    }
-
-    if (!this.showing) {
-      this.showing = true;
-      return this.viewSlot.add(this.view);
-    }
-
-    return undefined;
-  };
-
-  If.prototype.unbind = function unbind() {
+  IfCore.prototype.unbind = function unbind() {
     if (this.view === null) {
       return;
     }
@@ -27582,13 +27803,114 @@ var If = exports.If = (_dec = (0, _aureliaTemplating.customAttribute)('if'), _de
     if (this.showing) {
       this.showing = false;
       this.viewSlot.remove(this.view, true, true);
+    } else {
+      this.view.returnToCache();
     }
-    this.view.returnToCache();
+
     this.view = null;
   };
 
-  return If;
-}()) || _class) || _class) || _class);
+  IfCore.prototype._show = function _show() {
+    if (this.showing) {
+      if (!this.view.isBound) {
+        this.view.bind(this.bindingContext, this.overrideContext);
+      }
+      return;
+    }
+
+    if (this.view === null) {
+      this.view = this.viewFactory.create();
+    }
+
+    if (!this.view.isBound) {
+      this.view.bind(this.bindingContext, this.overrideContext);
+    }
+
+    this.showing = true;
+    return this.viewSlot.add(this.view);
+  };
+
+  IfCore.prototype._hide = function _hide() {
+    var _this = this;
+
+    if (!this.showing) {
+      return;
+    }
+
+    this.showing = false;
+    var removed = this.viewSlot.remove(this.view);
+
+    if (removed instanceof Promise) {
+      return removed.then(function () {
+        return _this.view.unbind();
+      });
+    }
+
+    this.view.unbind();
+  };
+
+  return IfCore;
+}();
+});
+___scope___.file("dist/commonjs/else.js", function(exports, require, module, __filename, __dirname){
+
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.Else = undefined;
+
+var _dec, _dec2, _class;
+
+var _aureliaTemplating = require('aurelia-templating');
+
+var _aureliaDependencyInjection = require('aurelia-dependency-injection');
+
+var _ifCore = require('./if-core');
+
+
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var Else = exports.Else = (_dec = (0, _aureliaTemplating.customAttribute)('else'), _dec2 = (0, _aureliaDependencyInjection.inject)(_aureliaTemplating.BoundViewFactory, _aureliaTemplating.ViewSlot), _dec(_class = (0, _aureliaTemplating.templateController)(_class = _dec2(_class = function (_IfCore) {
+  _inherits(Else, _IfCore);
+
+  function Else(viewFactory, viewSlot) {
+    
+
+    var _this = _possibleConstructorReturn(this, _IfCore.call(this, viewFactory, viewSlot));
+
+    _this._registerInIf();
+    return _this;
+  }
+
+  Else.prototype.bind = function bind(bindingContext, overrideContext) {
+    _IfCore.prototype.bind.call(this, bindingContext, overrideContext);
+
+    if (this.ifVm.condition) {
+      this._hide();
+    } else {
+      this._show();
+    }
+  };
+
+  Else.prototype._registerInIf = function _registerInIf() {
+    var previous = this.viewSlot.anchor.previousSibling;
+    while (previous && !previous.au) {
+      previous = previous.previousSibling;
+    }
+    if (!previous || !previous.au.if) {
+      throw new Error("Can't find matching If for Else custom attribute.");
+    }
+    this.ifVm = previous.au.if.viewModel;
+    this.ifVm.elseVm = this;
+  };
+
+  return Else;
+}(_ifCore.IfCore)) || _class) || _class) || _class);
 });
 ___scope___.file("dist/commonjs/with.js", function(exports, require, module, __filename, __dirname){
 
@@ -27768,7 +28090,7 @@ var Repeat = exports.Repeat = (_dec = (0, _aureliaTemplating.customAttribute)('r
     this.scope = null;
     this.items = null;
     this.matcherBinding = null;
-    this.viewSlot.removeAll(true);
+    this.viewSlot.removeAll(true, true);
     this._unsubscribeCollection();
   };
 
@@ -28088,71 +28410,69 @@ var ArrayRepeatStrategy = exports.ArrayRepeatStrategy = function () {
     }
 
     if (repeat.viewsRequireLifecycle) {
-      (function () {
-        var childrenSnapshot = children.slice(0);
-        var itemNameInBindingContext = repeat.local;
-        var matcher = repeat.matcher();
+      var childrenSnapshot = children.slice(0);
+      var itemNameInBindingContext = repeat.local;
+      var matcher = repeat.matcher();
 
-        var itemsPreviouslyInViews = [];
-        var viewsToRemove = [];
+      var itemsPreviouslyInViews = [];
+      var viewsToRemove = [];
 
-        for (var index = 0; index < viewsLength; index++) {
-          var view = childrenSnapshot[index];
-          var oldItem = view.bindingContext[itemNameInBindingContext];
+      for (var index = 0; index < viewsLength; index++) {
+        var view = childrenSnapshot[index];
+        var oldItem = view.bindingContext[itemNameInBindingContext];
 
-          if ((0, _repeatUtilities.indexOf)(items, oldItem, matcher) === -1) {
-            viewsToRemove.push(view);
-          } else {
-            itemsPreviouslyInViews.push(oldItem);
-          }
+        if ((0, _repeatUtilities.indexOf)(items, oldItem, matcher) === -1) {
+          viewsToRemove.push(view);
+        } else {
+          itemsPreviouslyInViews.push(oldItem);
         }
+      }
 
-        var updateViews = void 0;
-        var removePromise = void 0;
+      var updateViews = void 0;
+      var removePromise = void 0;
 
-        if (itemsPreviouslyInViews.length > 0) {
-          removePromise = repeat.removeViews(viewsToRemove, true, !repeat.viewsRequireLifecycle);
-          updateViews = function updateViews() {
-            for (var _index = 0; _index < itemsLength; _index++) {
-              var item = items[_index];
-              var indexOfView = (0, _repeatUtilities.indexOf)(itemsPreviouslyInViews, item, matcher, _index);
-              var _view = void 0;
+      if (itemsPreviouslyInViews.length > 0) {
+        removePromise = repeat.removeViews(viewsToRemove, true, !repeat.viewsRequireLifecycle);
+        updateViews = function updateViews() {
+          for (var _index = 0; _index < itemsLength; _index++) {
+            var item = items[_index];
+            var indexOfView = (0, _repeatUtilities.indexOf)(itemsPreviouslyInViews, item, matcher, _index);
+            var _view = void 0;
 
-              if (indexOfView === -1) {
-                var overrideContext = (0, _repeatUtilities.createFullOverrideContext)(repeat, items[_index], _index, itemsLength);
-                repeat.insertView(_index, overrideContext.bindingContext, overrideContext);
+            if (indexOfView === -1) {
+              var overrideContext = (0, _repeatUtilities.createFullOverrideContext)(repeat, items[_index], _index, itemsLength);
+              repeat.insertView(_index, overrideContext.bindingContext, overrideContext);
 
-                itemsPreviouslyInViews.splice(_index, 0, undefined);
-              } else if (indexOfView === _index) {
-                _view = children[indexOfView];
-                itemsPreviouslyInViews[indexOfView] = undefined;
-              } else {
-                _view = children[indexOfView];
-                repeat.moveView(indexOfView, _index);
-                itemsPreviouslyInViews.splice(indexOfView, 1);
-                itemsPreviouslyInViews.splice(_index, 0, undefined);
-              }
-
-              if (_view) {
-                (0, _repeatUtilities.updateOverrideContext)(_view.overrideContext, _index, itemsLength);
-              }
+              itemsPreviouslyInViews.splice(_index, 0, undefined);
+            } else if (indexOfView === _index) {
+              _view = children[indexOfView];
+              itemsPreviouslyInViews[indexOfView] = undefined;
+            } else {
+              _view = children[indexOfView];
+              repeat.moveView(indexOfView, _index);
+              itemsPreviouslyInViews.splice(indexOfView, 1);
+              itemsPreviouslyInViews.splice(_index, 0, undefined);
             }
 
-            _this._inPlaceProcessItems(repeat, items);
-          };
-        } else {
-          removePromise = repeat.removeAllViews(true, !repeat.viewsRequireLifecycle);
-          updateViews = function updateViews() {
-            return _this._standardProcessInstanceChanged(repeat, items);
-          };
-        }
+            if (_view) {
+              (0, _repeatUtilities.updateOverrideContext)(_view.overrideContext, _index, itemsLength);
+            }
+          }
 
-        if (removePromise instanceof Promise) {
-          removePromise.then(updateViews);
-        } else {
-          updateViews();
-        }
-      })();
+          _this._inPlaceProcessItems(repeat, items);
+        };
+      } else {
+        removePromise = repeat.removeAllViews(true, !repeat.viewsRequireLifecycle);
+        updateViews = function updateViews() {
+          return _this._standardProcessInstanceChanged(repeat, items);
+        };
+      }
+
+      if (removePromise instanceof Promise) {
+        removePromise.then(updateViews);
+      } else {
+        updateViews();
+      }
     } else {
       this._inPlaceProcessItems(repeat, items);
     }
@@ -28216,23 +28536,21 @@ var ArrayRepeatStrategy = exports.ArrayRepeatStrategy = function () {
 
     var maybePromise = this._runSplices(repeat, array.slice(0), splices);
     if (maybePromise instanceof Promise) {
-      (function () {
-        var queuedSplices = repeat.__queuedSplices = [];
+      var queuedSplices = repeat.__queuedSplices = [];
 
-        var runQueuedSplices = function runQueuedSplices() {
-          if (!queuedSplices.length) {
-            repeat.__queuedSplices = undefined;
-            repeat.__array = undefined;
-            return;
-          }
+      var runQueuedSplices = function runQueuedSplices() {
+        if (!queuedSplices.length) {
+          repeat.__queuedSplices = undefined;
+          repeat.__array = undefined;
+          return;
+        }
 
-          var nextPromise = _this2._runSplices(repeat, repeat.__array, queuedSplices) || Promise.resolve();
-          queuedSplices = repeat.__queuedSplices = [];
-          nextPromise.then(runQueuedSplices);
-        };
+        var nextPromise = _this2._runSplices(repeat, repeat.__array, queuedSplices) || Promise.resolve();
+        queuedSplices = repeat.__queuedSplices = [];
+        nextPromise.then(runQueuedSplices);
+      };
 
-        maybePromise.then(runQueuedSplices);
-      })();
+      maybePromise.then(runQueuedSplices);
     }
   };
 
@@ -28453,6 +28771,7 @@ var MapRepeatStrategy = exports.MapRepeatStrategy = function () {
     var ii = void 0;
     var overrideContext = void 0;
     var removeIndex = void 0;
+    var addIndex = void 0;
     var record = void 0;
     var rmPromises = [];
     var viewOrPromise = void 0;
@@ -28471,7 +28790,8 @@ var MapRepeatStrategy = exports.MapRepeatStrategy = function () {
           repeat.insertView(removeIndex, overrideContext.bindingContext, overrideContext);
           break;
         case 'add':
-          overrideContext = (0, _repeatUtilities.createFullOverrideContext)(repeat, map.get(key), map.size - 1, map.size, key);
+          addIndex = repeat.viewCount() <= map.size - 1 ? repeat.viewCount() : map.size - 1;
+          overrideContext = (0, _repeatUtilities.createFullOverrideContext)(repeat, map.get(key), addIndex, map.size, key);
           repeat.insertView(map.size - 1, overrideContext.bindingContext, overrideContext);
           break;
         case 'delete':
@@ -28580,8 +28900,9 @@ var SetRepeatStrategy = exports.SetRepeatStrategy = function () {
       value = record.value;
       switch (record.type) {
         case 'add':
-          overrideContext = (0, _repeatUtilities.createFullOverrideContext)(repeat, value, set.size - 1, set.size);
-          repeat.insertView(set.size - 1, overrideContext.bindingContext, overrideContext);
+          var size = Math.max(set.size - 1, 0);
+          overrideContext = (0, _repeatUtilities.createFullOverrideContext)(repeat, value, size, set.size);
+          repeat.insertView(size, overrideContext.bindingContext, overrideContext);
           break;
         case 'delete':
           removeIndex = this._getViewIndexByValue(repeat, value);
@@ -29072,23 +29393,12 @@ var _aureliaPal = require('aurelia-pal');
 
 var Focus = exports.Focus = (_dec = (0, _aureliaTemplating.customAttribute)('focus', _aureliaBinding.bindingMode.twoWay), _dec2 = (0, _aureliaDependencyInjection.inject)(_aureliaPal.DOM.Element, _aureliaTaskQueue.TaskQueue), _dec(_class = _dec2(_class = function () {
   function Focus(element, taskQueue) {
-    var _this = this;
-
     
 
     this.element = element;
     this.taskQueue = taskQueue;
     this.isAttached = false;
     this.needsApply = false;
-
-    this.focusListener = function (e) {
-      _this.value = true;
-    };
-    this.blurListener = function (e) {
-      if (_aureliaPal.DOM.activeElement !== _this.element) {
-        _this.value = false;
-      }
-    };
   }
 
   Focus.prototype.valueChanged = function valueChanged(newValue) {
@@ -29100,12 +29410,12 @@ var Focus = exports.Focus = (_dec = (0, _aureliaTemplating.customAttribute)('foc
   };
 
   Focus.prototype._apply = function _apply() {
-    var _this2 = this;
+    var _this = this;
 
     if (this.value) {
       this.taskQueue.queueMicroTask(function () {
-        if (_this2.value) {
-          _this2.element.focus();
+        if (_this.value) {
+          _this.element.focus();
         }
       });
     } else {
@@ -29119,14 +29429,22 @@ var Focus = exports.Focus = (_dec = (0, _aureliaTemplating.customAttribute)('foc
       this.needsApply = false;
       this._apply();
     }
-    this.element.addEventListener('focus', this.focusListener);
-    this.element.addEventListener('blur', this.blurListener);
+    this.element.addEventListener('focus', this);
+    this.element.addEventListener('blur', this);
   };
 
   Focus.prototype.detached = function detached() {
     this.isAttached = false;
-    this.element.removeEventListener('focus', this.focusListener);
-    this.element.removeEventListener('blur', this.blurListener);
+    this.element.removeEventListener('focus', this);
+    this.element.removeEventListener('blur', this);
+  };
+
+  Focus.prototype.handleEvent = function handleEvent(e) {
+    if (e.type === 'focus') {
+      this.value = true;
+    } else if (_aureliaPal.DOM.activeElement !== this.element) {
+      this.value = false;
+    }
   };
 
   return Focus;
@@ -29226,7 +29544,7 @@ var CSSViewEngineHooks = function () {
     } else if (_aureliaPal.FEATURE.scopedCSS) {
       var styleNode = _aureliaPal.DOM.injectStyles(this.css, content, true);
       styleNode.setAttribute('scoped', 'scoped');
-    } else if (!this.owner._alreadyGloballyInjected) {
+    } else if (this._global && !this.owner._alreadyGloballyInjected) {
       _aureliaPal.DOM.injectStyles(this.css);
       this.owner._alreadyGloballyInjected = true;
     }
@@ -30150,6 +30468,17 @@ var BrowserHistory = exports.BrowserHistory = (_temp = _class = function (_Histo
     _aureliaPal.DOM.title = title;
   };
 
+  BrowserHistory.prototype.setState = function setState(key, value) {
+    var state = Object.assign({}, this.history.state);
+    state[key] = value;
+    this.history.replaceState(state, null, null);
+  };
+
+  BrowserHistory.prototype.getState = function getState(key) {
+    var state = Object.assign({}, this.history.state);
+    return state[key];
+  };
+
   BrowserHistory.prototype._getHash = function _getHash() {
     return this.location.hash.substr(1);
   };
@@ -30253,6 +30582,14 @@ var History = exports.History = function () {
 
   History.prototype.setTitle = function setTitle(title) {
     mi('setTitle');
+  };
+
+  History.prototype.setState = function setState(key, value) {
+    mi('setState');
+  };
+
+  History.prototype.getState = function getState(key) {
+    mi('getState');
   };
 
   return History;
@@ -30527,7 +30864,7 @@ var RouterView = exports.RouterView = (_dec = (0, _aureliaTemplating.customEleme
       viewPortInstruction.controller = metadata.create(childContainer, _aureliaTemplating.BehaviorInstruction.dynamic(_this.element, viewModel, viewFactory));
 
       if (waitToSwap) {
-        return;
+        return null;
       }
 
       _this.swap(viewPortInstruction);
@@ -30657,7 +30994,7 @@ function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj;
 
 var logger = LogManager.getLogger('route-href');
 
-var RouteHref = exports.RouteHref = (_dec = (0, _aureliaTemplating.customAttribute)('route-href'), _dec2 = (0, _aureliaTemplating.bindable)({ name: 'route', changeHandler: 'processChange' }), _dec3 = (0, _aureliaTemplating.bindable)({ name: 'params', changeHandler: 'processChange' }), _dec4 = (0, _aureliaTemplating.bindable)({ name: 'attribute', defaultValue: 'href' }), _dec5 = (0, _aureliaDependencyInjection.inject)(_aureliaRouter.Router, _aureliaPal.DOM.Element), _dec(_class = _dec2(_class = _dec3(_class = _dec4(_class = _dec5(_class = function () {
+var RouteHref = exports.RouteHref = (_dec = (0, _aureliaTemplating.customAttribute)('route-href'), _dec2 = (0, _aureliaTemplating.bindable)({ name: 'route', changeHandler: 'processChange', primaryProperty: true }), _dec3 = (0, _aureliaTemplating.bindable)({ name: 'params', changeHandler: 'processChange' }), _dec4 = (0, _aureliaTemplating.bindable)({ name: 'attribute', defaultValue: 'href' }), _dec5 = (0, _aureliaDependencyInjection.inject)(_aureliaRouter.Router, _aureliaPal.DOM.Element), _dec(_class = _dec2(_class = _dec3(_class = _dec4(_class = _dec5(_class = function () {
   function RouteHref(router, element) {
     
 
@@ -30665,7 +31002,7 @@ var RouteHref = exports.RouteHref = (_dec = (0, _aureliaTemplating.customAttribu
     this.element = element;
   }
 
-  RouteHref.prototype.bind = function bind() {
+  RouteHref.prototype.attached = function attached() {
     this.isActive = true;
     this.processChange();
   };
@@ -30719,7 +31056,7 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.AppRouter = exports.PipelineProvider = exports.LoadRouteStep = exports.RouteLoader = exports.ActivateNextStep = exports.DeactivatePreviousStep = exports.CanActivateNextStep = exports.CanDeactivatePreviousStep = exports.Router = exports.BuildNavigationPlanStep = exports.activationStrategy = exports.RouterConfiguration = exports.RedirectToRoute = exports.Redirect = exports.NavModel = exports.NavigationInstruction = exports.CommitChangesStep = exports.Pipeline = exports.pipelineStatus = undefined;
 
-var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
@@ -30750,7 +31087,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
 
 function _normalizeAbsolutePath(path, hasPushState) {
-  var absolute = arguments.length <= 2 || arguments[2] === undefined ? false : arguments[2];
+  var absolute = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
 
   if (!hasPushState && path[0] !== '#') {
     path = '#' + path;
@@ -30965,7 +31302,7 @@ var NavigationInstruction = exports.NavigationInstruction = function () {
   NavigationInstruction.prototype.getBaseUrl = function getBaseUrl() {
     var _this = this;
 
-    var fragment = this.fragment;
+    var fragment = decodeURI(this.fragment);
 
     if (fragment === '') {
       var nonEmptyRoute = this.router.routes.find(function (route) {
@@ -30977,18 +31314,17 @@ var NavigationInstruction = exports.NavigationInstruction = function () {
     }
 
     if (!this.params) {
-      return fragment;
+      return encodeURI(fragment);
     }
 
     var wildcardName = this.getWildCardName();
     var path = this.params[wildcardName] || '';
 
     if (!path) {
-      return fragment;
+      return encodeURI(fragment);
     }
 
-    path = encodeURI(path);
-    return fragment.substr(0, fragment.lastIndexOf(path));
+    return encodeURI(fragment.substr(0, fragment.lastIndexOf(path)));
   };
 
   NavigationInstruction.prototype._commitChanges = function _commitChanges(waitToSwap) {
@@ -31018,17 +31354,20 @@ var NavigationInstruction = exports.NavigationInstruction = function () {
       }
 
       if (viewPortInstruction.strategy === activationStrategy.replace) {
-        if (waitToSwap) {
-          delaySwaps.push({ viewPort: viewPort, viewPortInstruction: viewPortInstruction });
-        }
-
-        loads.push(viewPort.process(viewPortInstruction, waitToSwap).then(function (x) {
-          if (viewPortInstruction.childNavigationInstruction) {
-            return viewPortInstruction.childNavigationInstruction._commitChanges();
+        if (viewPortInstruction.childNavigationInstruction && viewPortInstruction.childNavigationInstruction.parentCatchHandler) {
+          loads.push(viewPortInstruction.childNavigationInstruction._commitChanges());
+        } else {
+          if (waitToSwap) {
+            delaySwaps.push({ viewPort: viewPort, viewPortInstruction: viewPortInstruction });
           }
+          loads.push(viewPort.process(viewPortInstruction, waitToSwap).then(function (x) {
+            if (viewPortInstruction.childNavigationInstruction) {
+              return viewPortInstruction.childNavigationInstruction._commitChanges();
+            }
 
-          return undefined;
-        }));
+            return undefined;
+          }));
+        }
       } else {
         if (viewPortInstruction.childNavigationInstruction) {
           loads.push(viewPortInstruction.childNavigationInstruction._commitChanges(waitToSwap));
@@ -31058,7 +31397,7 @@ var NavigationInstruction = exports.NavigationInstruction = function () {
   };
 
   NavigationInstruction.prototype._buildTitle = function _buildTitle() {
-    var separator = arguments.length <= 0 || arguments[0] === undefined ? ' | ' : arguments[0];
+    var separator = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : ' | ';
 
     var title = '';
     var childTitles = [];
@@ -31129,7 +31468,7 @@ function isNavigationCommand(obj) {
 
 var Redirect = exports.Redirect = function () {
   function Redirect(url) {
-    var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
+    var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 
     
 
@@ -31152,8 +31491,8 @@ var Redirect = exports.Redirect = function () {
 
 var RedirectToRoute = exports.RedirectToRoute = function () {
   function RedirectToRoute(route) {
-    var params = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
-    var options = arguments.length <= 2 || arguments[2] === undefined ? {} : arguments[2];
+    var params = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+    var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
 
     
 
@@ -31225,9 +31564,9 @@ var RouterConfiguration = exports.RouterConfiguration = function () {
 
       if (Array.isArray(config.route)) {
         for (var i = 0, ii = config.route.length; i < ii; ++i) {
-          var current = Object.assign({}, config);
-          current.route = config.route[i];
-          routeConfigs.push(current);
+          var _current = Object.assign({}, config);
+          _current.route = config.route[i];
+          routeConfigs.push(_current);
         }
       } else {
         routeConfigs.push(Object.assign({}, config));
@@ -31281,9 +31620,9 @@ var RouterConfiguration = exports.RouterConfiguration = function () {
 
       var pipelineProvider = router.pipelineProvider;
       for (var _i2 = 0, _ii2 = pipelineSteps.length; _i2 < _ii2; ++_i2) {
-        var _pipelineSteps$_i = pipelineSteps[_i2];
-        var _name = _pipelineSteps$_i.name;
-        var step = _pipelineSteps$_i.step;
+        var _pipelineSteps$_i = pipelineSteps[_i2],
+            _name = _pipelineSteps$_i.name,
+            step = _pipelineSteps$_i.step;
 
         pipelineProvider.addStep(_name, step);
       }
@@ -31382,11 +31721,11 @@ function _buildNavigationPlan(instruction, forceLifecycleMinimum) {
     });
   }
 
-  for (var _viewPortName in config.viewPorts) {
-    plan[_viewPortName] = {
-      name: _viewPortName,
+  for (var viewPortName in config.viewPorts) {
+    plan[viewPortName] = {
+      name: viewPortName,
       strategy: activationStrategy.replace,
-      config: instruction.config.viewPorts[_viewPortName]
+      config: instruction.config.viewPorts[viewPortName]
     };
   }
 
@@ -31551,7 +31890,7 @@ var Router = exports.Router = function () {
   };
 
   Router.prototype.generate = function generate(name, params) {
-    var options = arguments.length <= 2 || arguments[2] === undefined ? {} : arguments[2];
+    var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
 
     var hasRoute = this._recognizer.hasRoute(name);
     if ((!this.isConfigured || !hasRoute) && this.parent) {
@@ -31677,11 +32016,11 @@ var Router = exports.Router = function () {
     var nav = this.navigation;
 
     for (var i = 0, length = nav.length; i < length; i++) {
-      var current = nav[i];
-      if (!current.config.href) {
-        current.href = _createRootedPath(current.relativeHref, this.baseUrl, this.history._hasPushState);
+      var _current2 = nav[i];
+      if (!_current2.config.href) {
+        _current2.href = _createRootedPath(_current2.relativeHref, this.baseUrl, this.history._hasPushState);
       } else {
-        current.href = _normalizeAbsolutePath(current.config.href, this.history._hasPushState);
+        _current2.href = _normalizeAbsolutePath(_current2.config.href, this.history._hasPushState);
       }
     }
   };
@@ -31694,8 +32033,8 @@ var Router = exports.Router = function () {
   };
 
   Router.prototype._createNavigationInstruction = function _createNavigationInstruction() {
-    var url = arguments.length <= 0 || arguments[0] === undefined ? '' : arguments[0];
-    var parentInstruction = arguments.length <= 1 || arguments[1] === undefined ? null : arguments[1];
+    var url = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '';
+    var parentInstruction = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
 
     var fragment = url;
     var queryString = '';
@@ -31741,13 +32080,48 @@ var Router = exports.Router = function () {
     } else if (this.catchAllHandler) {
       var _instruction2 = new NavigationInstruction(Object.assign({}, instructionInit, {
         params: { path: fragment },
-        queryParams: results && results.queryParams,
+        queryParams: results ? results.queryParams : {},
         config: null }));
 
       return evaluateNavigationStrategy(_instruction2, this.catchAllHandler);
+    } else if (this.parent) {
+      var _router = this._parentCatchAllHandler(this.parent);
+
+      if (_router) {
+        var newParentInstruction = this._findParentInstructionFromRouter(_router, parentInstruction);
+
+        var _instruction3 = new NavigationInstruction(Object.assign({}, instructionInit, {
+          params: { path: fragment },
+          queryParams: results ? results.queryParams : {},
+          router: _router,
+          parentInstruction: newParentInstruction,
+          parentCatchHandler: true,
+          config: null }));
+
+        return evaluateNavigationStrategy(_instruction3, _router.catchAllHandler);
+      }
     }
 
     return Promise.reject(new Error('Route not found: ' + url));
+  };
+
+  Router.prototype._findParentInstructionFromRouter = function _findParentInstructionFromRouter(router, instruction) {
+    if (instruction.router === router) {
+      instruction.fragment = router.baseUrl;
+      return instruction;
+    } else if (instruction.parentInstruction) {
+      return this._findParentInstructionFromRouter(router, instruction.parentInstruction);
+    }
+    return undefined;
+  };
+
+  Router.prototype._parentCatchAllHandler = function _parentCatchAllHandler(router) {
+    if (router.catchAllHandler) {
+      return router;
+    } else if (router.parent) {
+      return this._parentCatchAllHandler(router.parent);
+    }
+    return false;
   };
 
   Router.prototype._createRouteConfig = function _createRouteConfig(config, instruction) {
@@ -31820,7 +32194,7 @@ var CanDeactivatePreviousStep = exports.CanDeactivatePreviousStep = function () 
   }
 
   CanDeactivatePreviousStep.prototype.run = function run(navigationInstruction, next) {
-    return processDeactivatable(navigationInstruction.plan, 'canDeactivate', next);
+    return processDeactivatable(navigationInstruction, 'canDeactivate', next);
   };
 
   return CanDeactivatePreviousStep;
@@ -31844,7 +32218,7 @@ var DeactivatePreviousStep = exports.DeactivatePreviousStep = function () {
   }
 
   DeactivatePreviousStep.prototype.run = function run(navigationInstruction, next) {
-    return processDeactivatable(navigationInstruction.plan, 'deactivate', next, true);
+    return processDeactivatable(navigationInstruction, 'deactivate', next, true);
   };
 
   return DeactivatePreviousStep;
@@ -31862,7 +32236,8 @@ var ActivateNextStep = exports.ActivateNextStep = function () {
   return ActivateNextStep;
 }();
 
-function processDeactivatable(plan, callbackName, next, ignoreResult) {
+function processDeactivatable(navigationInstruction, callbackName, next, ignoreResult) {
+  var plan = navigationInstruction.plan;
   var infos = findDeactivatable(plan, callbackName);
   var i = infos.length;
 
@@ -31878,7 +32253,7 @@ function processDeactivatable(plan, callbackName, next, ignoreResult) {
     if (i--) {
       try {
         var viewModel = infos[i];
-        var _result = viewModel[callbackName]();
+        var _result = viewModel[callbackName](navigationInstruction);
         return processPotential(_result, inspect, next.cancel);
       } catch (error) {
         return next.cancel(error);
@@ -31892,7 +32267,7 @@ function processDeactivatable(plan, callbackName, next, ignoreResult) {
 }
 
 function findDeactivatable(plan, callbackName) {
-  var list = arguments.length <= 2 || arguments[2] === undefined ? [] : arguments[2];
+  var list = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : [];
 
   for (var viewPortName in plan) {
     var _viewPortPlan = plan[viewPortName];
@@ -31906,10 +32281,10 @@ function findDeactivatable(plan, callbackName) {
       }
     }
 
-    if (_viewPortPlan.childNavigationInstruction) {
-      findDeactivatable(_viewPortPlan.childNavigationInstruction.plan, callbackName, list);
-    } else if (prevComponent) {
+    if (_viewPortPlan.strategy === activationStrategy.replace && prevComponent) {
       addPreviousDeactivatable(prevComponent, callbackName, list);
+    } else if (_viewPortPlan.childNavigationInstruction) {
+      findDeactivatable(_viewPortPlan.childNavigationInstruction.plan, callbackName, list);
     }
   }
 
@@ -31954,19 +32329,13 @@ function processActivatable(navigationInstruction, callbackName, next, ignoreRes
 
     if (i < length) {
       try {
-        var _ret3 = function () {
-          var _current$viewModel;
+        var _current3$viewModel;
 
-          var current = infos[i];
-          var result = (_current$viewModel = current.viewModel)[callbackName].apply(_current$viewModel, current.lifecycleArgs);
-          return {
-            v: processPotential(result, function (val) {
-              return inspect(val, current.router);
-            }, next.cancel)
-          };
-        }();
-
-        if ((typeof _ret3 === 'undefined' ? 'undefined' : _typeof(_ret3)) === "object") return _ret3.v;
+        var _current3 = infos[i];
+        var _result2 = (_current3$viewModel = _current3.viewModel)[callbackName].apply(_current3$viewModel, _current3.lifecycleArgs);
+        return processPotential(_result2, function (val) {
+          return inspect(val, _current3.router);
+        }, next.cancel);
       } catch (error) {
         return next.cancel(error);
       }
@@ -31979,7 +32348,7 @@ function processActivatable(navigationInstruction, callbackName, next, ignoreRes
 }
 
 function findActivatable(navigationInstruction, callbackName) {
-  var list = arguments.length <= 2 || arguments[2] === undefined ? [] : arguments[2];
+  var list = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : [];
   var router = arguments[3];
 
   var plan = navigationInstruction.plan;
@@ -32057,35 +32426,29 @@ function processPotential(obj, resolve, reject) {
   }
 
   if (obj && typeof obj.subscribe === 'function') {
-    var _ret4 = function () {
-      var obs = obj;
-      return {
-        v: new SafeSubscription(function (sub) {
-          return obs.subscribe({
-            next: function next() {
-              if (sub.subscribed) {
-                sub.unsubscribe();
-                resolve(obj);
-              }
-            },
-            error: function error(_error) {
-              if (sub.subscribed) {
-                sub.unsubscribe();
-                reject(_error);
-              }
-            },
-            complete: function complete() {
-              if (sub.subscribed) {
-                sub.unsubscribe();
-                resolve(obj);
-              }
-            }
-          });
-        })
-      };
-    }();
-
-    if ((typeof _ret4 === 'undefined' ? 'undefined' : _typeof(_ret4)) === "object") return _ret4.v;
+    var obs = obj;
+    return new SafeSubscription(function (sub) {
+      return obs.subscribe({
+        next: function next() {
+          if (sub.subscribed) {
+            sub.unsubscribe();
+            resolve(obj);
+          }
+        },
+        error: function error(_error) {
+          if (sub.subscribed) {
+            sub.unsubscribe();
+            reject(_error);
+          }
+        },
+        complete: function complete() {
+          if (sub.subscribed) {
+            sub.unsubscribe();
+            resolve(obj);
+          }
+        }
+      });
+    });
   }
 
   try {
@@ -32135,7 +32498,7 @@ function loadNewRoute(routeLoader, navigationInstruction) {
 }
 
 function determineWhatToLoad(navigationInstruction) {
-  var toLoad = arguments.length <= 1 || arguments[1] === undefined ? [] : arguments[1];
+  var toLoad = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
 
   var plan = navigationInstruction.plan;
 
@@ -32192,27 +32555,21 @@ function loadComponent(routeLoader, navigationInstruction, config) {
   var lifecycleArgs = navigationInstruction.lifecycleArgs;
 
   return routeLoader.loadRoute(router, config, navigationInstruction).then(function (component) {
-    var viewModel = component.viewModel;
-    var childContainer = component.childContainer;
+    var viewModel = component.viewModel,
+        childContainer = component.childContainer;
 
     component.router = router;
     component.config = config;
 
     if ('configureRouter' in viewModel) {
-      var _ret5 = function () {
-        var childRouter = childContainer.getChildRouter();
-        component.childRouter = childRouter;
+      var childRouter = childContainer.getChildRouter();
+      component.childRouter = childRouter;
 
-        return {
-          v: childRouter.configure(function (c) {
-            return viewModel.configureRouter.apply(viewModel, [c, childRouter].concat(lifecycleArgs));
-          }).then(function () {
-            return component;
-          })
-        };
-      }();
-
-      if ((typeof _ret5 === 'undefined' ? 'undefined' : _typeof(_ret5)) === "object") return _ret5.v;
+      return childRouter.configure(function (c) {
+        return viewModel.configureRouter.apply(viewModel, [c, childRouter].concat(lifecycleArgs));
+      }).then(function () {
+        return component;
+      });
     }
 
     return component;
@@ -32288,7 +32645,7 @@ var PipelineProvider = exports.PipelineProvider = function () {
   };
 
   PipelineProvider.prototype._clearSteps = function _clearSteps() {
-    var name = arguments.length <= 0 || arguments[0] === undefined ? '' : arguments[0];
+    var name = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '';
 
     var slot = this._findStep(name);
     if (slot) {
@@ -32356,33 +32713,21 @@ var AppRouter = exports.AppRouter = function (_Router) {
     _Router.prototype.registerViewPort.call(this, viewPort, name);
 
     if (!this.isActive) {
-      var _ret6 = function () {
-        var viewModel = _this12._findViewModel(viewPort);
-        if ('configureRouter' in viewModel) {
-          if (!_this12.isConfigured) {
-            var _ret7 = function () {
-              var resolveConfiguredPromise = _this12._resolveConfiguredPromise;
-              _this12._resolveConfiguredPromise = function () {};
-              return {
-                v: {
-                  v: _this12.configure(function (config) {
-                    return viewModel.configureRouter(config, _this12);
-                  }).then(function () {
-                    _this12.activate();
-                    resolveConfiguredPromise();
-                  })
-                }
-              };
-            }();
-
-            if ((typeof _ret7 === 'undefined' ? 'undefined' : _typeof(_ret7)) === "object") return _ret7.v;
-          }
-        } else {
-          _this12.activate();
+      var viewModel = this._findViewModel(viewPort);
+      if ('configureRouter' in viewModel) {
+        if (!this.isConfigured) {
+          var resolveConfiguredPromise = this._resolveConfiguredPromise;
+          this._resolveConfiguredPromise = function () {};
+          return this.configure(function (config) {
+            return viewModel.configureRouter(config, _this12);
+          }).then(function () {
+            _this12.activate();
+            resolveConfiguredPromise();
+          });
         }
-      }();
-
-      if ((typeof _ret6 === 'undefined' ? 'undefined' : _typeof(_ret6)) === "object") return _ret6.v;
+      } else {
+        this.activate();
+      }
     } else {
       this._dequeueInstruction();
     }
@@ -32419,7 +32764,7 @@ var AppRouter = exports.AppRouter = function (_Router) {
   AppRouter.prototype._dequeueInstruction = function _dequeueInstruction() {
     var _this14 = this;
 
-    var instructionCount = arguments.length <= 0 || arguments[0] === undefined ? 0 : arguments[0];
+    var instructionCount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0;
 
     return Promise.resolve().then(function () {
       if (_this14.isNavigating && !instructionCount) {
@@ -32918,8 +33263,6 @@ var RouteRecognizer = exports.RouteRecognizer = function () {
 
       return findHandler(state, normalizedPath, queryParams);
     }
-
-    return undefined;
   };
 
   return RouteRecognizer;
@@ -32949,9 +33292,9 @@ function parse(route, names, types, caseSensitive) {
 
     var match = segment.match(/^:([^?]+)(\?)?$/);
     if (match) {
-      var _match = match;
-      var _name = _match[1];
-      var optional = _match[2];
+      var _match = match,
+          _name = _match[1],
+          optional = _match[2];
 
       if (_name.indexOf('=') !== -1) {
         throw new Error('Parameter ' + _name + ' in route ' + route + ' has a default value, which is not supported.');
@@ -33073,5 +33416,6 @@ function addSegment(currentState, segment) {
 });
 return ___scope___.entry = "dist/commonjs/aurelia-route-recognizer.js";
 });
+FuseBox.target = "universal"
 })
-(function(e){function r(e){var r=e.charCodeAt(0),n=e.charCodeAt(1);if((d||58!==n)&&(r>=97&&r<=122||64===r)){if(64===r){var t=e.split("/"),i=t.splice(2,t.length).join("/");return[t[0]+"/"+t[1],i||void 0]}var o=e.indexOf("/");if(o===-1)return[e];var a=e.substring(0,o),f=e.substring(o+1);return[a,f]}}function n(e){return e.substring(0,e.lastIndexOf("/"))||"./"}function t(){for(var e=[],r=0;r<arguments.length;r++)e[r]=arguments[r];for(var n=[],t=0,i=arguments.length;t<i;t++)n=n.concat(arguments[t].split("/"));for(var o=[],t=0,i=n.length;t<i;t++){var a=n[t];a&&"."!==a&&(".."===a?o.pop():o.push(a))}return""===n[0]&&o.unshift(""),o.join("/")||(o.length?"/":".")}function i(e){var r=e.match(/\.(\w{1,})$/);return r&&r[1]?e:e+".js"}function o(e){if(d){var r,n=document,t=n.getElementsByTagName("head")[0];/\.css$/.test(e)?(r=n.createElement("link"),r.rel="stylesheet",r.type="text/css",r.href=e):(r=n.createElement("script"),r.type="text/javascript",r.src=e,r.async=!0),t.insertBefore(r,t.firstChild)}}function a(e,r){for(var n in e)e.hasOwnProperty(n)&&r(n,e[n])}function f(e){return{server:require(e)}}function u(e,n){var o=n.path||"./",a=n.pkg||"default",u=r(e);if(u&&(o="./",a=u[0],n.v&&n.v[a]&&(a=a+"@"+n.v[a]),e=u[1]),e)if(126===e.charCodeAt(0))e=e.slice(2,e.length),o="./";else if(!d&&(47===e.charCodeAt(0)||58===e.charCodeAt(1)))return f(e);var s=h[a];if(!s){if(d)throw"Package not found "+a;return f(a+(e?"/"+e:""))}e=e?e:"./"+s.s.entry;var l,c=t(o,e),v=i(c),p=s.f[v];return!p&&v.indexOf("*")>-1&&(l=v),p||l||(v=t(c,"/","index.js"),p=s.f[v],p||(v=c+".js",p=s.f[v]),p||(p=s.f[c+".jsx"]),p||(v=c+"/index.jsx",p=s.f[v])),{file:p,wildcard:l,pkgName:a,versions:s.v,filePath:c,validPath:v}}function s(e,r){if(!d)return r(/\.(js|json)$/.test(e)?v.require(e):"");var n=new XMLHttpRequest;n.onreadystatechange=function(){if(4==n.readyState)if(200==n.status){var i=n.getResponseHeader("Content-Type"),o=n.responseText;/json/.test(i)?o="module.exports = "+o:/javascript/.test(i)||(o="module.exports = "+JSON.stringify(o));var a=t("./",e);g.dynamic(a,o),r(g.import(e,{}))}else console.error(e,"not found on request"),r(void 0)},n.open("GET",e,!0),n.send()}function l(e,r){var n=m[e];if(n)for(var t in n){var i=n[t].apply(null,r);if(i===!1)return!1}}function c(e,r){if(void 0===r&&(r={}),58===e.charCodeAt(4)||58===e.charCodeAt(5))return o(e);var t=u(e,r);if(t.server)return t.server;var i=t.file;if(t.wildcard){var a=new RegExp(t.wildcard.replace(/\*/g,"@").replace(/[.?*+^$[\]\\(){}|-]/g,"\\$&").replace(/@@/g,".*").replace(/@/g,"[a-z0-9$_-]+"),"i"),f=h[t.pkgName];if(f){var p={};for(var m in f.f)a.test(m)&&(p[m]=c(t.pkgName+"/"+m));return p}}if(!i){var g="function"==typeof r,x=l("async",[e,r]);if(x===!1)return;return s(e,function(e){return g?r(e):null})}var _=t.pkgName;if(i.locals&&i.locals.module)return i.locals.module.exports;var w=i.locals={},y=n(t.validPath);w.exports={},w.module={exports:w.exports},w.require=function(e,r){return c(e,{pkg:_,path:y,v:t.versions})},w.require.main={filename:d?"./":v.require.main.filename,paths:d?[]:v.require.main.paths};var b=[w.module.exports,w.require,w.module,t.validPath,y,_];return l("before-import",b),i.fn.apply(0,b),l("after-import",b),w.module.exports}if(e.FuseBox)return e.FuseBox;var d="undefined"!=typeof window&&window.navigator,v=d?window:global;d&&(v.global=window),e=d&&"undefined"==typeof __fbx__dnm__?e:module.exports;var p=d?window.__fsbx__=window.__fsbx__||{}:v.$fsbx=v.$fsbx||{};d||(v.require=require);var h=p.p=p.p||{},m=p.e=p.e||{},g=function(){function r(){}return r.global=function(e,r){return void 0===r?v[e]:void(v[e]=r)},r.import=function(e,r){return c(e,r)},r.on=function(e,r){m[e]=m[e]||[],m[e].push(r)},r.exists=function(e){try{var r=u(e,{});return void 0!==r.file}catch(e){return!1}},r.remove=function(e){var r=u(e,{}),n=h[r.pkgName];n&&n.f[r.validPath]&&delete n.f[r.validPath]},r.main=function(e){return this.mainFile=e,r.import(e,{})},r.expose=function(r){var n=function(n){var t=r[n].alias,i=c(r[n].pkg);"*"===t?a(i,function(r,n){return e[r]=n}):"object"==typeof t?a(t,function(r,n){return e[n]=i[r]}):e[t]=i};for(var t in r)n(t)},r.dynamic=function(r,n,t){this.pkg(t&&t.pkg||"default",{},function(t){t.file(r,function(r,t,i,o,a){var f=new Function("__fbx__dnm__","exports","require","module","__filename","__dirname","__root__",n);f(!0,r,t,i,o,a,e)})})},r.flush=function(e){var r=h.default;for(var n in r.f)e&&!e(n)||delete r.f[n].locals},r.pkg=function(e,r,n){if(h[e])return n(h[e].s);var t=h[e]={};return t.f={},t.v=r,t.s={file:function(e,r){return t.f[e]={fn:r}}},n(t.s)},r.addPlugin=function(e){this.plugins.push(e)},r}();return g.packages=h,g.isBrowser=void 0!==d,g.isServer=!d,g.plugins=[],e.FuseBox=g}(this))
+(function(e){function r(e){var r=e.charCodeAt(0),n=e.charCodeAt(1);if((p||58!==n)&&(r>=97&&r<=122||64===r)){if(64===r){var t=e.split("/"),i=t.splice(2,t.length).join("/");return[t[0]+"/"+t[1],i||void 0]}var o=e.indexOf("/");if(o===-1)return[e];var a=e.substring(0,o),u=e.substring(o+1);return[a,u]}}function n(e){return e.substring(0,e.lastIndexOf("/"))||"./"}function t(){for(var e=[],r=0;r<arguments.length;r++)e[r]=arguments[r];for(var n=[],t=0,i=arguments.length;t<i;t++)n=n.concat(arguments[t].split("/"));for(var o=[],t=0,i=n.length;t<i;t++){var a=n[t];a&&"."!==a&&(".."===a?o.pop():o.push(a))}return""===n[0]&&o.unshift(""),o.join("/")||(o.length?"/":".")}function i(e){var r=e.match(/\.(\w{1,})$/);return r&&r[1]?e:e+".js"}function o(e){if(p){var r,n=document,t=n.getElementsByTagName("head")[0];/\.css$/.test(e)?(r=n.createElement("link"),r.rel="stylesheet",r.type="text/css",r.href=e):(r=n.createElement("script"),r.type="text/javascript",r.src=e,r.async=!0),t.insertBefore(r,t.firstChild)}}function a(e,r){for(var n in e)e.hasOwnProperty(n)&&r(n,e[n])}function u(e){return{server:require(e)}}function f(e,n){var o=n.path||"./",a=n.pkg||"default",f=r(e);if(f&&(o="./",a=f[0],n.v&&n.v[a]&&(a=a+"@"+n.v[a]),e=f[1]),e)if(126===e.charCodeAt(0))e=e.slice(2,e.length),o="./";else if(!p&&(47===e.charCodeAt(0)||58===e.charCodeAt(1)))return u(e);var s=g[a];if(!s){if(p&&"electron"!==x.target)throw"Package not found "+a;return u(a+(e?"/"+e:""))}e=e?e:"./"+s.s.entry;var l,c=t(o,e),d=i(c),v=s.f[d];return!v&&d.indexOf("*")>-1&&(l=d),v||l||(d=t(c,"/","index.js"),v=s.f[d],v||"."!==c||(d=s.s&&s.s.entry||"index.js",v=s.f[d]),v||(d=c+".js",v=s.f[d]),v||(v=s.f[c+".jsx"]),v||(d=c+"/index.jsx",v=s.f[d])),{file:v,wildcard:l,pkgName:a,versions:s.v,filePath:c,validPath:d}}function s(e,r,n){if(void 0===n&&(n={}),!p)return r(/\.(js|json)$/.test(e)?v.require(e):"");if(n&&n.ajaxed===e)return console.error(e,"does not provide a module");var i=new XMLHttpRequest;i.onreadystatechange=function(){if(4==i.readyState)if(200==i.status){var n=i.getResponseHeader("Content-Type"),o=i.responseText;/json/.test(n)?o="module.exports = "+o:/javascript/.test(n)||(o="module.exports = "+JSON.stringify(o));var a=t("./",e);x.dynamic(a,o),r(x.import(e,{ajaxed:e}))}else console.error(e,"not found on request"),r(void 0)},i.open("GET",e,!0),i.send()}function l(e,r){var n=h[e];if(n)for(var t in n){var i=n[t].apply(null,r);if(i===!1)return!1}}function c(e,r){if(void 0===r&&(r={}),58===e.charCodeAt(4)||58===e.charCodeAt(5))return o(e);var t=f(e,r);if(t.server)return t.server;var i=t.file;if(t.wildcard){var a=new RegExp(t.wildcard.replace(/\*/g,"@").replace(/[.?*+^$[\]\\(){}|-]/g,"\\$&").replace(/@@/g,".*").replace(/@/g,"[a-z0-9$_-]+"),"i"),u=g[t.pkgName];if(u){var d={};for(var m in u.f)a.test(m)&&(d[m]=c(t.pkgName+"/"+m));return d}}if(!i){var h="function"==typeof r,x=l("async",[e,r]);if(x===!1)return;return s(e,function(e){return h?r(e):null},r)}var _=t.pkgName;if(i.locals&&i.locals.module)return i.locals.module.exports;var y=i.locals={},w=n(t.validPath);y.exports={},y.module={exports:y.exports},y.require=function(e,r){return c(e,{pkg:_,path:w,v:t.versions})},p||!v.require.main?y.require.main={filename:"./",paths:[]}:y.require.main=v.require.main;var j=[y.module.exports,y.require,y.module,t.validPath,w,_];return l("before-import",j),i.fn.apply(0,j),l("after-import",j),y.module.exports}if(e.FuseBox)return e.FuseBox;var d="undefined"!=typeof WorkerGlobalScope,p="undefined"!=typeof window&&window.navigator||d,v=p?d?{}:window:global;p&&(v.global=d?{}:window),e=p&&"undefined"==typeof __fbx__dnm__?e:module.exports;var m=p?d?{}:window.__fsbx__=window.__fsbx__||{}:v.$fsbx=v.$fsbx||{};p||(v.require=require);var g=m.p=m.p||{},h=m.e=m.e||{},x=function(){function r(){}return r.global=function(e,r){return void 0===r?v[e]:void(v[e]=r)},r.import=function(e,r){return c(e,r)},r.on=function(e,r){h[e]=h[e]||[],h[e].push(r)},r.exists=function(e){try{var r=f(e,{});return void 0!==r.file}catch(e){return!1}},r.remove=function(e){var r=f(e,{}),n=g[r.pkgName];n&&n.f[r.validPath]&&delete n.f[r.validPath]},r.main=function(e){return this.mainFile=e,r.import(e,{})},r.expose=function(r){var n=function(n){var t=r[n].alias,i=c(r[n].pkg);"*"===t?a(i,function(r,n){return e[r]=n}):"object"==typeof t?a(t,function(r,n){return e[n]=i[r]}):e[t]=i};for(var t in r)n(t)},r.dynamic=function(r,n,t){this.pkg(t&&t.pkg||"default",{},function(t){t.file(r,function(r,t,i,o,a){var u=new Function("__fbx__dnm__","exports","require","module","__filename","__dirname","__root__",n);u(!0,r,t,i,o,a,e)})})},r.flush=function(e){var r=g.default;for(var n in r.f)e&&!e(n)||delete r.f[n].locals},r.pkg=function(e,r,n){if(g[e])return n(g[e].s);var t=g[e]={};return t.f={},t.v=r,t.s={file:function(e,r){return t.f[e]={fn:r}}},n(t.s)},r.addPlugin=function(e){this.plugins.push(e)},r.packages=g,r.isBrowser=p,r.isServer=!p,r.plugins=[],r}();return p||(v.FuseBox=x),e.FuseBox=x}(this))
