@@ -1,4 +1,4 @@
-
+console.log('vgrid:1.1.0');
 
 // import loader
 import 'fuse-box-aurelia-loader';

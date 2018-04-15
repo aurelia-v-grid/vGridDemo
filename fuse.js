@@ -6,8 +6,7 @@ var build = function () {
     const {
         FuseBox,
         HTMLPlugin,
-        RawPlugin,
-        TypeScriptHelpers
+        RawPlugin
     } = require("fuse-box");
 
 
@@ -17,8 +16,7 @@ var build = function () {
         plugins: [
            //TypeCheckPlugin({bundles:['app']}),
             HTMLPlugin(), 
-            [".css", RawPlugin({extensions: ['.css']})], 
-            TypeScriptHelpers()
+            [".css", RawPlugin({extensions: ['.css']})]
             
             ]
     });
