@@ -481,11 +481,11 @@ ___scope___.file("dist/commonjs/aurelia-binding.js", function(exports, require, 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.getSetObserver = exports.BindingEngine = exports.NameExpression = exports.Listener = exports.ListenerExpression = exports.BindingBehaviorResource = exports.ValueConverterResource = exports.Call = exports.CallExpression = exports.Binding = exports.BindingExpression = exports.ObjectObservationAdapter = exports.ObserverLocator = exports.SVGAnalyzer = exports.presentationAttributes = exports.presentationElements = exports.elements = exports.ComputedExpression = exports.ClassObserver = exports.SelectValueObserver = exports.CheckedObserver = exports.ValueAttributeObserver = exports.StyleObserver = exports.DataAttributeObserver = exports.dataAttributeAccessor = exports.XLinkAttributeObserver = exports.SetterObserver = exports.PrimitiveObserver = exports.propertyAccessor = exports.DirtyCheckProperty = exports.DirtyChecker = exports.EventSubscriber = exports.EventManager = exports.delegationStrategy = exports.getMapObserver = exports.ParserImplementation = exports.Parser = exports.Scanner = exports.Lexer = exports.Token = exports.bindingMode = exports.ExpressionCloner = exports.Unparser = exports.LiteralObject = exports.LiteralArray = exports.LiteralString = exports.LiteralPrimitive = exports.PrefixNot = exports.Binary = exports.CallFunction = exports.CallMember = exports.CallScope = exports.AccessKeyed = exports.AccessMember = exports.AccessScope = exports.AccessThis = exports.Conditional = exports.Assign = exports.ValueConverter = exports.BindingBehavior = exports.Chain = exports.Expression = exports.getArrayObserver = exports.CollectionLengthObserver = exports.ModifyCollectionObserver = exports.ExpressionObserver = exports.sourceContext = exports.targetContext = undefined;
-
-var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
+exports.getSetObserver = exports.BindingEngine = exports.NameExpression = exports.Listener = exports.ListenerExpression = exports.BindingBehaviorResource = exports.ValueConverterResource = exports.Call = exports.CallExpression = exports.Binding = exports.BindingExpression = exports.ObjectObservationAdapter = exports.ObserverLocator = exports.SVGAnalyzer = exports.presentationAttributes = exports.presentationElements = exports.elements = exports.ComputedExpression = exports.ClassObserver = exports.SelectValueObserver = exports.CheckedObserver = exports.ValueAttributeObserver = exports.StyleObserver = exports.DataAttributeObserver = exports.dataAttributeAccessor = exports.XLinkAttributeObserver = exports.SetterObserver = exports.PrimitiveObserver = exports.propertyAccessor = exports.DirtyCheckProperty = exports.DirtyChecker = exports.EventSubscriber = exports.EventManager = exports.delegationStrategy = exports.getMapObserver = exports.ParserImplementation = exports.Parser = exports.bindingMode = exports.ExpressionCloner = exports.Unparser = exports.LiteralObject = exports.LiteralArray = exports.LiteralTemplate = exports.LiteralString = exports.LiteralPrimitive = exports.Unary = exports.Binary = exports.CallFunction = exports.CallMember = exports.CallScope = exports.AccessKeyed = exports.AccessMember = exports.AccessScope = exports.AccessThis = exports.Conditional = exports.Assign = exports.ValueConverter = exports.BindingBehavior = exports.Expression = exports.getArrayObserver = exports.CollectionLengthObserver = exports.ModifyCollectionObserver = exports.ExpressionObserver = exports.sourceContext = exports.targetContext = undefined;
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
 var _dec, _dec2, _class, _dec3, _class2, _dec4, _class3, _dec5, _class5, _dec6, _class7, _dec7, _class8, _dec8, _class9, _dec9, _class10, _class12, _temp, _dec10, _class13, _class14, _temp2;
 
@@ -1469,109 +1469,115 @@ var CollectionLengthObserver = exports.CollectionLengthObserver = (_dec4 = subsc
   return CollectionLengthObserver;
 }()) || _class3);
 
-var pop = Array.prototype.pop;
-var push = Array.prototype.push;
-var reverse = Array.prototype.reverse;
-var shift = Array.prototype.shift;
-var sort = Array.prototype.sort;
-var splice = Array.prototype.splice;
-var unshift = Array.prototype.unshift;
+var arrayProto = Array.prototype;
+var pop = arrayProto.pop;
+var push = arrayProto.push;
+var reverse = arrayProto.reverse;
+var shift = arrayProto.shift;
+var sort = arrayProto.sort;
+var splice = arrayProto.splice;
+var unshift = arrayProto.unshift;
 
-Array.prototype.pop = function () {
-  var notEmpty = this.length > 0;
-  var methodCallResult = pop.apply(this, arguments);
-  if (notEmpty && this.__array_observer__ !== undefined) {
-    this.__array_observer__.addChangeRecord({
-      type: 'delete',
-      object: this,
-      name: this.length,
-      oldValue: methodCallResult
-    });
-  }
-  return methodCallResult;
-};
+if (arrayProto.__au_patched__) {
+  LogManager.getLogger('array-observation').warn('Detected 2nd attempt of patching array from Aurelia binding.' + ' This is probably caused by dependency mismatch between core modules and a 3rd party plugin.' + ' Please see https://github.com/aurelia/cli/pull/906 if you are using webpack.');
+} else {
+  Reflect.defineProperty(arrayProto, '__au_patched__', { value: 1 });
+  arrayProto.pop = function () {
+    var notEmpty = this.length > 0;
+    var methodCallResult = pop.apply(this, arguments);
+    if (notEmpty && this.__array_observer__ !== undefined) {
+      this.__array_observer__.addChangeRecord({
+        type: 'delete',
+        object: this,
+        name: this.length,
+        oldValue: methodCallResult
+      });
+    }
+    return methodCallResult;
+  };
 
-Array.prototype.push = function () {
-  var methodCallResult = push.apply(this, arguments);
-  if (this.__array_observer__ !== undefined) {
-    this.__array_observer__.addChangeRecord({
-      type: 'splice',
-      object: this,
-      index: this.length - arguments.length,
-      removed: [],
-      addedCount: arguments.length
-    });
-  }
-  return methodCallResult;
-};
+  arrayProto.push = function () {
+    var methodCallResult = push.apply(this, arguments);
+    if (this.__array_observer__ !== undefined) {
+      this.__array_observer__.addChangeRecord({
+        type: 'splice',
+        object: this,
+        index: this.length - arguments.length,
+        removed: [],
+        addedCount: arguments.length
+      });
+    }
+    return methodCallResult;
+  };
 
-Array.prototype.reverse = function () {
-  var oldArray = void 0;
-  if (this.__array_observer__ !== undefined) {
-    this.__array_observer__.flushChangeRecords();
-    oldArray = this.slice();
-  }
-  var methodCallResult = reverse.apply(this, arguments);
-  if (this.__array_observer__ !== undefined) {
-    this.__array_observer__.reset(oldArray);
-  }
-  return methodCallResult;
-};
+  arrayProto.reverse = function () {
+    var oldArray = void 0;
+    if (this.__array_observer__ !== undefined) {
+      this.__array_observer__.flushChangeRecords();
+      oldArray = this.slice();
+    }
+    var methodCallResult = reverse.apply(this, arguments);
+    if (this.__array_observer__ !== undefined) {
+      this.__array_observer__.reset(oldArray);
+    }
+    return methodCallResult;
+  };
 
-Array.prototype.shift = function () {
-  var notEmpty = this.length > 0;
-  var methodCallResult = shift.apply(this, arguments);
-  if (notEmpty && this.__array_observer__ !== undefined) {
-    this.__array_observer__.addChangeRecord({
-      type: 'delete',
-      object: this,
-      name: 0,
-      oldValue: methodCallResult
-    });
-  }
-  return methodCallResult;
-};
+  arrayProto.shift = function () {
+    var notEmpty = this.length > 0;
+    var methodCallResult = shift.apply(this, arguments);
+    if (notEmpty && this.__array_observer__ !== undefined) {
+      this.__array_observer__.addChangeRecord({
+        type: 'delete',
+        object: this,
+        name: 0,
+        oldValue: methodCallResult
+      });
+    }
+    return methodCallResult;
+  };
 
-Array.prototype.sort = function () {
-  var oldArray = void 0;
-  if (this.__array_observer__ !== undefined) {
-    this.__array_observer__.flushChangeRecords();
-    oldArray = this.slice();
-  }
-  var methodCallResult = sort.apply(this, arguments);
-  if (this.__array_observer__ !== undefined) {
-    this.__array_observer__.reset(oldArray);
-  }
-  return methodCallResult;
-};
+  arrayProto.sort = function () {
+    var oldArray = void 0;
+    if (this.__array_observer__ !== undefined) {
+      this.__array_observer__.flushChangeRecords();
+      oldArray = this.slice();
+    }
+    var methodCallResult = sort.apply(this, arguments);
+    if (this.__array_observer__ !== undefined) {
+      this.__array_observer__.reset(oldArray);
+    }
+    return methodCallResult;
+  };
 
-Array.prototype.splice = function () {
-  var methodCallResult = splice.apply(this, arguments);
-  if (this.__array_observer__ !== undefined) {
-    this.__array_observer__.addChangeRecord({
-      type: 'splice',
-      object: this,
-      index: +arguments[0],
-      removed: methodCallResult,
-      addedCount: arguments.length > 2 ? arguments.length - 2 : 0
-    });
-  }
-  return methodCallResult;
-};
+  arrayProto.splice = function () {
+    var methodCallResult = splice.apply(this, arguments);
+    if (this.__array_observer__ !== undefined) {
+      this.__array_observer__.addChangeRecord({
+        type: 'splice',
+        object: this,
+        index: +arguments[0],
+        removed: methodCallResult,
+        addedCount: arguments.length > 2 ? arguments.length - 2 : 0
+      });
+    }
+    return methodCallResult;
+  };
 
-Array.prototype.unshift = function () {
-  var methodCallResult = unshift.apply(this, arguments);
-  if (this.__array_observer__ !== undefined) {
-    this.__array_observer__.addChangeRecord({
-      type: 'splice',
-      object: this,
-      index: 0,
-      removed: [],
-      addedCount: arguments.length
-    });
-  }
-  return methodCallResult;
-};
+  arrayProto.unshift = function () {
+    var methodCallResult = unshift.apply(this, arguments);
+    if (this.__array_observer__ !== undefined) {
+      this.__array_observer__.addChangeRecord({
+        type: 'splice',
+        object: this,
+        index: 0,
+        removed: [],
+        addedCount: arguments.length
+      });
+    }
+    return methodCallResult;
+  };
+}
 
 function _getArrayObserver(taskQueue, array) {
   return ModifyArrayObserver.for(taskQueue, array);
@@ -1609,7 +1615,6 @@ var Expression = exports.Expression = function () {
   function Expression() {
     
 
-    this.isChain = false;
     this.isAssignable = false;
   }
 
@@ -1628,54 +1633,18 @@ var Expression = exports.Expression = function () {
   return Expression;
 }();
 
-var Chain = exports.Chain = function (_Expression) {
-  _inherits(Chain, _Expression);
-
-  function Chain(expressions) {
-    
-
-    var _this3 = _possibleConstructorReturn(this, _Expression.call(this));
-
-    _this3.expressions = expressions;
-    _this3.isChain = true;
-    return _this3;
-  }
-
-  Chain.prototype.evaluate = function evaluate(scope, lookupFunctions) {
-    var result = void 0;
-    var expressions = this.expressions;
-    var last = void 0;
-
-    for (var _i7 = 0, length = expressions.length; _i7 < length; ++_i7) {
-      last = expressions[_i7].evaluate(scope, lookupFunctions);
-
-      if (last !== null) {
-        result = last;
-      }
-    }
-
-    return result;
-  };
-
-  Chain.prototype.accept = function accept(visitor) {
-    return visitor.visitChain(this);
-  };
-
-  return Chain;
-}(Expression);
-
-var BindingBehavior = exports.BindingBehavior = function (_Expression2) {
-  _inherits(BindingBehavior, _Expression2);
+var BindingBehavior = exports.BindingBehavior = function (_Expression) {
+  _inherits(BindingBehavior, _Expression);
 
   function BindingBehavior(expression, name, args) {
     
 
-    var _this4 = _possibleConstructorReturn(this, _Expression2.call(this));
+    var _this3 = _possibleConstructorReturn(this, _Expression.call(this));
 
-    _this4.expression = expression;
-    _this4.name = name;
-    _this4.args = args;
-    return _this4;
+    _this3.expression = expression;
+    _this3.name = name;
+    _this3.args = args;
+    return _this3;
   }
 
   BindingBehavior.prototype.evaluate = function evaluate(scope, lookupFunctions) {
@@ -1722,19 +1691,19 @@ var BindingBehavior = exports.BindingBehavior = function (_Expression2) {
   return BindingBehavior;
 }(Expression);
 
-var ValueConverter = exports.ValueConverter = function (_Expression3) {
-  _inherits(ValueConverter, _Expression3);
+var ValueConverter = exports.ValueConverter = function (_Expression2) {
+  _inherits(ValueConverter, _Expression2);
 
-  function ValueConverter(expression, name, args, allArgs) {
+  function ValueConverter(expression, name, args) {
     
 
-    var _this5 = _possibleConstructorReturn(this, _Expression3.call(this));
+    var _this4 = _possibleConstructorReturn(this, _Expression2.call(this));
 
-    _this5.expression = expression;
-    _this5.name = name;
-    _this5.args = args;
-    _this5.allArgs = allArgs;
-    return _this5;
+    _this4.expression = expression;
+    _this4.name = name;
+    _this4.args = args;
+    _this4.allArgs = [expression].concat(args);
+    return _this4;
   }
 
   ValueConverter.prototype.evaluate = function evaluate(scope, lookupFunctions) {
@@ -1790,18 +1759,18 @@ var ValueConverter = exports.ValueConverter = function (_Expression3) {
   return ValueConverter;
 }(Expression);
 
-var Assign = exports.Assign = function (_Expression4) {
-  _inherits(Assign, _Expression4);
+var Assign = exports.Assign = function (_Expression3) {
+  _inherits(Assign, _Expression3);
 
   function Assign(target, value) {
     
 
-    var _this6 = _possibleConstructorReturn(this, _Expression4.call(this));
+    var _this5 = _possibleConstructorReturn(this, _Expression3.call(this));
 
-    _this6.target = target;
-    _this6.value = value;
-    _this6.isAssignable = true;
-    return _this6;
+    _this5.target = target;
+    _this5.value = value;
+    _this5.isAssignable = true;
+    return _this5;
   }
 
   Assign.prototype.evaluate = function evaluate(scope, lookupFunctions) {
@@ -1822,18 +1791,18 @@ var Assign = exports.Assign = function (_Expression4) {
   return Assign;
 }(Expression);
 
-var Conditional = exports.Conditional = function (_Expression5) {
-  _inherits(Conditional, _Expression5);
+var Conditional = exports.Conditional = function (_Expression4) {
+  _inherits(Conditional, _Expression4);
 
   function Conditional(condition, yes, no) {
     
 
-    var _this7 = _possibleConstructorReturn(this, _Expression5.call(this));
+    var _this6 = _possibleConstructorReturn(this, _Expression4.call(this));
 
-    _this7.condition = condition;
-    _this7.yes = yes;
-    _this7.no = no;
-    return _this7;
+    _this6.condition = condition;
+    _this6.yes = yes;
+    _this6.no = no;
+    return _this6;
   }
 
   Conditional.prototype.evaluate = function evaluate(scope, lookupFunctions) {
@@ -1856,16 +1825,16 @@ var Conditional = exports.Conditional = function (_Expression5) {
   return Conditional;
 }(Expression);
 
-var AccessThis = exports.AccessThis = function (_Expression6) {
-  _inherits(AccessThis, _Expression6);
+var AccessThis = exports.AccessThis = function (_Expression5) {
+  _inherits(AccessThis, _Expression5);
 
   function AccessThis(ancestor) {
     
 
-    var _this8 = _possibleConstructorReturn(this, _Expression6.call(this));
+    var _this7 = _possibleConstructorReturn(this, _Expression5.call(this));
 
-    _this8.ancestor = ancestor;
-    return _this8;
+    _this7.ancestor = ancestor;
+    return _this7;
   }
 
   AccessThis.prototype.evaluate = function evaluate(scope, lookupFunctions) {
@@ -1886,18 +1855,18 @@ var AccessThis = exports.AccessThis = function (_Expression6) {
   return AccessThis;
 }(Expression);
 
-var AccessScope = exports.AccessScope = function (_Expression7) {
-  _inherits(AccessScope, _Expression7);
+var AccessScope = exports.AccessScope = function (_Expression6) {
+  _inherits(AccessScope, _Expression6);
 
   function AccessScope(name, ancestor) {
     
 
-    var _this9 = _possibleConstructorReturn(this, _Expression7.call(this));
+    var _this8 = _possibleConstructorReturn(this, _Expression6.call(this));
 
-    _this9.name = name;
-    _this9.ancestor = ancestor;
-    _this9.isAssignable = true;
-    return _this9;
+    _this8.name = name;
+    _this8.ancestor = ancestor;
+    _this8.isAssignable = true;
+    return _this8;
   }
 
   AccessScope.prototype.evaluate = function evaluate(scope, lookupFunctions) {
@@ -1922,18 +1891,18 @@ var AccessScope = exports.AccessScope = function (_Expression7) {
   return AccessScope;
 }(Expression);
 
-var AccessMember = exports.AccessMember = function (_Expression8) {
-  _inherits(AccessMember, _Expression8);
+var AccessMember = exports.AccessMember = function (_Expression7) {
+  _inherits(AccessMember, _Expression7);
 
   function AccessMember(object, name) {
     
 
-    var _this10 = _possibleConstructorReturn(this, _Expression8.call(this));
+    var _this9 = _possibleConstructorReturn(this, _Expression7.call(this));
 
-    _this10.object = object;
-    _this10.name = name;
-    _this10.isAssignable = true;
-    return _this10;
+    _this9.object = object;
+    _this9.name = name;
+    _this9.isAssignable = true;
+    return _this9;
   }
 
   AccessMember.prototype.evaluate = function evaluate(scope, lookupFunctions) {
@@ -1968,18 +1937,18 @@ var AccessMember = exports.AccessMember = function (_Expression8) {
   return AccessMember;
 }(Expression);
 
-var AccessKeyed = exports.AccessKeyed = function (_Expression9) {
-  _inherits(AccessKeyed, _Expression9);
+var AccessKeyed = exports.AccessKeyed = function (_Expression8) {
+  _inherits(AccessKeyed, _Expression8);
 
   function AccessKeyed(object, key) {
     
 
-    var _this11 = _possibleConstructorReturn(this, _Expression9.call(this));
+    var _this10 = _possibleConstructorReturn(this, _Expression8.call(this));
 
-    _this11.object = object;
-    _this11.key = key;
-    _this11.isAssignable = true;
-    return _this11;
+    _this10.object = object;
+    _this10.key = key;
+    _this10.isAssignable = true;
+    return _this10;
   }
 
   AccessKeyed.prototype.evaluate = function evaluate(scope, lookupFunctions) {
@@ -2014,18 +1983,18 @@ var AccessKeyed = exports.AccessKeyed = function (_Expression9) {
   return AccessKeyed;
 }(Expression);
 
-var CallScope = exports.CallScope = function (_Expression10) {
-  _inherits(CallScope, _Expression10);
+var CallScope = exports.CallScope = function (_Expression9) {
+  _inherits(CallScope, _Expression9);
 
   function CallScope(name, args, ancestor) {
     
 
-    var _this12 = _possibleConstructorReturn(this, _Expression10.call(this));
+    var _this11 = _possibleConstructorReturn(this, _Expression9.call(this));
 
-    _this12.name = name;
-    _this12.args = args;
-    _this12.ancestor = ancestor;
-    return _this12;
+    _this11.name = name;
+    _this11.args = args;
+    _this11.ancestor = ancestor;
+    return _this11;
   }
 
   CallScope.prototype.evaluate = function evaluate(scope, lookupFunctions, mustEvaluate) {
@@ -2053,18 +2022,18 @@ var CallScope = exports.CallScope = function (_Expression10) {
   return CallScope;
 }(Expression);
 
-var CallMember = exports.CallMember = function (_Expression11) {
-  _inherits(CallMember, _Expression11);
+var CallMember = exports.CallMember = function (_Expression10) {
+  _inherits(CallMember, _Expression10);
 
   function CallMember(object, name, args) {
     
 
-    var _this13 = _possibleConstructorReturn(this, _Expression11.call(this));
+    var _this12 = _possibleConstructorReturn(this, _Expression10.call(this));
 
-    _this13.object = object;
-    _this13.name = name;
-    _this13.args = args;
-    return _this13;
+    _this12.object = object;
+    _this12.name = name;
+    _this12.args = args;
+    return _this12;
   }
 
   CallMember.prototype.evaluate = function evaluate(scope, lookupFunctions, mustEvaluate) {
@@ -2086,9 +2055,9 @@ var CallMember = exports.CallMember = function (_Expression11) {
     var obj = this.object.evaluate(scope);
     if (getFunction(obj, this.name, false)) {
       var args = this.args;
-      var _i8 = args.length;
-      while (_i8--) {
-        args[_i8].connect(binding, scope);
+      var _i7 = args.length;
+      while (_i7--) {
+        args[_i7].connect(binding, scope);
       }
     }
   };
@@ -2096,17 +2065,17 @@ var CallMember = exports.CallMember = function (_Expression11) {
   return CallMember;
 }(Expression);
 
-var CallFunction = exports.CallFunction = function (_Expression12) {
-  _inherits(CallFunction, _Expression12);
+var CallFunction = exports.CallFunction = function (_Expression11) {
+  _inherits(CallFunction, _Expression11);
 
   function CallFunction(func, args) {
     
 
-    var _this14 = _possibleConstructorReturn(this, _Expression12.call(this));
+    var _this13 = _possibleConstructorReturn(this, _Expression11.call(this));
 
-    _this14.func = func;
-    _this14.args = args;
-    return _this14;
+    _this13.func = func;
+    _this13.args = args;
+    return _this13;
   }
 
   CallFunction.prototype.evaluate = function evaluate(scope, lookupFunctions, mustEvaluate) {
@@ -2129,9 +2098,9 @@ var CallFunction = exports.CallFunction = function (_Expression12) {
     var func = this.func.evaluate(scope);
     if (typeof func === 'function') {
       var args = this.args;
-      var _i9 = args.length;
-      while (_i9--) {
-        args[_i9].connect(binding, scope);
+      var _i8 = args.length;
+      while (_i8--) {
+        args[_i8].connect(binding, scope);
       }
     }
   };
@@ -2139,18 +2108,18 @@ var CallFunction = exports.CallFunction = function (_Expression12) {
   return CallFunction;
 }(Expression);
 
-var Binary = exports.Binary = function (_Expression13) {
-  _inherits(Binary, _Expression13);
+var Binary = exports.Binary = function (_Expression12) {
+  _inherits(Binary, _Expression12);
 
   function Binary(operation, left, right) {
     
 
-    var _this15 = _possibleConstructorReturn(this, _Expression13.call(this));
+    var _this14 = _possibleConstructorReturn(this, _Expression12.call(this));
 
-    _this15.operation = operation;
-    _this15.left = left;
-    _this15.right = right;
-    return _this15;
+    _this14.operation = operation;
+    _this14.left = left;
+    _this14.right = right;
+    return _this14;
   }
 
   Binary.prototype.evaluate = function evaluate(scope, lookupFunctions) {
@@ -2174,6 +2143,10 @@ var Binary = exports.Binary = function (_Expression13) {
         return left != right;
       case '!==':
         return left !== right;
+      case 'instanceof':
+        return typeof right === 'function' && left instanceof right;
+      case 'in':
+        return (typeof right === 'undefined' ? 'undefined' : _typeof(right)) === 'object' && right !== null && left in right;
     }
 
     if (left === null || right === null || left === undefined || right === undefined) {
@@ -2233,44 +2206,53 @@ var Binary = exports.Binary = function (_Expression13) {
   return Binary;
 }(Expression);
 
-var PrefixNot = exports.PrefixNot = function (_Expression14) {
-  _inherits(PrefixNot, _Expression14);
+var Unary = exports.Unary = function (_Expression13) {
+  _inherits(Unary, _Expression13);
 
-  function PrefixNot(operation, expression) {
+  function Unary(operation, expression) {
     
 
-    var _this16 = _possibleConstructorReturn(this, _Expression14.call(this));
+    var _this15 = _possibleConstructorReturn(this, _Expression13.call(this));
 
-    _this16.operation = operation;
-    _this16.expression = expression;
-    return _this16;
+    _this15.operation = operation;
+    _this15.expression = expression;
+    return _this15;
   }
 
-  PrefixNot.prototype.evaluate = function evaluate(scope, lookupFunctions) {
-    return !this.expression.evaluate(scope, lookupFunctions);
+  Unary.prototype.evaluate = function evaluate(scope, lookupFunctions) {
+    switch (this.operation) {
+      case '!':
+        return !this.expression.evaluate(scope, lookupFunctions);
+      case 'typeof':
+        return _typeof(this.expression.evaluate(scope, lookupFunctions));
+      case 'void':
+        return void this.expression.evaluate(scope, lookupFunctions);
+    }
+
+    throw new Error('Internal error [' + this.operation + '] not handled');
   };
 
-  PrefixNot.prototype.accept = function accept(visitor) {
+  Unary.prototype.accept = function accept(visitor) {
     return visitor.visitPrefix(this);
   };
 
-  PrefixNot.prototype.connect = function connect(binding, scope) {
+  Unary.prototype.connect = function connect(binding, scope) {
     this.expression.connect(binding, scope);
   };
 
-  return PrefixNot;
+  return Unary;
 }(Expression);
 
-var LiteralPrimitive = exports.LiteralPrimitive = function (_Expression15) {
-  _inherits(LiteralPrimitive, _Expression15);
+var LiteralPrimitive = exports.LiteralPrimitive = function (_Expression14) {
+  _inherits(LiteralPrimitive, _Expression14);
 
   function LiteralPrimitive(value) {
     
 
-    var _this17 = _possibleConstructorReturn(this, _Expression15.call(this));
+    var _this16 = _possibleConstructorReturn(this, _Expression14.call(this));
 
-    _this17.value = value;
-    return _this17;
+    _this16.value = value;
+    return _this16;
   }
 
   LiteralPrimitive.prototype.evaluate = function evaluate(scope, lookupFunctions) {
@@ -2286,16 +2268,16 @@ var LiteralPrimitive = exports.LiteralPrimitive = function (_Expression15) {
   return LiteralPrimitive;
 }(Expression);
 
-var LiteralString = exports.LiteralString = function (_Expression16) {
-  _inherits(LiteralString, _Expression16);
+var LiteralString = exports.LiteralString = function (_Expression15) {
+  _inherits(LiteralString, _Expression15);
 
   function LiteralString(value) {
     
 
-    var _this18 = _possibleConstructorReturn(this, _Expression16.call(this));
+    var _this17 = _possibleConstructorReturn(this, _Expression15.call(this));
 
-    _this18.value = value;
-    return _this18;
+    _this17.value = value;
+    return _this17;
   }
 
   LiteralString.prototype.evaluate = function evaluate(scope, lookupFunctions) {
@@ -2309,6 +2291,79 @@ var LiteralString = exports.LiteralString = function (_Expression16) {
   LiteralString.prototype.connect = function connect(binding, scope) {};
 
   return LiteralString;
+}(Expression);
+
+var LiteralTemplate = exports.LiteralTemplate = function (_Expression16) {
+  _inherits(LiteralTemplate, _Expression16);
+
+  function LiteralTemplate(cooked, expressions, raw, tag) {
+    
+
+    var _this18 = _possibleConstructorReturn(this, _Expression16.call(this));
+
+    _this18.cooked = cooked;
+    _this18.expressions = expressions || [];
+    _this18.length = _this18.expressions.length;
+    _this18.tagged = tag !== undefined;
+    if (_this18.tagged) {
+      _this18.cooked.raw = raw;
+      _this18.tag = tag;
+      if (tag instanceof AccessScope) {
+        _this18.contextType = 'Scope';
+      } else if (tag instanceof AccessMember || tag instanceof AccessKeyed) {
+        _this18.contextType = 'Object';
+      } else {
+        throw new Error(_this18.tag + ' is not a valid template tag');
+      }
+    }
+    return _this18;
+  }
+
+  LiteralTemplate.prototype.getScopeContext = function getScopeContext(scope, lookupFunctions) {
+    return getContextFor(this.tag.name, scope, this.tag.ancestor);
+  };
+
+  LiteralTemplate.prototype.getObjectContext = function getObjectContext(scope, lookupFunctions) {
+    return this.tag.object.evaluate(scope, lookupFunctions);
+  };
+
+  LiteralTemplate.prototype.evaluate = function evaluate(scope, lookupFunctions, mustEvaluate) {
+    var results = new Array(this.length);
+    for (var _i9 = 0; _i9 < this.length; _i9++) {
+      results[_i9] = this.expressions[_i9].evaluate(scope, lookupFunctions);
+    }
+    if (this.tagged) {
+      var func = this.tag.evaluate(scope, lookupFunctions);
+      if (typeof func === 'function') {
+        var context = this['get' + this.contextType + 'Context'](scope, lookupFunctions);
+        return func.call.apply(func, [context, this.cooked].concat(results));
+      }
+      if (!mustEvaluate) {
+        return null;
+      }
+      throw new Error(this.tag + ' is not a function');
+    }
+    var result = this.cooked[0];
+    for (var _i10 = 0; _i10 < this.length; _i10++) {
+      result = String.prototype.concat(result, results[_i10], this.cooked[_i10 + 1]);
+    }
+    return result;
+  };
+
+  LiteralTemplate.prototype.accept = function accept(visitor) {
+    return visitor.visitLiteralTemplate(this);
+  };
+
+  LiteralTemplate.prototype.connect = function connect(binding, scope) {
+    for (var _i11 = 0; _i11 < this.length; _i11++) {
+      this.expressions[_i11].connect(binding, scope);
+    }
+    if (this.tagged) {
+      this.tag.connect(binding, scope);
+    }
+  };
+
+  return LiteralTemplate;
 }(Expression);
 
 var LiteralArray = exports.LiteralArray = function (_Expression17) {
@@ -2327,8 +2382,8 @@ var LiteralArray = exports.LiteralArray = function (_Expression17) {
     var elements = this.elements;
     var result = [];
 
-    for (var _i10 = 0, length = elements.length; _i10 < length; ++_i10) {
-      result[_i10] = elements[_i10].evaluate(scope, lookupFunctions);
+    for (var _i12 = 0, length = elements.length; _i12 < length; ++_i12) {
+      result[_i12] = elements[_i12].evaluate(scope, lookupFunctions);
     }
 
     return result;
@@ -2340,8 +2395,8 @@ var LiteralArray = exports.LiteralArray = function (_Expression17) {
 
   LiteralArray.prototype.connect = function connect(binding, scope) {
     var length = this.elements.length;
-    for (var _i11 = 0; _i11 < length; _i11++) {
-      this.elements[_i11].connect(binding, scope);
+    for (var _i13 = 0; _i13 < length; _i13++) {
+      this.elements[_i13].connect(binding, scope);
     }
   };
 
@@ -2366,8 +2421,8 @@ var LiteralObject = exports.LiteralObject = function (_Expression18) {
     var keys = this.keys;
     var values = this.values;
 
-    for (var _i12 = 0, length = keys.length; _i12 < length; ++_i12) {
-      instance[keys[_i12]] = values[_i12].evaluate(scope, lookupFunctions);
+    for (var _i14 = 0, length = keys.length; _i14 < length; ++_i14) {
+      instance[keys[_i14]] = values[_i14].evaluate(scope, lookupFunctions);
     }
 
     return instance;
@@ -2379,8 +2434,8 @@ var LiteralObject = exports.LiteralObject = function (_Expression18) {
 
   LiteralObject.prototype.connect = function connect(binding, scope) {
     var length = this.keys.length;
-    for (var _i13 = 0; _i13 < length; _i13++) {
-      this.values[_i13].connect(binding, scope);
+    for (var _i15 = 0; _i15 < length; _i15++) {
+      this.values[_i15].connect(binding, scope);
     }
   };
 
@@ -2390,8 +2445,8 @@ var LiteralObject = exports.LiteralObject = function (_Expression18) {
 function evalList(scope, list, lookupFunctions) {
   var length = list.length;
   var result = [];
-  for (var _i14 = 0; _i14 < length; _i14++) {
-    result[_i14] = list[_i14].evaluate(scope, lookupFunctions);
+  for (var _i16 = 0; _i16 < length; _i16++) {
+    result[_i16] = list[_i16].evaluate(scope, lookupFunctions);
   }
   return result;
 }
@@ -2486,27 +2541,15 @@ if (typeof FEATURE_NO_UNPARSER === 'undefined') {
     Unparser.prototype.writeArgs = function writeArgs(args) {
       this.write('(');
 
-      for (var _i15 = 0, length = args.length; _i15 < length; ++_i15) {
-        if (_i15 !== 0) {
+      for (var _i17 = 0, length = args.length; _i17 < length; ++_i17) {
+        if (_i17 !== 0) {
           this.write(',');
         }
 
-        args[_i15].accept(this);
+        args[_i17].accept(this);
       }
 
       this.write(')');
-    };
-
-    Unparser.prototype.visitChain = function visitChain(chain) {
-      var expressions = chain.expressions;
-
-      for (var _i16 = 0, length = expressions.length; _i16 < length; ++_i16) {
-        if (_i16 !== 0) {
-          this.write(';');
-        }
-
-        expressions[_i16].accept(this);
-      }
     };
 
     Unparser.prototype.visitBindingBehavior = function visitBindingBehavior(behavior) {
@@ -2515,9 +2558,9 @@ if (typeof FEATURE_NO_UNPARSER === 'undefined') {
       behavior.expression.accept(this);
       this.write('&' + behavior.name);
 
-      for (var _i17 = 0, length = args.length; _i17 < length; ++_i17) {
+      for (var _i18 = 0, length = args.length; _i18 < length; ++_i18) {
         this.write(':');
-        args[_i17].accept(this);
+        args[_i18].accept(this);
       }
     };
 
@@ -2527,9 +2570,9 @@ if (typeof FEATURE_NO_UNPARSER === 'undefined') {
       converter.expression.accept(this);
       this.write('|' + converter.name);
 
-      for (var _i18 = 0, length = args.length; _i18 < length; ++_i18) {
+      for (var _i19 = 0, length = args.length; _i19 < length; ++_i19) {
         this.write(':');
-        args[_i18].accept(this);
+        args[_i19].accept(this);
       }
     };
 
@@ -2601,13 +2644,20 @@ if (typeof FEATURE_NO_UNPARSER === 'undefined') {
 
     Unparser.prototype.visitPrefix = function visitPrefix(prefix) {
       this.write('(' + prefix.operation);
+      if (prefix.operation.charCodeAt(0) >= 97) {
+        this.write(' ');
+      }
       prefix.expression.accept(this);
       this.write(')');
     };
 
     Unparser.prototype.visitBinary = function visitBinary(binary) {
       binary.left.accept(this);
-      this.write(binary.operation);
+      if (binary.operation.charCodeAt(0) === 105) {
+        this.write(' ' + binary.operation + ' ');
+      } else {
+        this.write(binary.operation);
+      }
       binary.right.accept(this);
     };
 
@@ -2620,12 +2670,12 @@ if (typeof FEATURE_NO_UNPARSER === 'undefined') {
 
       this.write('[');
 
-      for (var _i19 = 0, length = elements.length; _i19 < length; ++_i19) {
-        if (_i19 !== 0) {
+      for (var _i20 = 0, length = elements.length; _i20 < length; ++_i20) {
+        if (_i20 !== 0) {
           this.write(',');
         }
 
-        elements[_i19].accept(this);
+        elements[_i20].accept(this);
       }
 
       this.write(']');
@@ -2637,13 +2687,13 @@ if (typeof FEATURE_NO_UNPARSER === 'undefined') {
 
       this.write('{');
 
-      for (var _i20 = 0, length = keys.length; _i20 < length; ++_i20) {
-        if (_i20 !== 0) {
+      for (var _i21 = 0, length = keys.length; _i21 < length; ++_i21) {
+        if (_i21 !== 0) {
           this.write(',');
         }
 
-        this.write('\'' + keys[_i20] + '\':');
-        values[_i20].accept(this);
+        this.write('\'' + keys[_i21] + '\':');
+        values[_i21].accept(this);
       }
 
       this.write('}');
@@ -2652,6 +2702,20 @@ if (typeof FEATURE_NO_UNPARSER === 'undefined') {
     Unparser.prototype.visitLiteralString = function visitLiteralString(literal) {
       var escaped = literal.value.replace(/'/g, "\'");
       this.write('\'' + escaped + '\'');
+    };
+
+    Unparser.prototype.visitLiteralTemplate = function visitLiteralTemplate(literal) {
+      var cooked = literal.cooked,
+          expressions = literal.expressions;
+
+      var length = expressions.length;
+      this.write('`');
+      this.write(cooked[0]);
+      for (var _i22 = 0; _i22 < length; _i22++) {
+        expressions[_i22].accept(this);
+        this.write(cooked[_i22 + 1]);
+      }
+      this.write('`');
     };
 
     return Unparser;
@@ -2670,10 +2734,6 @@ var ExpressionCloner = exports.ExpressionCloner = function () {
       clonedArray[i] = array[i].accept(this);
     }
     return clonedArray;
-  };
-
-  ExpressionCloner.prototype.visitChain = function visitChain(chain) {
-    return new Chain(this.cloneExpressionArray(chain.expressions));
   };
 
   ExpressionCloner.prototype.visitBindingBehavior = function visitBindingBehavior(behavior) {
@@ -2720,8 +2780,8 @@ var ExpressionCloner = exports.ExpressionCloner = function () {
     return new CallMember(call.object.accept(this), call.name, this.cloneExpressionArray(call.args));
   };
 
-  ExpressionCloner.prototype.visitPrefix = function visitPrefix(prefix) {
-    return new PrefixNot(prefix.operation, prefix.expression.accept(this));
+  ExpressionCloner.prototype.visitUnary = function visitUnary(unary) {
+    return new Unary(prefix.operation, prefix.expression.accept(this));
   };
 
   ExpressionCloner.prototype.visitBinary = function visitBinary(binary) {
@@ -2744,6 +2804,10 @@ var ExpressionCloner = exports.ExpressionCloner = function () {
     return new LiteralString(literal.value);
   };
 
+  ExpressionCloner.prototype.visitLiteralTemplate = function visitLiteralTemplate(literal) {
+    return new LiteralTemplate(literal.cooked, this.cloneExpressionArray(literal.expressions), literal.raw, literal.tag && literal.tag.accept(this));
+  };
+
   return ExpressionCloner;
 }();
 
@@ -2760,278 +2824,471 @@ var bindingMode = exports.bindingMode = {
   fromView: 3
 };
 
-var Token = exports.Token = function () {
-  function Token(index, text) {
+var Parser = exports.Parser = function () {
+  function Parser() {
     
 
-    this.index = index;
-    this.text = text;
+    this.cache = Object.create(null);
   }
 
-  Token.prototype.withOp = function withOp(op) {
-    this.opKey = op;
-    return this;
+  Parser.prototype.parse = function parse(src) {
+    src = src || '';
+
+    return this.cache[src] || (this.cache[src] = new ParserImplementation(src).parseBindingBehavior());
   };
 
-  Token.prototype.withGetterSetter = function withGetterSetter(key) {
-    this.key = key;
-    return this;
-  };
-
-  Token.prototype.withValue = function withValue(value) {
-    this.value = value;
-    return this;
-  };
-
-  Token.prototype.toString = function toString() {
-    return 'Token(' + this.text + ')';
-  };
-
-  return Token;
+  return Parser;
 }();
 
-var Lexer = exports.Lexer = function () {
-  function Lexer() {
-    
-  }
+var fromCharCode = String.fromCharCode;
 
-  Lexer.prototype.lex = function lex(text) {
-    var scanner = new Scanner(text);
-    var tokens = [];
-    var token = scanner.scanToken();
-
-    while (token) {
-      tokens.push(token);
-      token = scanner.scanToken();
+var ParserImplementation = exports.ParserImplementation = function () {
+  _createClass(ParserImplementation, [{
+    key: 'raw',
+    get: function get() {
+      return this.src.slice(this.start, this.idx);
     }
+  }]);
 
-    return tokens;
-  };
-
-  return Lexer;
-}();
-
-var Scanner = exports.Scanner = function () {
-  function Scanner(input) {
+  function ParserImplementation(src) {
     
 
-    this.input = input;
-    this.length = input.length;
-    this.peek = 0;
-    this.index = -1;
+    this.idx = 0;
 
-    this.advance();
+    this.start = 0;
+
+    this.src = src;
+    this.len = src.length;
+
+    this.tkn = T$EOF;
+
+    this.val = undefined;
+
+    this.ch = src.charCodeAt(0);
   }
 
-  Scanner.prototype.scanToken = function scanToken() {
-    while (this.peek <= $SPACE) {
-      if (++this.index >= this.length) {
-        this.peek = $EOF;
-        return null;
+  ParserImplementation.prototype.parseBindingBehavior = function parseBindingBehavior() {
+    this.nextToken();
+    if (this.tkn & T$ExpressionTerminal) {
+      this.err('Invalid start of expression');
+    }
+    var result = this.parseValueConverter();
+    while (this.opt(T$Ampersand)) {
+      result = new BindingBehavior(result, this.val, this.parseVariadicArgs());
+    }
+    if (this.tkn !== T$EOF) {
+      this.err('Unconsumed token ' + this.raw);
+    }
+    return result;
+  };
+
+  ParserImplementation.prototype.parseValueConverter = function parseValueConverter() {
+    var result = this.parseExpression();
+    while (this.opt(T$Bar)) {
+      result = new ValueConverter(result, this.val, this.parseVariadicArgs());
+    }
+    return result;
+  };
+
+  ParserImplementation.prototype.parseVariadicArgs = function parseVariadicArgs() {
+    this.nextToken();
+    var result = [];
+    while (this.opt(T$Colon)) {
+      result.push(this.parseExpression());
+    }
+    return result;
+  };
+
+  ParserImplementation.prototype.parseExpression = function parseExpression() {
+    var exprStart = this.idx;
+    var result = this.parseConditional();
+
+    while (this.tkn === T$Eq) {
+      if (!result.isAssignable) {
+        this.err('Expression ' + this.src.slice(exprStart, this.start) + ' is not assignable');
       }
-
-      this.peek = this.input.charCodeAt(this.index);
+      this.nextToken();
+      exprStart = this.idx;
+      result = new Assign(result, this.parseConditional());
     }
+    return result;
+  };
 
-    if (isIdentifierStart(this.peek)) {
-      return this.scanIdentifier();
+  ParserImplementation.prototype.parseConditional = function parseConditional() {
+    var result = this.parseBinary(0);
+
+    if (this.opt(T$Question)) {
+      var yes = this.parseExpression();
+      this.expect(T$Colon);
+      result = new Conditional(result, yes, this.parseExpression());
     }
+    return result;
+  };
 
-    if (isDigit(this.peek)) {
-      return this.scanNumber(this.index);
+  ParserImplementation.prototype.parseBinary = function parseBinary(minPrecedence) {
+    var left = this.parseLeftHandSide(0);
+
+    while (this.tkn & T$BinaryOp) {
+      var opToken = this.tkn;
+      if ((opToken & T$Precedence) <= minPrecedence) {
+        break;
+      }
+      this.nextToken();
+      left = new Binary(TokenValues[opToken & T$TokenMask], left, this.parseBinary(opToken & T$Precedence));
     }
+    return left;
+  };
 
-    var start = this.index;
+  ParserImplementation.prototype.parseLeftHandSide = function parseLeftHandSide(context) {
+    var result = void 0;
 
-    switch (this.peek) {
-      case $PERIOD:
-        this.advance();
-        return isDigit(this.peek) ? this.scanNumber(start) : new Token(start, '.');
-      case $LPAREN:
-      case $RPAREN:
-      case $LBRACE:
-      case $RBRACE:
-      case $LBRACKET:
-      case $RBRACKET:
-      case $COMMA:
-      case $COLON:
-      case $SEMICOLON:
-        return this.scanCharacter(start, String.fromCharCode(this.peek));
-      case $SQ:
-      case $DQ:
-        return this.scanString();
-      case $PLUS:
-      case $MINUS:
-      case $STAR:
-      case $SLASH:
-      case $PERCENT:
-      case $CARET:
-      case $QUESTION:
-        return this.scanOperator(start, String.fromCharCode(this.peek));
-      case $LT:
-      case $GT:
-      case $BANG:
-      case $EQ:
-        return this.scanComplexOperator(start, $EQ, String.fromCharCode(this.peek), '=');
-      case $AMPERSAND:
-        return this.scanComplexOperator(start, $AMPERSAND, '&', '&');
-      case $BAR:
-        return this.scanComplexOperator(start, $BAR, '|', '|');
-      case $NBSP:
-        while (isWhitespace(this.peek)) {
-          this.advance();
+    primary: switch (this.tkn) {
+      case T$Plus:
+        this.nextToken();
+        return this.parseLeftHandSide(0);
+      case T$Minus:
+        this.nextToken();
+        return new Binary('-', new LiteralPrimitive(0), this.parseLeftHandSide(0));
+      case T$Bang:
+      case T$TypeofKeyword:
+      case T$VoidKeyword:
+        var op = TokenValues[this.tkn & T$TokenMask];
+        this.nextToken();
+        return new Unary(op, this.parseLeftHandSide(0));
+      case T$ParentScope:
+        {
+          do {
+            this.nextToken();
+            context++;
+            if (this.opt(T$Period)) {
+              if (this.tkn === T$Period) {
+                this.err();
+              }
+              continue;
+            } else if (this.tkn & T$AccessScopeTerminal) {
+              result = new AccessThis(context & C$Ancestor);
+
+              context = context & C$ShorthandProp | C$This;
+              break primary;
+            } else {
+              this.err();
+            }
+          } while (this.tkn === T$ParentScope);
         }
 
-        return this.scanToken();
+      case T$Identifier:
+        {
+          result = new AccessScope(this.val, context & C$Ancestor);
+          this.nextToken();
+          context = context & C$ShorthandProp | C$Scope;
+          break;
+        }
+      case T$ThisScope:
+        this.nextToken();
+        result = new AccessThis(0);
+        context = context & C$ShorthandProp | C$This;
+        break;
+      case T$LParen:
+        this.nextToken();
+        result = this.parseExpression();
+        this.expect(T$RParen);
+        context = C$Primary;
+        break;
+      case T$LBracket:
+        {
+          this.nextToken();
+          var _elements = [];
+          if (this.tkn !== T$RBracket) {
+            do {
+              _elements.push(this.parseExpression());
+            } while (this.opt(T$Comma));
+          }
+          this.expect(T$RBracket);
+          result = new LiteralArray(_elements);
+          context = C$Primary;
+          break;
+        }
+      case T$LBrace:
+        {
+          var keys = [];
+          var values = [];
+          this.nextToken();
+          while (this.tkn !== T$RBrace) {
+            if (this.tkn & T$IdentifierOrKeyword) {
+              var ch = this.ch,
+                  tkn = this.tkn,
+                  idx = this.idx;
+
+              keys.push(this.val);
+              this.nextToken();
+              if (this.opt(T$Colon)) {
+                values.push(this.parseExpression());
+              } else {
+                this.ch = ch;
+                this.tkn = tkn;
+                this.idx = idx;
+                values.push(this.parseLeftHandSide(C$ShorthandProp));
+              }
+            } else if (this.tkn & T$Literal) {
+              keys.push(this.val);
+              this.nextToken();
+              this.expect(T$Colon);
+              values.push(this.parseExpression());
+            } else {
+              this.err();
+            }
+            if (this.tkn !== T$RBrace) {
+              this.expect(T$Comma);
+            }
+          }
+          this.expect(T$RBrace);
+          result = new LiteralObject(keys, values);
+          context = C$Primary;
+          break;
+        }
+      case T$StringLiteral:
+        result = new LiteralString(this.val);
+        this.nextToken();
+        context = C$Primary;
+        break;
+      case T$TemplateTail:
+        result = new LiteralTemplate([this.val]);
+        this.nextToken();
+        context = C$Primary;
+        break;
+      case T$TemplateContinuation:
+        result = this.parseTemplate(0);
+        context = C$Primary;
+        break;
+      case T$NumericLiteral:
+        {
+          result = new LiteralPrimitive(this.val);
+          this.nextToken();
+
+          break;
+        }
+      case T$NullKeyword:
+      case T$UndefinedKeyword:
+      case T$TrueKeyword:
+      case T$FalseKeyword:
+        result = new LiteralPrimitive(TokenValues[this.tkn & T$TokenMask]);
+        this.nextToken();
+        context = C$Primary;
+        break;
+      default:
+        if (this.idx >= this.len) {
+          this.err('Unexpected end of expression');
+        } else {
+          this.err();
+        }
     }
 
-    var character = String.fromCharCode(this.peek);
-    this.error('Unexpected character [' + character + ']');
-    return null;
-  };
-
-  Scanner.prototype.scanCharacter = function scanCharacter(start, text) {
-    assert(this.peek === text.charCodeAt(0));
-    this.advance();
-    return new Token(start, text);
-  };
-
-  Scanner.prototype.scanOperator = function scanOperator(start, text) {
-    assert(this.peek === text.charCodeAt(0));
-    assert(OPERATORS[text] === 1);
-    this.advance();
-    return new Token(start, text).withOp(text);
-  };
-
-  Scanner.prototype.scanComplexOperator = function scanComplexOperator(start, code, one, two) {
-    assert(this.peek === one.charCodeAt(0));
-    this.advance();
-
-    var text = one;
-
-    if (this.peek === code) {
-      this.advance();
-      text += two;
+    if (context & C$ShorthandProp) {
+      return result;
     }
 
-    if (this.peek === code) {
-      this.advance();
-      text += two;
-    }
+    var name = this.val;
+    while (this.tkn & T$MemberOrCallExpression) {
+      switch (this.tkn) {
+        case T$Period:
+          this.nextToken();
+          if (!(this.tkn & T$IdentifierOrKeyword)) {
+            this.err();
+          }
+          name = this.val;
+          this.nextToken();
 
-    assert(OPERATORS[text] === 1);
-
-    return new Token(start, text).withOp(text);
-  };
-
-  Scanner.prototype.scanIdentifier = function scanIdentifier() {
-    assert(isIdentifierStart(this.peek));
-    var start = this.index;
-
-    this.advance();
-
-    while (isIdentifierPart(this.peek)) {
-      this.advance();
-    }
-
-    var text = this.input.substring(start, this.index);
-    var result = new Token(start, text);
-
-    if (OPERATORS[text] === 1) {
-      result.withOp(text);
-    } else {
-      result.withGetterSetter(text);
+          context = context & C$Primary | (context & (C$This | C$Scope)) << 1 | context & C$Member | (context & C$Keyed) >> 1 | (context & C$Call) >> 2;
+          if (this.tkn === T$LParen) {
+            continue;
+          }
+          if (context & C$Scope) {
+            result = new AccessScope(name, result.ancestor);
+          } else {
+            result = new AccessMember(result, name);
+          }
+          continue;
+        case T$LBracket:
+          this.nextToken();
+          context = C$Keyed;
+          result = new AccessKeyed(result, this.parseExpression());
+          this.expect(T$RBracket);
+          break;
+        case T$LParen:
+          this.nextToken();
+          var args = [];
+          while (this.tkn !== T$RParen) {
+            args.push(this.parseExpression());
+            if (!this.opt(T$Comma)) {
+              break;
+            }
+          }
+          this.expect(T$RParen);
+          if (context & C$Scope) {
+            result = new CallScope(name, args, result.ancestor);
+          } else if (context & (C$Member | C$Primary)) {
+            result = new CallMember(result, name, args);
+          } else {
+            result = new CallFunction(result, args);
+          }
+          context = C$Call;
+          break;
+        case T$TemplateTail:
+          result = new LiteralTemplate([this.val], [], [this.raw], result);
+          this.nextToken();
+          break;
+        case T$TemplateContinuation:
+          result = this.parseTemplate(context | C$Tagged, result);
+      }
     }
 
     return result;
   };
 
-  Scanner.prototype.scanNumber = function scanNumber(start) {
-    assert(isDigit(this.peek));
-    var simple = this.index === start;
-    this.advance();
+  ParserImplementation.prototype.parseTemplate = function parseTemplate(context, func) {
+    var cooked = [this.val];
+    var raw = context & C$Tagged ? [this.raw] : undefined;
+    this.expect(T$TemplateContinuation);
+    var expressions = [this.parseExpression()];
 
-    while (true) {
-      if (!isDigit(this.peek)) {
-        if (this.peek === $PERIOD) {
-          simple = false;
-        } else if (isExponentStart(this.peek)) {
-          this.advance();
-
-          if (isExponentSign(this.peek)) {
-            this.advance();
-          }
-
-          if (!isDigit(this.peek)) {
-            this.error('Invalid exponent', -1);
-          }
-
-          simple = false;
-        } else {
-          break;
-        }
+    while ((this.tkn = this.scanTemplateTail()) !== T$TemplateTail) {
+      cooked.push(this.val);
+      if (context & C$Tagged) {
+        raw.push(this.raw);
       }
-
-      this.advance();
+      this.expect(T$TemplateContinuation);
+      expressions.push(this.parseExpression());
     }
 
-    var text = this.input.substring(start, this.index);
-    var value = simple ? parseInt(text, 10) : parseFloat(text);
-    return new Token(start, text).withValue(value);
+    cooked.push(this.val);
+    if (context & C$Tagged) {
+      raw.push(this.raw);
+    }
+    this.nextToken();
+    return new LiteralTemplate(cooked, expressions, raw, func);
   };
 
-  Scanner.prototype.scanString = function scanString() {
-    assert(this.peek === $SQ || this.peek === $DQ);
+  ParserImplementation.prototype.nextToken = function nextToken() {
+    while (this.idx < this.len) {
+      if (this.ch <= 0x20) {
+        this.next();
+        continue;
+      }
+      this.start = this.idx;
+      if (this.ch === 0x24 || this.ch >= 0x61 && this.ch <= 0x7A) {
+        this.tkn = this.scanIdentifier();
+        return;
+      }
 
-    var start = this.index;
-    var quote = this.peek;
+      if ((this.tkn = CharScanners[this.ch](this)) !== null) {
+        return;
+      }
+    }
+    this.tkn = T$EOF;
+  };
 
-    this.advance();
+  ParserImplementation.prototype.next = function next() {
+    return this.ch = this.src.charCodeAt(++this.idx);
+  };
+
+  ParserImplementation.prototype.scanIdentifier = function scanIdentifier() {
+    while (AsciiIdParts.has(this.next()) || this.ch > 0x7F && IdParts[this.ch]) {}
+
+    return KeywordLookup[this.val = this.raw] || T$Identifier;
+  };
+
+  ParserImplementation.prototype.scanNumber = function scanNumber(isFloat) {
+    if (isFloat) {
+      this.val = 0;
+    } else {
+      this.val = this.ch - 0x30;
+      while (this.next() <= 0x39 && this.ch >= 0x30) {
+        this.val = this.val * 10 + this.ch - 0x30;
+      }
+    }
+
+    if (isFloat || this.ch === 0x2E) {
+      if (!isFloat) {
+        this.next();
+      }
+      var start = this.idx;
+      var value = this.ch - 0x30;
+      while (this.next() <= 0x39 && this.ch >= 0x30) {
+        value = value * 10 + this.ch - 0x30;
+      }
+      this.val = this.val + value / Math.pow(10, this.idx - start);
+    }
+
+    if (this.ch === 0x65 || this.ch === 0x45) {
+      var _start = this.idx;
+
+      this.next();
+      if (this.ch === 0x2D || this.ch === 0x2B) {
+        this.next();
+      }
+
+      if (!(this.ch >= 0x30 && this.ch <= 0x39)) {
+        this.idx = _start;
+        this.err('Invalid exponent');
+      }
+      while (this.next() <= 0x39 && this.ch >= 0x30) {}
+      this.val = parseFloat(this.src.slice(this.start, this.idx));
+    }
+
+    return T$NumericLiteral;
+  };
+
+  ParserImplementation.prototype.scanString = function scanString() {
+    var quote = this.ch;
+    this.next();
 
     var buffer = void 0;
-    var marker = this.index;
+    var marker = this.idx;
 
-    while (this.peek !== quote) {
-      if (this.peek === $BACKSLASH) {
+    while (this.ch !== quote) {
+      if (this.ch === 0x5C) {
         if (!buffer) {
           buffer = [];
         }
 
-        buffer.push(this.input.substring(marker, this.index));
-        this.advance();
+        buffer.push(this.src.slice(marker, this.idx));
+
+        this.next();
 
         var _unescaped = void 0;
 
-        if (this.peek === $u) {
-          var hex = this.input.substring(this.index + 1, this.index + 5);
+        if (this.ch === 0x75) {
+          this.next();
 
-          if (!/[A-Z0-9]{4}/.test(hex)) {
-            this.error('Invalid unicode escape [\\u' + hex + ']');
-          }
+          if (this.idx + 4 < this.len) {
+            var hex = this.src.slice(this.idx, this.idx + 4);
 
-          _unescaped = parseInt(hex, 16);
+            if (!/[A-Z0-9]{4}/i.test(hex)) {
+              this.err('Invalid unicode escape [\\u' + hex + ']');
+            }
 
-          for (var _i21 = 0; _i21 < 5; ++_i21) {
-            this.advance();
+            _unescaped = parseInt(hex, 16);
+            this.idx += 4;
+            this.ch = this.src.charCodeAt(this.idx);
+          } else {
+            this.err();
           }
         } else {
-          _unescaped = unescape(this.peek);
-          this.advance();
+          _unescaped = unescape(this.ch);
+          this.next();
         }
 
-        buffer.push(String.fromCharCode(_unescaped));
-        marker = this.index;
-      } else if (this.peek === $EOF) {
-        this.error('Unterminated quote');
+        buffer.push(fromCharCode(_unescaped));
+        marker = this.idx;
+      } else if (this.ch === 0) {
+        this.err('Unterminated quote');
       } else {
-        this.advance();
+        this.next();
       }
     }
 
-    var last = this.input.substring(marker, this.index);
-    this.advance();
-    var text = this.input.substring(start, this.index);
-
+    var last = this.src.slice(marker, this.idx);
+    this.next();
     var unescaped = last;
 
     if (buffer !== null && buffer !== undefined) {
@@ -3039,567 +3296,335 @@ var Scanner = exports.Scanner = function () {
       unescaped = buffer.join('');
     }
 
-    return new Token(start, text).withValue(unescaped);
+    this.val = unescaped;
+    return T$StringLiteral;
   };
 
-  Scanner.prototype.advance = function advance() {
-    if (++this.index >= this.length) {
-      this.peek = $EOF;
-    } else {
-      this.peek = this.input.charCodeAt(this.index);
-    }
-  };
-
-  Scanner.prototype.error = function error(message) {
-    var offset = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
-
-    var position = this.index + offset;
-    throw new Error('Lexer Error: ' + message + ' at column ' + position + ' in expression [' + this.input + ']');
-  };
-
-  return Scanner;
-}();
-
-var OPERATORS = {
-  'undefined': 1,
-  'null': 1,
-  'true': 1,
-  'false': 1,
-  '+': 1,
-  '-': 1,
-  '*': 1,
-  '/': 1,
-  '%': 1,
-  '^': 1,
-  '=': 1,
-  '==': 1,
-  '===': 1,
-  '!=': 1,
-  '!==': 1,
-  '<': 1,
-  '>': 1,
-  '<=': 1,
-  '>=': 1,
-  '&&': 1,
-  '||': 1,
-  '&': 1,
-  '|': 1,
-  '!': 1,
-  '?': 1
-};
-
-var $EOF = 0;
-var $TAB = 9;
-var $LF = 10;
-var $VTAB = 11;
-var $FF = 12;
-var $CR = 13;
-var $SPACE = 32;
-var $BANG = 33;
-var $DQ = 34;
-var $$ = 36;
-var $PERCENT = 37;
-var $AMPERSAND = 38;
-var $SQ = 39;
-var $LPAREN = 40;
-var $RPAREN = 41;
-var $STAR = 42;
-var $PLUS = 43;
-var $COMMA = 44;
-var $MINUS = 45;
-var $PERIOD = 46;
-var $SLASH = 47;
-var $COLON = 58;
-var $SEMICOLON = 59;
-var $LT = 60;
-var $EQ = 61;
-var $GT = 62;
-var $QUESTION = 63;
-
-var $0 = 48;
-var $9 = 57;
-
-var $A = 65;
-var $E = 69;
-var $Z = 90;
-
-var $LBRACKET = 91;
-var $BACKSLASH = 92;
-var $RBRACKET = 93;
-var $CARET = 94;
-var $_ = 95;
-
-var $a = 97;
-var $e = 101;
-var $f = 102;
-var $n = 110;
-var $r = 114;
-var $t = 116;
-var $u = 117;
-var $v = 118;
-var $z = 122;
-
-var $LBRACE = 123;
-var $BAR = 124;
-var $RBRACE = 125;
-var $NBSP = 160;
-
-function isWhitespace(code) {
-  return code >= $TAB && code <= $SPACE || code === $NBSP;
-}
-
-function isIdentifierStart(code) {
-  return $a <= code && code <= $z || $A <= code && code <= $Z || code === $_ || code === $$;
-}
-
-function isIdentifierPart(code) {
-  return $a <= code && code <= $z || $A <= code && code <= $Z || $0 <= code && code <= $9 || code === $_ || code === $$;
-}
-
-function isDigit(code) {
-  return $0 <= code && code <= $9;
-}
-
-function isExponentStart(code) {
-  return code === $e || code === $E;
-}
-
-function isExponentSign(code) {
-  return code === $MINUS || code === $PLUS;
-}
-
-function unescape(code) {
-  switch (code) {
-    case $n:
-      return $LF;
-    case $f:
-      return $FF;
-    case $r:
-      return $CR;
-    case $t:
-      return $TAB;
-    case $v:
-      return $VTAB;
-    default:
-      return code;
-  }
-}
-
-function assert(condition, message) {
-  if (!condition) {
-    throw message || 'Assertion failed';
-  }
-}
-
-var EOF = new Token(-1, null);
-
-var Parser = exports.Parser = function () {
-  function Parser() {
-    
-
-    this.cache = {};
-    this.lexer = new Lexer();
-  }
-
-  Parser.prototype.parse = function parse(input) {
-    input = input || '';
-
-    return this.cache[input] || (this.cache[input] = new ParserImplementation(this.lexer, input).parseChain());
-  };
-
-  return Parser;
-}();
-
-var ParserImplementation = exports.ParserImplementation = function () {
-  function ParserImplementation(lexer, input) {
-    
-
-    this.index = 0;
-    this.input = input;
-    this.tokens = lexer.lex(input);
-  }
-
-  ParserImplementation.prototype.parseChain = function parseChain() {
-    var isChain = false;
-    var expressions = [];
-
-    while (this.optional(';')) {
-      isChain = true;
-    }
-
-    while (this.index < this.tokens.length) {
-      if (this.peek.text === ')' || this.peek.text === '}' || this.peek.text === ']') {
-        this.error('Unconsumed token ' + this.peek.text);
-      }
-
-      var expr = this.parseBindingBehavior();
-      expressions.push(expr);
-
-      while (this.optional(';')) {
-        isChain = true;
-      }
-
-      if (isChain) {
-        this.error('Multiple expressions are not allowed.');
-      }
-    }
-
-    return expressions.length === 1 ? expressions[0] : new Chain(expressions);
-  };
-
-  ParserImplementation.prototype.parseBindingBehavior = function parseBindingBehavior() {
-    var result = this.parseValueConverter();
-
-    while (this.optional('&')) {
-      var name = this.peek.text;
-      var args = [];
-
-      this.advance();
-
-      while (this.optional(':')) {
-        args.push(this.parseExpression());
-      }
-
-      result = new BindingBehavior(result, name, args);
-    }
-
-    return result;
-  };
-
-  ParserImplementation.prototype.parseValueConverter = function parseValueConverter() {
-    var result = this.parseExpression();
-
-    while (this.optional('|')) {
-      var name = this.peek.text;
-      var args = [];
-
-      this.advance();
-
-      while (this.optional(':')) {
-        args.push(this.parseExpression());
-      }
-
-      result = new ValueConverter(result, name, args, [result].concat(args));
-    }
-
-    return result;
-  };
-
-  ParserImplementation.prototype.parseExpression = function parseExpression() {
-    var start = this.peek.index;
-    var result = this.parseConditional();
-
-    while (this.peek.text === '=') {
-      if (!result.isAssignable) {
-        var end = this.index < this.tokens.length ? this.peek.index : this.input.length;
-        var expression = this.input.substring(start, end);
-
-        this.error('Expression ' + expression + ' is not assignable');
-      }
-
-      this.expect('=');
-      result = new Assign(result, this.parseConditional());
-    }
-
-    return result;
-  };
-
-  ParserImplementation.prototype.parseConditional = function parseConditional() {
-    var start = this.peek.index;
-    var result = this.parseLogicalOr();
-
-    if (this.optional('?')) {
-      var yes = this.parseExpression();
-
-      if (!this.optional(':')) {
-        var end = this.index < this.tokens.length ? this.peek.index : this.input.length;
-        var expression = this.input.substring(start, end);
-
-        this.error('Conditional expression ' + expression + ' requires all 3 expressions');
-      }
-
-      var no = this.parseExpression();
-      result = new Conditional(result, yes, no);
-    }
-
-    return result;
-  };
-
-  ParserImplementation.prototype.parseLogicalOr = function parseLogicalOr() {
-    var result = this.parseLogicalAnd();
-
-    while (this.optional('||')) {
-      result = new Binary('||', result, this.parseLogicalAnd());
-    }
-
-    return result;
-  };
-
-  ParserImplementation.prototype.parseLogicalAnd = function parseLogicalAnd() {
-    var result = this.parseEquality();
-
-    while (this.optional('&&')) {
-      result = new Binary('&&', result, this.parseEquality());
-    }
-
-    return result;
-  };
-
-  ParserImplementation.prototype.parseEquality = function parseEquality() {
-    var result = this.parseRelational();
-
-    while (true) {
-      if (this.optional('==')) {
-        result = new Binary('==', result, this.parseRelational());
-      } else if (this.optional('!=')) {
-        result = new Binary('!=', result, this.parseRelational());
-      } else if (this.optional('===')) {
-        result = new Binary('===', result, this.parseRelational());
-      } else if (this.optional('!==')) {
-        result = new Binary('!==', result, this.parseRelational());
-      } else {
-        return result;
-      }
-    }
-  };
-
-  ParserImplementation.prototype.parseRelational = function parseRelational() {
-    var result = this.parseAdditive();
-
-    while (true) {
-      if (this.optional('<')) {
-        result = new Binary('<', result, this.parseAdditive());
-      } else if (this.optional('>')) {
-        result = new Binary('>', result, this.parseAdditive());
-      } else if (this.optional('<=')) {
-        result = new Binary('<=', result, this.parseAdditive());
-      } else if (this.optional('>=')) {
-        result = new Binary('>=', result, this.parseAdditive());
-      } else {
-        return result;
-      }
-    }
-  };
-
-  ParserImplementation.prototype.parseAdditive = function parseAdditive() {
-    var result = this.parseMultiplicative();
-
-    while (true) {
-      if (this.optional('+')) {
-        result = new Binary('+', result, this.parseMultiplicative());
-      } else if (this.optional('-')) {
-        result = new Binary('-', result, this.parseMultiplicative());
-      } else {
-        return result;
-      }
-    }
-  };
-
-  ParserImplementation.prototype.parseMultiplicative = function parseMultiplicative() {
-    var result = this.parsePrefix();
-
-    while (true) {
-      if (this.optional('*')) {
-        result = new Binary('*', result, this.parsePrefix());
-      } else if (this.optional('%')) {
-        result = new Binary('%', result, this.parsePrefix());
-      } else if (this.optional('/')) {
-        result = new Binary('/', result, this.parsePrefix());
-      } else {
-        return result;
-      }
-    }
-  };
-
-  ParserImplementation.prototype.parsePrefix = function parsePrefix() {
-    if (this.optional('+')) {
-      return this.parsePrefix();
-    } else if (this.optional('-')) {
-      return new Binary('-', new LiteralPrimitive(0), this.parsePrefix());
-    } else if (this.optional('!')) {
-      return new PrefixNot('!', this.parsePrefix());
-    }
-
-    return this.parseAccessOrCallMember();
-  };
-
-  ParserImplementation.prototype.parseAccessOrCallMember = function parseAccessOrCallMember() {
-    var result = this.parsePrimary();
-
-    while (true) {
-      if (this.optional('.')) {
-        var name = this.peek.text;
-
-        this.advance();
-
-        if (this.optional('(')) {
-          var args = this.parseExpressionList(')');
-          this.expect(')');
-          if (result instanceof AccessThis) {
-            result = new CallScope(name, args, result.ancestor);
-          } else {
-            result = new CallMember(result, name, args);
-          }
+  ParserImplementation.prototype.scanTemplate = function scanTemplate() {
+    var tail = true;
+    var result = '';
+
+    while (this.next() !== 0x60) {
+      if (this.ch === 0x24) {
+        if (this.idx + 1 < this.len && this.src.charCodeAt(this.idx + 1) === 0x7B) {
+          this.idx++;
+          tail = false;
+          break;
         } else {
-          if (result instanceof AccessThis) {
-            result = new AccessScope(name, result.ancestor);
-          } else {
-            result = new AccessMember(result, name);
-          }
+          result += '$';
         }
-      } else if (this.optional('[')) {
-        var key = this.parseExpression();
-        this.expect(']');
-        result = new AccessKeyed(result, key);
-      } else if (this.optional('(')) {
-        var _args = this.parseExpressionList(')');
-        this.expect(')');
-        result = new CallFunction(result, _args);
+      } else if (this.ch === 0x5C) {
+        result += fromCharCode(unescape(this.next()));
       } else {
-        return result;
-      }
-    }
-  };
-
-  ParserImplementation.prototype.parsePrimary = function parsePrimary() {
-    if (this.optional('(')) {
-      var result = this.parseExpression();
-      this.expect(')');
-      return result;
-    } else if (this.optional('null')) {
-      return new LiteralPrimitive(null);
-    } else if (this.optional('undefined')) {
-      return new LiteralPrimitive(undefined);
-    } else if (this.optional('true')) {
-      return new LiteralPrimitive(true);
-    } else if (this.optional('false')) {
-      return new LiteralPrimitive(false);
-    } else if (this.optional('[')) {
-      var _elements = this.parseExpressionList(']');
-      this.expect(']');
-      return new LiteralArray(_elements);
-    } else if (this.peek.text === '{') {
-      return this.parseObject();
-    } else if (this.peek.key !== null && this.peek.key !== undefined) {
-      return this.parseAccessOrCallScope();
-    } else if (this.peek.value !== null && this.peek.value !== undefined) {
-      var value = this.peek.value;
-      this.advance();
-      return value instanceof String || typeof value === 'string' ? new LiteralString(value) : new LiteralPrimitive(value);
-    } else if (this.index >= this.tokens.length) {
-      throw new Error('Unexpected end of expression: ' + this.input);
-    } else {
-      this.error('Unexpected token ' + this.peek.text);
-    }
-  };
-
-  ParserImplementation.prototype.parseAccessOrCallScope = function parseAccessOrCallScope() {
-    var name = this.peek.key;
-
-    this.advance();
-
-    if (name === '$this') {
-      return new AccessThis(0);
-    }
-
-    var ancestor = 0;
-    while (name === '$parent') {
-      ancestor++;
-      if (this.optional('.')) {
-        name = this.peek.key;
-        this.advance();
-      } else if (this.peek === EOF || this.peek.text === '(' || this.peek.text === ')' || this.peek.text === '[' || this.peek.text === '}' || this.peek.text === ',' || this.peek.text === '|' || this.peek.text === '&') {
-        return new AccessThis(ancestor);
-      } else {
-        this.error('Unexpected token ' + this.peek.text);
+        result += fromCharCode(this.ch);
       }
     }
 
-    if (this.optional('(')) {
-      var args = this.parseExpressionList(')');
-      this.expect(')');
-      return new CallScope(name, args, ancestor);
+    this.next();
+    this.val = result;
+    if (tail) {
+      return T$TemplateTail;
     }
-
-    return new AccessScope(name, ancestor);
+    return T$TemplateContinuation;
   };
 
-  ParserImplementation.prototype.parseObject = function parseObject() {
-    var keys = [];
-    var values = [];
-
-    this.expect('{');
-
-    if (this.peek.text !== '}') {
-      do {
-        var peek = this.peek;
-        var value = peek.value;
-        keys.push(typeof value === 'string' ? value : peek.text);
-
-        this.advance();
-        if (peek.key && (this.peek.text === ',' || this.peek.text === '}')) {
-          --this.index;
-          values.push(this.parseAccessOrCallScope());
-        } else {
-          this.expect(':');
-          values.push(this.parseExpression());
-        }
-      } while (this.optional(','));
+  ParserImplementation.prototype.scanTemplateTail = function scanTemplateTail() {
+    if (this.idx >= this.len) {
+      this.err('Unterminated template');
     }
-
-    this.expect('}');
-
-    return new LiteralObject(keys, values);
+    this.idx--;
+    return this.scanTemplate();
   };
 
-  ParserImplementation.prototype.parseExpressionList = function parseExpressionList(terminator) {
-    var result = [];
+  ParserImplementation.prototype.err = function err() {
+    var message = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 'Unexpected token ' + this.raw;
+    var column = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : this.start;
 
-    if (this.peek.text !== terminator) {
-      do {
-        result.push(this.parseExpression());
-      } while (this.optional(','));
-    }
-
-    return result;
+    throw new Error('Parser Error: ' + message + ' at column ' + column + ' in expression [' + this.src + ']');
   };
 
-  ParserImplementation.prototype.optional = function optional(text) {
-    if (this.peek.text === text) {
-      this.advance();
+  ParserImplementation.prototype.opt = function opt(token) {
+    if (this.tkn === token) {
+      this.nextToken();
       return true;
     }
 
     return false;
   };
 
-  ParserImplementation.prototype.expect = function expect(text) {
-    if (this.peek.text === text) {
-      this.advance();
+  ParserImplementation.prototype.expect = function expect(token) {
+    if (this.tkn === token) {
+      this.nextToken();
     } else {
-      this.error('Missing expected ' + text);
+      this.err('Missing expected token ' + TokenValues[token & T$TokenMask], this.idx);
     }
   };
-
-  ParserImplementation.prototype.advance = function advance() {
-    this.index++;
-  };
-
-  ParserImplementation.prototype.error = function error(message) {
-    var location = this.index < this.tokens.length ? 'at column ' + (this.tokens[this.index].index + 1) + ' in' : 'at the end of the expression';
-
-    throw new Error('Parser Error: ' + message + ' ' + location + ' [' + this.input + ']');
-  };
-
-  _createClass(ParserImplementation, [{
-    key: 'peek',
-    get: function get() {
-      return this.index < this.tokens.length ? this.tokens[this.index] : EOF;
-    }
-  }]);
 
   return ParserImplementation;
 }();
+
+function unescape(code) {
+  switch (code) {
+    case 0x66:
+      return 0xC;
+    case 0x6E:
+      return 0xA;
+    case 0x72:
+      return 0xD;
+    case 0x74:
+      return 0x9;
+    case 0x76:
+      return 0xB;
+    default:
+      return code;
+  }
+}
+
+var C$This = 1 << 10;
+var C$Scope = 1 << 11;
+var C$Member = 1 << 12;
+var C$Keyed = 1 << 13;
+var C$Call = 1 << 14;
+var C$Primary = 1 << 15;
+var C$ShorthandProp = 1 << 16;
+var C$Tagged = 1 << 17;
+
+var C$Ancestor = (1 << 9) - 1;
+
+var T$TokenMask = (1 << 6) - 1;
+
+var T$PrecShift = 6;
+
+var T$Precedence = 7 << T$PrecShift;
+
+var T$ExpressionTerminal = 1 << 11;
+
+var T$ClosingToken = 1 << 12;
+
+var T$OpeningToken = 1 << 13;
+
+var T$AccessScopeTerminal = 1 << 14;
+var T$Keyword = 1 << 15;
+var T$EOF = 1 << 16 | T$AccessScopeTerminal | T$ExpressionTerminal;
+var T$Identifier = 1 << 17;
+var T$IdentifierOrKeyword = T$Identifier | T$Keyword;
+var T$Literal = 1 << 18;
+var T$NumericLiteral = 1 << 19 | T$Literal;
+var T$StringLiteral = 1 << 20 | T$Literal;
+var T$BinaryOp = 1 << 21;
+
+var T$UnaryOp = 1 << 22;
+
+var T$MemberExpression = 1 << 23;
+
+var T$MemberOrCallExpression = 1 << 24;
+var T$TemplateTail = 1 << 25 | T$MemberOrCallExpression;
+var T$TemplateContinuation = 1 << 26 | T$MemberOrCallExpression;
+
+var T$FalseKeyword = 0 | T$Keyword | T$Literal;
+var T$TrueKeyword = 1 | T$Keyword | T$Literal;
+var T$NullKeyword = 2 | T$Keyword | T$Literal;
+var T$UndefinedKeyword = 3 | T$Keyword | T$Literal;
+var T$ThisScope = 4 | T$IdentifierOrKeyword;
+var T$ParentScope = 5 | T$IdentifierOrKeyword;
+
+var T$LParen = 6 | T$OpeningToken | T$AccessScopeTerminal | T$MemberOrCallExpression;
+var T$LBrace = 7 | T$OpeningToken;
+var T$Period = 8 | T$MemberExpression | T$MemberOrCallExpression;
+var T$RBrace = 9 | T$AccessScopeTerminal | T$ClosingToken | T$ExpressionTerminal;
+var T$RParen = 10 | T$AccessScopeTerminal | T$ClosingToken | T$ExpressionTerminal;
+var T$Comma = 11 | T$AccessScopeTerminal;
+var T$LBracket = 12 | T$OpeningToken | T$AccessScopeTerminal | T$MemberExpression | T$MemberOrCallExpression;
+var T$RBracket = 13 | T$ClosingToken | T$ExpressionTerminal;
+var T$Colon = 14 | T$AccessScopeTerminal;
+var T$Question = 15;
+
+var T$Ampersand = 18 | T$AccessScopeTerminal;
+var T$Bar = 19 | T$AccessScopeTerminal;
+var T$BarBar = 20 | 1 << T$PrecShift | T$BinaryOp;
+var T$AmpersandAmpersand = 21 | 2 << T$PrecShift | T$BinaryOp;
+var T$Caret = 22 | 3 << T$PrecShift | T$BinaryOp;
+var T$EqEq = 23 | 4 << T$PrecShift | T$BinaryOp;
+var T$BangEq = 24 | 4 << T$PrecShift | T$BinaryOp;
+var T$EqEqEq = 25 | 4 << T$PrecShift | T$BinaryOp;
+var T$BangEqEq = 26 | 4 << T$PrecShift | T$BinaryOp;
+var T$Lt = 27 | 5 << T$PrecShift | T$BinaryOp;
+var T$Gt = 28 | 5 << T$PrecShift | T$BinaryOp;
+var T$LtEq = 29 | 5 << T$PrecShift | T$BinaryOp;
+var T$GtEq = 30 | 5 << T$PrecShift | T$BinaryOp;
+var T$InKeyword = 31 | 5 << T$PrecShift | T$BinaryOp | T$Keyword;
+var T$InstanceOfKeyword = 32 | 5 << T$PrecShift | T$BinaryOp | T$Keyword;
+var T$Plus = 33 | 6 << T$PrecShift | T$BinaryOp | T$UnaryOp;
+var T$Minus = 34 | 6 << T$PrecShift | T$BinaryOp | T$UnaryOp;
+var T$TypeofKeyword = 35 | T$UnaryOp | T$Keyword;
+var T$VoidKeyword = 36 | T$UnaryOp | T$Keyword;
+var T$Star = 37 | 7 << T$PrecShift | T$BinaryOp;
+var T$Percent = 38 | 7 << T$PrecShift | T$BinaryOp;
+var T$Slash = 39 | 7 << T$PrecShift | T$BinaryOp;
+var T$Eq = 40;
+var T$Bang = 41 | T$UnaryOp;
+
+var KeywordLookup = Object.create(null);
+KeywordLookup.true = T$TrueKeyword;
+KeywordLookup.null = T$NullKeyword;
+KeywordLookup.false = T$FalseKeyword;
+KeywordLookup.undefined = T$UndefinedKeyword;
+KeywordLookup.$this = T$ThisScope;
+KeywordLookup.$parent = T$ParentScope;
+KeywordLookup.in = T$InKeyword;
+KeywordLookup.instanceof = T$InstanceOfKeyword;
+KeywordLookup.typeof = T$TypeofKeyword;
+KeywordLookup.void = T$VoidKeyword;
+
+var TokenValues = [false, true, null, undefined, '$this', '$parent', '(', '{', '.', '}', ')', ',', '[', ']', ':', '?', '\'', '"', '&', '|', '||', '&&', '^', '==', '!=', '===', '!==', '<', '>', '<=', '>=', 'in', 'instanceof', '+', '-', 'typeof', 'void', '*', '%', '/', '=', '!'];
+
+var codes = {
+  AsciiIdPart: [0x24, 0, 0x30, 0x3A, 0x41, 0x5B, 0x5F, 0, 0x61, 0x7B],
+  IdStart: [0x24, 0, 0x41, 0x5B, 0x5F, 0, 0x61, 0x7B, 0xAA, 0, 0xBA, 0, 0xC0, 0xD7, 0xD8, 0xF7, 0xF8, 0x2B9, 0x2E0, 0x2E5, 0x1D00, 0x1D26, 0x1D2C, 0x1D5D, 0x1D62, 0x1D66, 0x1D6B, 0x1D78, 0x1D79, 0x1DBF, 0x1E00, 0x1F00, 0x2071, 0, 0x207F, 0, 0x2090, 0x209D, 0x212A, 0x212C, 0x2132, 0, 0x214E, 0, 0x2160, 0x2189, 0x2C60, 0x2C80, 0xA722, 0xA788, 0xA78B, 0xA7AF, 0xA7B0, 0xA7B8, 0xA7F7, 0xA800, 0xAB30, 0xAB5B, 0xAB5C, 0xAB65, 0xFB00, 0xFB07, 0xFF21, 0xFF3B, 0xFF41, 0xFF5B],
+  Digit: [0x30, 0x3A],
+  Skip: [0, 0x21, 0x7F, 0xA1]
+};
+
+function decompress(lookup, set, compressed, value) {
+  var rangeCount = compressed.length;
+  for (var _i23 = 0; _i23 < rangeCount; _i23 += 2) {
+    var start = compressed[_i23];
+    var end = compressed[_i23 + 1];
+    end = end > 0 ? end : start + 1;
+    if (lookup) {
+      var j = start;
+      while (j < end) {
+        lookup[j] = value;
+        j++;
+      }
+    }
+    if (set) {
+      for (var ch = start; ch < end; ch++) {
+        set.add(ch);
+      }
+    }
+  }
+}
+
+function returnToken(token) {
+  return function (p) {
+    p.next();
+    return token;
+  };
+}
+function unexpectedCharacter(p) {
+  p.err('Unexpected character [' + fromCharCode(p.ch) + ']');
+  return null;
+}
+
+var AsciiIdParts = new Set();
+decompress(null, AsciiIdParts, codes.AsciiIdPart, true);
+
+var IdParts = new Uint8Array(0xFFFF);
+decompress(IdParts, null, codes.IdStart, 1);
+decompress(IdParts, null, codes.Digit, 1);
+
+var CharScanners = new Array(0xFFFF);
+var ci = 0;
+while (ci < 0xFFFF) {
+  CharScanners[ci] = unexpectedCharacter;
+  ci++;
+}
+
+decompress(CharScanners, null, codes.Skip, function (p) {
+  p.next();
+  return null;
+});
+decompress(CharScanners, null, codes.IdStart, function (p) {
+  return p.scanIdentifier();
+});
+decompress(CharScanners, null, codes.Digit, function (p) {
+  return p.scanNumber(false);
+});
+
+CharScanners[0x22] = CharScanners[0x27] = function (p) {
+  return p.scanString();
+};
+CharScanners[0x60] = function (p) {
+  return p.scanTemplate();
+};
+
+CharScanners[0x21] = function (p) {
+  if (p.next() !== 0x3D) {
+    return T$Bang;
+  }
+  if (p.next() !== 0x3D) {
+    return T$BangEq;
+  }
+  p.next();
+  return T$BangEqEq;
+};
+
+CharScanners[0x3D] = function (p) {
+  if (p.next() !== 0x3D) {
+    return T$Eq;
+  }
+  if (p.next() !== 0x3D) {
+    return T$EqEq;
+  }
+  p.next();
+  return T$EqEqEq;
+};
+
+CharScanners[0x26] = function (p) {
+  if (p.next() !== 0x26) {
+    return T$Ampersand;
+  }
+  p.next();
+  return T$AmpersandAmpersand;
+};
+
+CharScanners[0x7C] = function (p) {
+  if (p.next() !== 0x7C) {
+    return T$Bar;
+  }
+  p.next();
+  return T$BarBar;
+};
+
+CharScanners[0x2E] = function (p) {
+  if (p.next() <= 0x39 && p.ch >= 0x30) {
+    return p.scanNumber(true);
+  }
+  return T$Period;
+};
+
+CharScanners[0x3C] = function (p) {
+  if (p.next() !== 0x3D) {
+    return T$Lt;
+  }
+  p.next();
+  return T$LtEq;
+};
+
+CharScanners[0x3E] = function (p) {
+  if (p.next() !== 0x3D) {
+    return T$Gt;
+  }
+  p.next();
+  return T$GtEq;
+};
+
+CharScanners[0x25] = returnToken(T$Percent);
+CharScanners[0x28] = returnToken(T$LParen);
+CharScanners[0x29] = returnToken(T$RParen);
+CharScanners[0x2A] = returnToken(T$Star);
+CharScanners[0x2B] = returnToken(T$Plus);
+CharScanners[0x2C] = returnToken(T$Comma);
+CharScanners[0x2D] = returnToken(T$Minus);
+CharScanners[0x2F] = returnToken(T$Slash);
+CharScanners[0x3A] = returnToken(T$Colon);
+CharScanners[0x3F] = returnToken(T$Question);
+CharScanners[0x5B] = returnToken(T$LBracket);
+CharScanners[0x5D] = returnToken(T$RBracket);
+CharScanners[0x5E] = returnToken(T$Caret);
+CharScanners[0x7B] = returnToken(T$LBrace);
+CharScanners[0x7D] = returnToken(T$RBrace);
 
 var mapProto = Map.prototype;
 
@@ -3714,8 +3739,8 @@ function handleCapturedEvent(event) {
     }
     target = target.parentNode;
   }
-  for (var _i22 = orderedCallbacks.length - 1; _i22 >= 0 && !event.propagationStopped; _i22--) {
-    var orderedCallback = orderedCallbacks[_i22];
+  for (var _i24 = orderedCallbacks.length - 1; _i24 >= 0 && !event.propagationStopped; _i24--) {
+    var orderedCallback = orderedCallbacks[_i24];
     if ('handleEvent' in orderedCallback) {
       orderedCallback.handleEvent(event);
     } else {
@@ -3814,7 +3839,6 @@ var DelegationEntryHandler = function () {
   DelegationEntryHandler.prototype.dispose = function dispose() {
     this.entry.decrement();
     this.lookup[this.targetEvent] = null;
-    this.entry = this.lookup = this.targetEvent = null;
   };
 
   return DelegationEntryHandler;
@@ -3831,7 +3855,6 @@ var EventHandler = function () {
 
   EventHandler.prototype.dispose = function dispose() {
     this.target.removeEventListener(this.targetEvent, this.callback);
-    this.target = this.targetEvent = this.callback = null;
   };
 
   return EventHandler;
@@ -4015,8 +4038,8 @@ var EventSubscriber = exports.EventSubscriber = function () {
     this.handler = callbackOrListener;
 
     var events = this.events;
-    for (var _i23 = 0, ii = events.length; ii > _i23; ++_i23) {
-      element.addEventListener(events[_i23], callbackOrListener);
+    for (var _i25 = 0, ii = events.length; ii > _i25; ++_i25) {
+      element.addEventListener(events[_i25], callbackOrListener);
     }
   };
 
@@ -4027,8 +4050,8 @@ var EventSubscriber = exports.EventSubscriber = function () {
     var element = this.element;
     var callbackOrListener = this.handler;
     var events = this.events;
-    for (var _i24 = 0, ii = events.length; ii > _i24; ++_i24) {
-      element.removeEventListener(events[_i24], callbackOrListener);
+    for (var _i26 = 0, ii = events.length; ii > _i26; ++_i26) {
+      element.removeEventListener(events[_i26], callbackOrListener);
     }
     this.element = this.handler = null;
   };
@@ -4681,8 +4704,8 @@ var SelectValueObserver = exports.SelectValueObserver = (_dec9 = subscriberColle
     var count = 0;
     var value = [];
 
-    for (var _i25 = 0, ii = options.length; _i25 < ii; _i25++) {
-      var _option = options.item(_i25);
+    for (var _i27 = 0, ii = options.length; _i27 < ii; _i27++) {
+      var _option = options.item(_i27);
       if (!_option.selected) {
         continue;
       }
@@ -4782,7 +4805,7 @@ var SelectValueObserver = exports.SelectValueObserver = (_dec9 = subscriberColle
       _this24.synchronizeOptions();
       _this24.synchronizeValue();
     });
-    this.domObserver.observe(this.element, { childList: true, subtree: true });
+    this.domObserver.observe(this.element, { childList: true, subtree: true, characterData: true });
   };
 
   SelectValueObserver.prototype.unbind = function unbind() {
@@ -4820,8 +4843,8 @@ var ClassObserver = exports.ClassObserver = function () {
 
     if (newValue !== null && newValue !== undefined && newValue.length) {
       names = newValue.split(/\s+/);
-      for (var _i26 = 0, length = names.length; _i26 < length; _i26++) {
-        name = names[_i26];
+      for (var _i28 = 0, length = names.length; _i28 < length; _i28++) {
+        name = names[_i28];
         if (name === '') {
           continue;
         }
@@ -4914,9 +4937,9 @@ var ComputedExpression = exports.ComputedExpression = function (_Expression19) {
 function createComputedObserver(obj, propertyName, descriptor, observerLocator) {
   var dependencies = descriptor.get.dependencies;
   if (!(dependencies instanceof ComputedExpression)) {
-    var _i27 = dependencies.length;
-    while (_i27--) {
-      dependencies[_i27] = observerLocator.parser.parse(dependencies[_i27]);
+    var _i29 = dependencies.length;
+    while (_i29--) {
+      dependencies[_i29] = observerLocator.parser.parse(dependencies[_i29]);
     }
     dependencies = descriptor.get.dependencies = new ComputedExpression(propertyName, dependencies);
   }
@@ -5235,8 +5258,8 @@ var ObserverLocator = exports.ObserverLocator = (_temp = _class12 = function () 
   };
 
   ObserverLocator.prototype.getAdapterObserver = function getAdapterObserver(obj, propertyName, descriptor) {
-    for (var _i28 = 0, ii = this.adapters.length; _i28 < ii; _i28++) {
-      var adapter = this.adapters[_i28];
+    for (var _i30 = 0, ii = this.adapters.length; _i30 < ii; _i30++) {
+      var adapter = this.adapters[_i30];
       var observer = adapter.getObserver(obj, propertyName, descriptor);
       if (observer) {
         return observer;
@@ -6252,9 +6275,9 @@ ___scope___.file("dist/commonjs/aurelia-dependency-injection.js", function(expor
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.Container = exports.InvocationHandler = exports._emptyParameters = exports.SingletonRegistration = exports.TransientRegistration = exports.FactoryInvoker = exports.NewInstance = exports.Factory = exports.StrategyResolver = exports.Parent = exports.Optional = exports.All = exports.Lazy = exports.resolver = undefined;
+exports.Container = exports.InvocationHandler = exports._emptyParameters = exports.SingletonRegistration = exports.TransientRegistration = exports.FactoryInvoker = exports.NewInstance = exports.Factory = exports.Parent = exports.Optional = exports.All = exports.Lazy = exports.StrategyResolver = exports.resolver = undefined;
 
-var _dec, _class, _dec2, _class3, _dec3, _class5, _dec4, _class7, _dec5, _class9, _dec6, _class11, _dec7, _class13, _classInvokers;
+var _dec, _class, _dec2, _class2, _dec3, _class3, _dec4, _class4, _dec5, _class5, _dec6, _class6, _dec7, _class7, _classInvokers;
 
 exports.getDecoratorDependencies = getDecoratorDependencies;
 exports.lazy = lazy;
@@ -6285,7 +6308,39 @@ var resolver = exports.resolver = _aureliaMetadata.protocol.create('aurelia:reso
   return true;
 });
 
-var Lazy = exports.Lazy = (_dec = resolver(), _dec(_class = function () {
+var StrategyResolver = exports.StrategyResolver = (_dec = resolver(), _dec(_class = function () {
+  function StrategyResolver(strategy, state) {
+    
+
+    this.strategy = strategy;
+    this.state = state;
+  }
+
+  StrategyResolver.prototype.get = function get(container, key) {
+    switch (this.strategy) {
+      case 0:
+        return this.state;
+      case 1:
+        var _singleton = container.invoke(this.state);
+        this.state = _singleton;
+        this.strategy = 0;
+        return _singleton;
+      case 2:
+        return container.invoke(this.state);
+      case 3:
+        return this.state(container, key, this);
+      case 4:
+        return this.state[0].get(container, key);
+      case 5:
+        return container.get(this.state);
+      default:
+        throw new Error('Invalid strategy: ' + this.strategy);
+    }
+  };
+
+  return StrategyResolver;
+}()) || _class);
+var Lazy = exports.Lazy = (_dec2 = resolver(), _dec2(_class2 = function () {
   function Lazy(key) {
     
 
@@ -6305,8 +6360,8 @@ var Lazy = exports.Lazy = (_dec = resolver(), _dec(_class = function () {
   };
 
   return Lazy;
-}()) || _class);
-var All = exports.All = (_dec2 = resolver(), _dec2(_class3 = function () {
+}()) || _class2);
+var All = exports.All = (_dec3 = resolver(), _dec3(_class3 = function () {
   function All(key) {
     
 
@@ -6323,9 +6378,9 @@ var All = exports.All = (_dec2 = resolver(), _dec2(_class3 = function () {
 
   return All;
 }()) || _class3);
-var Optional = exports.Optional = (_dec3 = resolver(), _dec3(_class5 = function () {
+var Optional = exports.Optional = (_dec4 = resolver(), _dec4(_class4 = function () {
   function Optional(key) {
-    var checkParent = arguments.length <= 1 || arguments[1] === undefined ? true : arguments[1];
+    var checkParent = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : true;
 
     
 
@@ -6342,14 +6397,14 @@ var Optional = exports.Optional = (_dec3 = resolver(), _dec3(_class5 = function 
   };
 
   Optional.of = function of(key) {
-    var checkParent = arguments.length <= 1 || arguments[1] === undefined ? true : arguments[1];
+    var checkParent = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : true;
 
     return new Optional(key, checkParent);
   };
 
   return Optional;
-}()) || _class5);
-var Parent = exports.Parent = (_dec4 = resolver(), _dec4(_class7 = function () {
+}()) || _class4);
+var Parent = exports.Parent = (_dec5 = resolver(), _dec5(_class5 = function () {
   function Parent(key) {
     
 
@@ -6365,40 +6420,8 @@ var Parent = exports.Parent = (_dec4 = resolver(), _dec4(_class7 = function () {
   };
 
   return Parent;
-}()) || _class7);
-var StrategyResolver = exports.StrategyResolver = (_dec5 = resolver(), _dec5(_class9 = function () {
-  function StrategyResolver(strategy, state) {
-    
-
-    this.strategy = strategy;
-    this.state = state;
-  }
-
-  StrategyResolver.prototype.get = function get(container, key) {
-    switch (this.strategy) {
-      case 0:
-        return this.state;
-      case 1:
-        var singleton = container.invoke(this.state);
-        this.state = singleton;
-        this.strategy = 0;
-        return singleton;
-      case 2:
-        return container.invoke(this.state);
-      case 3:
-        return this.state(container, key, this);
-      case 4:
-        return this.state[0].get(container, key);
-      case 5:
-        return container.get(this.state);
-      default:
-        throw new Error('Invalid strategy: ' + this.strategy);
-    }
-  };
-
-  return StrategyResolver;
-}()) || _class9);
-var Factory = exports.Factory = (_dec6 = resolver(), _dec6(_class11 = function () {
+}()) || _class5);
+var Factory = exports.Factory = (_dec6 = resolver(), _dec6(_class6 = function () {
   function Factory(key) {
     
 
@@ -6406,14 +6429,18 @@ var Factory = exports.Factory = (_dec6 = resolver(), _dec6(_class11 = function (
   }
 
   Factory.prototype.get = function get(container) {
-    var _this2 = this;
+    var fn = this._key;
+    var resolver = container.getResolver(fn);
+    if (resolver && resolver.strategy === 3) {
+      fn = resolver.state;
+    }
 
     return function () {
       for (var _len = arguments.length, rest = Array(_len), _key = 0; _key < _len; _key++) {
         rest[_key] = arguments[_key];
       }
 
-      return container.invoke(_this2._key, rest);
+      return container.invoke(fn, rest);
     };
   };
 
@@ -6422,8 +6449,8 @@ var Factory = exports.Factory = (_dec6 = resolver(), _dec6(_class11 = function (
   };
 
   return Factory;
-}()) || _class11);
-var NewInstance = exports.NewInstance = (_dec7 = resolver(), _dec7(_class13 = function () {
+}()) || _class6);
+var NewInstance = exports.NewInstance = (_dec7 = resolver(), _dec7(_class7 = function () {
   function NewInstance(key) {
     
 
@@ -6441,7 +6468,14 @@ var NewInstance = exports.NewInstance = (_dec7 = resolver(), _dec7(_class13 = fu
     var dynamicDependencies = this.dynamicDependencies.length > 0 ? this.dynamicDependencies.map(function (dependency) {
       return dependency['protocol:aurelia:resolver'] ? dependency.get(container) : container.get(dependency);
     }) : undefined;
-    var instance = container.invoke(this.key, dynamicDependencies);
+
+    var fn = this.key;
+    var resolver = container.getResolver(fn);
+    if (resolver && resolver.strategy === 3) {
+      fn = resolver.state;
+    }
+
+    var instance = container.invoke(fn, dynamicDependencies);
     container.registerInstance(this.asKey, instance);
     return instance;
   };
@@ -6460,41 +6494,34 @@ var NewInstance = exports.NewInstance = (_dec7 = resolver(), _dec7(_class13 = fu
   };
 
   return NewInstance;
-}()) || _class13);
-function getDecoratorDependencies(target, name) {
-  var dependencies = target.inject;
-  if (typeof dependencies === 'function') {
-    throw new Error('Decorator ' + name + ' cannot be used with "inject()".  Please use an array instead.');
-  }
-  if (!dependencies) {
-    dependencies = _aureliaMetadata.metadata.getOwn(_aureliaMetadata.metadata.paramTypes, target).slice();
-    target.inject = dependencies;
-  }
+}()) || _class7);
+function getDecoratorDependencies(target) {
+  autoinject(target);
 
-  return dependencies;
+  return target.inject;
 }
 
 function lazy(keyValue) {
   return function (target, key, index) {
-    var params = getDecoratorDependencies(target, 'lazy');
-    params[index] = Lazy.of(keyValue);
+    var inject = getDecoratorDependencies(target);
+    inject[index] = Lazy.of(keyValue);
   };
 }
 
 function all(keyValue) {
   return function (target, key, index) {
-    var params = getDecoratorDependencies(target, 'all');
-    params[index] = All.of(keyValue);
+    var inject = getDecoratorDependencies(target);
+    inject[index] = All.of(keyValue);
   };
 }
 
 function optional() {
-  var checkParentOrTarget = arguments.length <= 0 || arguments[0] === undefined ? true : arguments[0];
+  var checkParentOrTarget = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : true;
 
   var deco = function deco(checkParent) {
     return function (target, key, index) {
-      var params = getDecoratorDependencies(target, 'optional');
-      params[index] = Optional.of(params[index], checkParent);
+      var inject = getDecoratorDependencies(target);
+      inject[index] = Optional.of(inject[index], checkParent);
     };
   };
   if (typeof checkParentOrTarget === 'boolean') {
@@ -6504,15 +6531,14 @@ function optional() {
 }
 
 function parent(target, key, index) {
-  var params = getDecoratorDependencies(target, 'parent');
-  params[index] = Parent.of(params[index]);
+  var inject = getDecoratorDependencies(target);
+  inject[index] = Parent.of(inject[index]);
 }
 
-function factory(keyValue, asValue) {
+function factory(keyValue) {
   return function (target, key, index) {
-    var params = getDecoratorDependencies(target, 'factory');
-    var factory = Factory.of(keyValue);
-    params[index] = asValue ? factory.as(asValue) : factory;
+    var inject = getDecoratorDependencies(target);
+    inject[index] = Factory.of(keyValue);
   };
 }
 
@@ -6523,10 +6549,10 @@ function newInstance(asKeyOrTarget) {
 
   var deco = function deco(asKey) {
     return function (target, key, index) {
-      var params = getDecoratorDependencies(target, 'newInstance');
-      params[index] = NewInstance.of.apply(NewInstance, [params[index]].concat(dynamicDependencies));
+      var inject = getDecoratorDependencies(target);
+      inject[index] = NewInstance.of.apply(NewInstance, [inject[index]].concat(dynamicDependencies));
       if (!!asKey) {
-        params[index].as(asKey);
+        inject[index].as(asKey);
       }
     };
   };
@@ -6597,7 +6623,7 @@ function transient(key) {
 }
 
 function singleton(keyOrRegisterInChild) {
-  var registerInChild = arguments.length <= 1 || arguments[1] === undefined ? false : arguments[1];
+  var registerInChild = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
 
   return registration(new SingletonRegistration(keyOrRegisterInChild, registerInChild));
 }
@@ -6619,7 +6645,7 @@ var TransientRegistration = exports.TransientRegistration = function () {
 
 var SingletonRegistration = exports.SingletonRegistration = function () {
   function SingletonRegistration(keyOrRegisterInChild) {
-    var registerInChild = arguments.length <= 1 || arguments[1] === undefined ? false : arguments[1];
+    var registerInChild = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
 
     
 
@@ -6834,7 +6860,7 @@ var Container = exports.Container = function () {
   };
 
   Container.prototype.hasResolver = function hasResolver(key) {
-    var checkParent = arguments.length <= 1 || arguments[1] === undefined ? false : arguments[1];
+    var checkParent = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
 
     validateKey(key);
 
@@ -6966,23 +6992,8 @@ var Container = exports.Container = function () {
 
 function autoinject(potentialTarget) {
   var deco = function deco(target) {
-    var previousInject = target.inject ? target.inject.slice() : null;
-    var autoInject = _aureliaMetadata.metadata.getOwn(_aureliaMetadata.metadata.paramTypes, target) || _emptyParameters;
-    if (!previousInject) {
-      target.inject = autoInject;
-    } else {
-      for (var i = 0; i < autoInject.length; i++) {
-        if (previousInject[i] && previousInject[i] !== autoInject[i]) {
-          var prevIndex = previousInject.indexOf(autoInject[i]);
-          if (prevIndex > -1) {
-            previousInject.splice(prevIndex, 1);
-          }
-          previousInject.splice(prevIndex > -1 && prevIndex < i ? i - 1 : i, 0, autoInject[i]);
-        } else if (!previousInject[i]) {
-          previousInject[i] = autoInject[i];
-        }
-      }
-      target.inject = previousInject;
+    if (!target.hasOwnProperty('inject')) {
+      target.inject = (_aureliaMetadata.metadata.getOwn(_aureliaMetadata.metadata.paramTypes, target) || _emptyParameters).slice();
     }
   };
 
@@ -6995,16 +7006,11 @@ function inject() {
   }
 
   return function (target, key, descriptor) {
-    if (typeof descriptor === 'number' && rest.length === 1) {
-      var params = target.inject;
-      if (typeof params === 'function') {
-        throw new Error('Decorator inject cannot be used with "inject()".  Please use an array instead.');
+    if (typeof descriptor === 'number') {
+      autoinject(target);
+      if (rest.length === 1) {
+        target.inject[descriptor] = rest[0];
       }
-      if (!params) {
-        params = _aureliaMetadata.metadata.getOwn(_aureliaMetadata.metadata.paramTypes, target).slice();
-        target.inject = params;
-      }
-      params[descriptor] = rest[0];
       return;
     }
 
@@ -7182,16 +7188,155 @@ ___scope___.file("dist/commonjs/aurelia-fetch-client.js", function(exports, requ
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.HttpClient = exports.HttpClientConfiguration = exports.RetryInterceptor = exports.retryStrategy = undefined;
 
-var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
 exports.json = json;
+
+var _aureliaPal = require('aurelia-pal');
 
 
 
 function json(body, replacer) {
   return JSON.stringify(body !== undefined ? body : {}, replacer);
 }
+
+var retryStrategy = exports.retryStrategy = {
+  fixed: 0,
+  incremental: 1,
+  exponential: 2,
+  random: 3
+};
+
+var defaultRetryConfig = {
+  maxRetries: 3,
+  interval: 1000,
+  strategy: retryStrategy.fixed
+};
+
+var RetryInterceptor = exports.RetryInterceptor = function () {
+  function RetryInterceptor(retryConfig) {
+    
+
+    this.retryConfig = Object.assign({}, defaultRetryConfig, retryConfig || {});
+
+    if (this.retryConfig.strategy === retryStrategy.exponential && this.retryConfig.interval <= 1000) {
+      throw new Error('An interval less than or equal to 1 second is not allowed when using the exponential retry strategy');
+    }
+  }
+
+  RetryInterceptor.prototype.request = function (_request) {
+    function request(_x) {
+      return _request.apply(this, arguments);
+    }
+
+    request.toString = function () {
+      return _request.toString();
+    };
+
+    return request;
+  }(function (request) {
+    if (!request.retryConfig) {
+      request.retryConfig = Object.assign({}, this.retryConfig);
+      request.retryConfig.counter = 0;
+    }
+
+    request.retryConfig.requestClone = request.clone();
+
+    return request;
+  });
+
+  RetryInterceptor.prototype.response = function (_response) {
+    function response(_x2, _x3) {
+      return _response.apply(this, arguments);
+    }
+
+    response.toString = function () {
+      return _response.toString();
+    };
+
+    return response;
+  }(function (response, request) {
+    delete request.retryConfig;
+    return response;
+  });
+
+  RetryInterceptor.prototype.responseError = function responseError(error, request, httpClient) {
+    var retryConfig = request.retryConfig;
+    var requestClone = retryConfig.requestClone;
+
+    return Promise.resolve().then(function () {
+      if (retryConfig.counter < retryConfig.maxRetries) {
+        var result = retryConfig.doRetry ? retryConfig.doRetry(error, request) : true;
+
+        return Promise.resolve(result).then(function (doRetry) {
+          if (doRetry) {
+            retryConfig.counter++;
+            return new Promise(function (resolve) {
+              return _aureliaPal.PLATFORM.global.setTimeout(resolve, calculateDelay(retryConfig) || 0);
+            }).then(function () {
+              var newRequest = requestClone.clone();
+              if (typeof retryConfig.beforeRetry === 'function') {
+                return retryConfig.beforeRetry(newRequest, httpClient);
+              }
+              return newRequest;
+            }).then(function (newRequest) {
+              return httpClient.fetch(Object.assign(newRequest, { retryConfig: retryConfig }));
+            });
+          }
+
+          delete request.retryConfig;
+          throw error;
+        });
+      }
+
+      delete request.retryConfig;
+      throw error;
+    });
+  };
+
+  return RetryInterceptor;
+}();
+
+function calculateDelay(retryConfig) {
+  var interval = retryConfig.interval,
+      strategy = retryConfig.strategy,
+      minRandomInterval = retryConfig.minRandomInterval,
+      maxRandomInterval = retryConfig.maxRandomInterval,
+      counter = retryConfig.counter;
+
+
+  if (typeof strategy === 'function') {
+    return retryConfig.strategy(counter);
+  }
+
+  switch (strategy) {
+    case retryStrategy.fixed:
+      return retryStrategies[retryStrategy.fixed](interval);
+    case retryStrategy.incremental:
+      return retryStrategies[retryStrategy.incremental](counter, interval);
+    case retryStrategy.exponential:
+      return retryStrategies[retryStrategy.exponential](counter, interval);
+    case retryStrategy.random:
+      return retryStrategies[retryStrategy.random](counter, interval, minRandomInterval, maxRandomInterval);
+    default:
+      throw new Error('Unrecognized retry strategy');
+  }
+}
+
+var retryStrategies = [function (interval) {
+  return interval;
+}, function (retryCount, interval) {
+  return interval * retryCount;
+}, function (retryCount, interval) {
+  return retryCount === 1 ? interval : Math.pow(interval, retryCount) / 1000;
+}, function (retryCount, interval) {
+  var minRandomInterval = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 0;
+  var maxRandomInterval = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 60000;
+
+  return Math.random() * (maxRandomInterval - minRandomInterval) + minRandomInterval;
+}];
 
 var HttpClientConfiguration = exports.HttpClientConfiguration = function () {
   function HttpClientConfiguration() {
@@ -7225,6 +7370,12 @@ var HttpClientConfiguration = exports.HttpClientConfiguration = function () {
 
   HttpClientConfiguration.prototype.rejectErrorResponses = function rejectErrorResponses() {
     return this.withInterceptor({ response: rejectOnError });
+  };
+
+  HttpClientConfiguration.prototype.withRetry = function withRetry(config) {
+    var interceptor = new RetryInterceptor(config);
+
+    return this.withInterceptor(interceptor);
   };
 
   return HttpClientConfiguration;
@@ -7278,6 +7429,24 @@ var HttpClient = exports.HttpClient = function () {
       throw new Error('Default headers must be a plain object.');
     }
 
+    var interceptors = normalizedConfig.interceptors;
+
+    if (interceptors && interceptors.length) {
+      if (interceptors.filter(function (x) {
+        return RetryInterceptor.prototype.isPrototypeOf(x);
+      }).length > 1) {
+        throw new Error('Only one RetryInterceptor is allowed.');
+      }
+
+      var retryInterceptorIndex = interceptors.findIndex(function (x) {
+        return RetryInterceptor.prototype.isPrototypeOf(x);
+      });
+
+      if (retryInterceptorIndex >= 0 && retryInterceptorIndex !== interceptors.length - 1) {
+        throw new Error('The retry interceptor must be the last interceptor defined.');
+      }
+    }
+
     this.baseUrl = normalizedConfig.baseUrl;
     this.defaults = defaults;
     this.interceptors = normalizedConfig.interceptors || [];
@@ -7287,7 +7456,7 @@ var HttpClient = exports.HttpClient = function () {
   };
 
   HttpClient.prototype.fetch = function (_fetch) {
-    function fetch(_x, _x2) {
+    function fetch(_x6, _x7) {
       return _fetch.apply(this, arguments);
     }
 
@@ -7301,28 +7470,60 @@ var HttpClient = exports.HttpClient = function () {
 
     trackRequestStart.call(this);
 
-    var request = Promise.resolve().then(function () {
-      return buildRequest.call(_this, input, init, _this.defaults);
-    });
-    var promise = processRequest(request, this.interceptors).then(function (result) {
+    var request = this.buildRequest(input, init);
+    return processRequest(request, this.interceptors, this).then(function (result) {
       var response = null;
 
       if (Response.prototype.isPrototypeOf(result)) {
-        response = result;
+        response = Promise.resolve(result);
       } else if (Request.prototype.isPrototypeOf(result)) {
-        request = Promise.resolve(result);
+        request = result;
         response = fetch(result);
       } else {
         throw new Error('An invalid result was returned by the interceptor chain. Expected a Request or Response instance, but got [' + result + ']');
       }
 
-      return request.then(function (_request) {
-        return processResponse(response, _this.interceptors, _request);
-      });
+      return processResponse(response, _this.interceptors, request, _this);
+    }).then(function (result) {
+      if (Request.prototype.isPrototypeOf(result)) {
+        return _this.fetch(result);
+      }
+      trackRequestEnd.call(_this);
+      return result;
     });
-
-    return trackRequestEndWith.call(this, promise);
   });
+
+  HttpClient.prototype.buildRequest = function buildRequest(input, init) {
+    var defaults = this.defaults || {};
+    var request = void 0;
+    var body = void 0;
+    var requestContentType = void 0;
+
+    var parsedDefaultHeaders = parseHeaderValues(defaults.headers);
+    if (Request.prototype.isPrototypeOf(input)) {
+      request = input;
+      requestContentType = new Headers(request.headers).get('Content-Type');
+    } else {
+      init || (init = {});
+      body = init.body;
+      var bodyObj = body ? { body: body } : null;
+      var requestInit = Object.assign({}, defaults, { headers: {} }, init, bodyObj);
+      requestContentType = new Headers(requestInit.headers).get('Content-Type');
+      request = new Request(getRequestUrl(this.baseUrl, input), requestInit);
+    }
+    if (!requestContentType) {
+      if (new Headers(parsedDefaultHeaders).has('content-type')) {
+        request.headers.set('Content-Type', new Headers(parsedDefaultHeaders).get('content-type'));
+      } else if (body && isJSON(body)) {
+        request.headers.set('Content-Type', 'application/json');
+      }
+    }
+    setDefaultHeaders(request.headers, parsedDefaultHeaders);
+    if (body && Blob.prototype.isPrototypeOf(body) && body.type) {
+      request.headers.set('Content-Type', body.type);
+    }
+    return request;
+  };
 
   return HttpClient;
 }();
@@ -7330,17 +7531,11 @@ var HttpClient = exports.HttpClient = function () {
 var absoluteUrlRegexp = /^([a-z][a-z0-9+\-.]*:)?\/\//i;
 
 function trackRequestStart() {
-  this.isRequesting = !! ++this.activeRequestCount;
+  this.isRequesting = !!++this.activeRequestCount;
 }
 
 function trackRequestEnd() {
   this.isRequesting = !! --this.activeRequestCount;
-}
-
-function trackRequestEndWith(promise) {
-  var handle = trackRequestEnd.bind(this);
-  promise.then(handle, handle);
-  return promise;
 }
 
 function parseHeaderValues(headers) {
@@ -7351,38 +7546,6 @@ function parseHeaderValues(headers) {
     }
   }
   return parsedHeaders;
-}
-
-function buildRequest(input, init) {
-  var defaults = this.defaults || {};
-  var request = void 0;
-  var body = void 0;
-  var requestContentType = void 0;
-
-  var parsedDefaultHeaders = parseHeaderValues(defaults.headers);
-  if (Request.prototype.isPrototypeOf(input)) {
-    request = input;
-    requestContentType = new Headers(request.headers).get('Content-Type');
-  } else {
-    init || (init = {});
-    body = init.body;
-    var bodyObj = body ? { body: body } : null;
-    var requestInit = Object.assign({}, defaults, { headers: {} }, init, bodyObj);
-    requestContentType = new Headers(requestInit.headers).get('Content-Type');
-    request = new Request(getRequestUrl(this.baseUrl, input), requestInit);
-  }
-  if (!requestContentType) {
-    if (new Headers(parsedDefaultHeaders).has('content-type')) {
-      request.headers.set('Content-Type', new Headers(parsedDefaultHeaders).get('content-type'));
-    } else if (body && isJSON(body)) {
-      request.headers.set('Content-Type', 'application/json');
-    }
-  }
-  setDefaultHeaders(request.headers, parsedDefaultHeaders);
-  if (body && Blob.prototype.isPrototypeOf(body) && body.type) {
-    request.headers.set('Content-Type', body.type);
-  }
-  return request;
 }
 
 function getRequestUrl(baseUrl, url) {
@@ -7401,12 +7564,12 @@ function setDefaultHeaders(headers, defaultHeaders) {
   }
 }
 
-function processRequest(request, interceptors) {
-  return applyInterceptors(request, interceptors, 'request', 'requestError');
+function processRequest(request, interceptors, http) {
+  return applyInterceptors(request, interceptors, 'request', 'requestError', http);
 }
 
-function processResponse(response, interceptors, request) {
-  return applyInterceptors(response, interceptors, 'response', 'responseError', request);
+function processResponse(response, interceptors, request, http) {
+  return applyInterceptors(response, interceptors, 'response', 'responseError', request, http);
 }
 
 function applyInterceptors(input, interceptors, successName, errorName) {
@@ -7455,6 +7618,8 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.LogManager = exports.FrameworkConfiguration = exports.Aurelia = undefined;
+
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
 var _aureliaDependencyInjection = require('aurelia-dependency-injection');
 
@@ -7719,36 +7884,53 @@ function runTasks(config, tasks) {
   return next();
 }
 
-function loadPlugin(config, loader, info) {
+function loadPlugin(fwConfig, loader, info) {
   logger.debug('Loading plugin ' + info.moduleId + '.');
-  config.resourcesRelativeTo = info.resourcesRelativeTo;
+  if (typeof info.moduleId === 'string') {
+    fwConfig.resourcesRelativeTo = info.resourcesRelativeTo;
 
-  var id = info.moduleId;
+    var id = info.moduleId;
 
-  if (info.resourcesRelativeTo.length > 1) {
-    return loader.normalize(info.moduleId, info.resourcesRelativeTo[1]).then(function (normalizedId) {
-      return _loadPlugin(normalizedId);
-    });
+    if (info.resourcesRelativeTo.length > 1) {
+      return loader.normalize(info.moduleId, info.resourcesRelativeTo[1]).then(function (normalizedId) {
+        return _loadPlugin(normalizedId);
+      });
+    }
+
+    return _loadPlugin(id);
+  } else if (typeof info.configure === 'function') {
+    if (fwConfig.configuredPlugins.indexOf(info.configure) !== -1) {
+      return Promise.resolve();
+    }
+    fwConfig.configuredPlugins.push(info.configure);
+
+    return Promise.resolve(info.configure.call(null, fwConfig, info.config || {}));
   }
-
-  return _loadPlugin(id);
+  throw new Error(invalidConfigMsg(info.moduleId || info.configure, 'plugin'));
 
   function _loadPlugin(moduleId) {
     return loader.loadModule(moduleId).then(function (m) {
       if ('configure' in m) {
-        return Promise.resolve(m.configure(config, info.config || {})).then(function () {
-          config.resourcesRelativeTo = null;
+        if (fwConfig.configuredPlugins.indexOf(m.configure) !== -1) {
+          return Promise.resolve();
+        }
+        return Promise.resolve(m.configure(fwConfig, info.config || {})).then(function () {
+          fwConfig.configuredPlugins.push(m.configure);
+          fwConfig.resourcesRelativeTo = null;
           logger.debug('Configured plugin ' + info.moduleId + '.');
         });
       }
 
-      config.resourcesRelativeTo = null;
+      fwConfig.resourcesRelativeTo = null;
       logger.debug('Loaded plugin ' + info.moduleId + '.');
     });
   }
 }
 
 function loadResources(aurelia, resourcesToLoad, appResources) {
+  if (Object.keys(resourcesToLoad).length === 0) {
+    return Promise.resolve();
+  }
   var viewEngine = aurelia.container.get(_aureliaTemplating.ViewEngine);
 
   return Promise.all(Object.keys(resourcesToLoad).map(function (n) {
@@ -7805,10 +7987,22 @@ function getExt(name) {
   }
 }
 
+function loadBehaviors(config) {
+  return Promise.all(config.behaviorsToLoad.map(function (m) {
+    return m.load(config.container, m.target);
+  })).then(function () {
+    config.behaviorsToLoad = null;
+  });
+}
+
 function assertProcessed(plugins) {
   if (plugins.processed) {
     throw new Error('This config instance has already been applied. To load more plugins or global resources, create a new FrameworkConfiguration instance.');
   }
+}
+
+function invalidConfigMsg(cfg, type) {
+  return 'Invalid ' + type + ' [' + cfg + '], ' + type + ' must be specified as functions or relative module IDs.';
 }
 
 var FrameworkConfiguration = function () {
@@ -7819,10 +8013,15 @@ var FrameworkConfiguration = function () {
 
     this.aurelia = aurelia;
     this.container = aurelia.container;
+
     this.info = [];
     this.processed = false;
     this.preTasks = [];
     this.postTasks = [];
+
+    this.behaviorsToLoad = [];
+
+    this.configuredPlugins = [];
     this.resourcesToLoad = {};
     this.preTask(function () {
       return aurelia.loader.normalize('aurelia-bootstrapper').then(function (name) {
@@ -7864,13 +8063,26 @@ var FrameworkConfiguration = function () {
   FrameworkConfiguration.prototype.feature = function feature(plugin) {
     var config = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 
-    var hasIndex = /\/index$/i.test(plugin);
-    var moduleId = hasIndex || getExt(plugin) ? plugin : plugin + '/index';
-    var root = hasIndex ? plugin.substr(0, plugin.length - 6) : plugin;
-    return this.plugin({ moduleId: moduleId, resourcesRelativeTo: [root, ''], config: config });
+    switch (typeof plugin === 'undefined' ? 'undefined' : _typeof(plugin)) {
+      case 'string':
+        var hasIndex = /\/index$/i.test(plugin);
+        var _moduleId = hasIndex || getExt(plugin) ? plugin : plugin + '/index';
+        var root = hasIndex ? plugin.substr(0, plugin.length - 6) : plugin;
+        this.info.push({ moduleId: _moduleId, resourcesRelativeTo: [root, ''], config: config });
+        break;
+
+      case 'function':
+        this.info.push({ configure: plugin, config: config || {} });
+        break;
+      default:
+        throw new Error(invalidConfigMsg(plugin, 'feature'));
+    }
+    return this;
   };
 
   FrameworkConfiguration.prototype.globalResources = function globalResources(resources) {
+    var _this5 = this;
+
     assertProcessed(this);
 
     var toAdd = Array.isArray(resources) ? resources : arguments;
@@ -7879,19 +8091,31 @@ var FrameworkConfiguration = function () {
 
     for (var i = 0, ii = toAdd.length; i < ii; ++i) {
       resource = toAdd[i];
-      if (typeof resource !== 'string') {
-        throw new Error('Invalid resource path [' + resource + ']. Resources must be specified as relative module IDs.');
+      switch (typeof resource === 'undefined' ? 'undefined' : _typeof(resource)) {
+        case 'string':
+          var parent = resourcesRelativeTo[0];
+          var grandParent = resourcesRelativeTo[1];
+          var name = resource;
+
+          if ((resource.startsWith('./') || resource.startsWith('../')) && parent !== '') {
+            name = (0, _aureliaPath.join)(parent, resource);
+          }
+
+          this.resourcesToLoad[name] = { moduleId: name, relativeTo: grandParent };
+          break;
+        case 'function':
+          var meta = this.aurelia.resources.autoRegister(this.container, resource);
+          if (meta instanceof _aureliaTemplating.HtmlBehaviorResource && meta.elementName !== null) {
+            if (this.behaviorsToLoad.push(meta) === 1) {
+              this.postTask(function () {
+                return loadBehaviors(_this5);
+              });
+            }
+          }
+          break;
+        default:
+          throw new Error(invalidConfigMsg(resource, 'resource'));
       }
-
-      var parent = resourcesRelativeTo[0];
-      var grandParent = resourcesRelativeTo[1];
-      var name = resource;
-
-      if ((resource.startsWith('./') || resource.startsWith('../')) && parent !== '') {
-        name = (0, _aureliaPath.join)(parent, resource);
-      }
-
-      this.resourcesToLoad[name] = { moduleId: name, relativeTo: grandParent };
     }
 
     return this;
@@ -7903,25 +8127,32 @@ var FrameworkConfiguration = function () {
     return this;
   };
 
-  FrameworkConfiguration.prototype.plugin = function plugin(_plugin, config) {
+  FrameworkConfiguration.prototype.plugin = function plugin(_plugin, pluginConfig) {
     assertProcessed(this);
 
-    if (typeof _plugin === 'string') {
-      return this.plugin({ moduleId: _plugin, resourcesRelativeTo: [_plugin, ''], config: config || {} });
+    var info = void 0;
+    switch (typeof _plugin === 'undefined' ? 'undefined' : _typeof(_plugin)) {
+      case 'string':
+        info = { moduleId: _plugin, resourcesRelativeTo: [_plugin, ''], config: pluginConfig || {} };
+        break;
+      case 'function':
+        info = { configure: _plugin, config: pluginConfig || {} };
+        break;
+      default:
+        throw new Error(invalidConfigMsg(_plugin, 'plugin'));
     }
-
-    this.info.push(_plugin);
+    this.info.push(info);
     return this;
   };
 
   FrameworkConfiguration.prototype._addNormalizedPlugin = function _addNormalizedPlugin(name, config) {
-    var _this5 = this;
+    var _this6 = this;
 
     var plugin = { moduleId: name, resourcesRelativeTo: [name, ''], config: config || {} };
-    this.plugin(plugin);
+    this.info.push(plugin);
 
     this.preTask(function () {
-      var relativeTo = [name, _this5.bootstrapperName];
+      var relativeTo = [name, _this6.bootstrapperName];
       plugin.moduleId = name;
       plugin.resourcesRelativeTo = relativeTo;
       return Promise.resolve();
@@ -7959,7 +8190,7 @@ var FrameworkConfiguration = function () {
   };
 
   FrameworkConfiguration.prototype.developmentLogging = function developmentLogging(level) {
-    var _this6 = this;
+    var _this7 = this;
 
     var logLevel = level ? TheLogManager.logLevel[level] : undefined;
 
@@ -7968,8 +8199,8 @@ var FrameworkConfiguration = function () {
     }
 
     this.preTask(function () {
-      return _this6.aurelia.loader.normalize('aurelia-logging-console', _this6.bootstrapperName).then(function (name) {
-        return _this6.aurelia.loader.loadModule(name).then(function (m) {
+      return _this7.aurelia.loader.normalize('aurelia-logging-console', _this7.bootstrapperName).then(function (name) {
+        return _this7.aurelia.loader.loadModule(name).then(function (m) {
           TheLogManager.addAppender(new m.ConsoleAppender());
           TheLogManager.setLevel(logLevel);
         });
@@ -7980,29 +8211,30 @@ var FrameworkConfiguration = function () {
   };
 
   FrameworkConfiguration.prototype.apply = function apply() {
-    var _this7 = this;
+    var _this8 = this;
 
     if (this.processed) {
       return Promise.resolve();
     }
 
     return runTasks(this, this.preTasks).then(function () {
-      var loader = _this7.aurelia.loader;
-      var info = _this7.info;
+      var loader = _this8.aurelia.loader;
+      var info = _this8.info;
       var current = void 0;
 
       var next = function next() {
         current = info.shift();
         if (current) {
-          return loadPlugin(_this7, loader, current).then(next);
+          return loadPlugin(_this8, loader, current).then(next);
         }
 
-        _this7.processed = true;
+        _this8.processed = true;
+        _this8.configuredPlugins = null;
         return Promise.resolve();
       };
 
       return next().then(function () {
-        return runTasks(_this7, _this7.postTasks);
+        return runTasks(_this8, _this8.postTasks);
       });
     });
   };
@@ -8060,11 +8292,9 @@ var DefaultLinkHandler = exports.DefaultLinkHandler = function (_LinkHandler) {
     var _this = _possibleConstructorReturn(this, _LinkHandler.call(this));
 
     _this.handler = function (e) {
-      var _DefaultLinkHandler$g = DefaultLinkHandler.getEventInfo(e);
-
-      var shouldHandleEvent = _DefaultLinkHandler$g.shouldHandleEvent;
-      var href = _DefaultLinkHandler$g.href;
-
+      var _DefaultLinkHandler$g = DefaultLinkHandler.getEventInfo(e),
+          shouldHandleEvent = _DefaultLinkHandler$g.shouldHandleEvent,
+          href = _DefaultLinkHandler$g.href;
 
       if (shouldHandleEvent) {
         e.preventDefault();
@@ -8097,6 +8327,10 @@ var DefaultLinkHandler = exports.DefaultLinkHandler = function (_LinkHandler) {
       return info;
     }
 
+    if (target.hasAttribute('download') || target.hasAttribute('router-ignore')) {
+      return info;
+    }
+
     if (event.altKey || event.ctrlKey || event.metaKey || event.shiftKey) {
       return info;
     }
@@ -8126,7 +8360,7 @@ var DefaultLinkHandler = exports.DefaultLinkHandler = function (_LinkHandler) {
     var targetWindow = target.getAttribute('target');
     var win = _aureliaPal.PLATFORM.global;
 
-    return !targetWindow || targetWindow === win.name || targetWindow === '_self' || targetWindow === 'top' && win === win.top;
+    return !targetWindow || targetWindow === win.name || targetWindow === '_self';
   };
 
   return DefaultLinkHandler;
@@ -8188,9 +8422,9 @@ var BrowserHistory = exports.BrowserHistory = (_temp = _class = function (_Histo
 
         return true;
       } else if (this._hasPushState && atRoot && loc.hash) {
-          this.fragment = this._getHash().replace(routeStripper, '');
-          this.history.replaceState({}, _aureliaPal.DOM.title, this.root + this.fragment + loc.search);
-        }
+        this.fragment = this._getHash().replace(routeStripper, '');
+        this.history.replaceState({}, _aureliaPal.DOM.title, this.root + this.fragment + loc.search);
+      }
     }
 
     if (!this.fragment) {
@@ -8217,12 +8451,11 @@ var BrowserHistory = exports.BrowserHistory = (_temp = _class = function (_Histo
   };
 
   BrowserHistory.prototype.navigate = function navigate(fragment) {
-    var _ref = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
-
-    var _ref$trigger = _ref.trigger;
-    var trigger = _ref$trigger === undefined ? true : _ref$trigger;
-    var _ref$replace = _ref.replace;
-    var replace = _ref$replace === undefined ? false : _ref$replace;
+    var _ref = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {},
+        _ref$trigger = _ref.trigger,
+        trigger = _ref$trigger === undefined ? true : _ref$trigger,
+        _ref$replace = _ref.replace,
+        replace = _ref$replace === undefined ? false : _ref$replace;
 
     if (fragment && absoluteUrl.test(fragment)) {
       this.location.href = fragment;
@@ -8253,12 +8486,14 @@ var BrowserHistory = exports.BrowserHistory = (_temp = _class = function (_Histo
     } else if (this._wantsHashChange) {
       updateHash(this.location, fragment, replace);
     } else {
-      return this.location.assign(url);
+      this.location.assign(url);
     }
 
     if (trigger) {
       return this._loadUrl(fragment);
     }
+
+    return true;
   };
 
   BrowserHistory.prototype.navigateBack = function navigateBack() {
@@ -8271,10 +8506,10 @@ var BrowserHistory = exports.BrowserHistory = (_temp = _class = function (_Histo
 
   BrowserHistory.prototype.setState = function setState(key, value) {
     var state = Object.assign({}, this.history.state);
-    var _location = this.location;
-    var pathname = _location.pathname;
-    var search = _location.search;
-    var hash = _location.hash;
+    var _location = this.location,
+        pathname = _location.pathname,
+        search = _location.search,
+        hash = _location.hash;
 
     state[key] = value;
     this.history.replaceState(state, null, '' + pathname + search + hash);
@@ -9068,6 +9303,10 @@ var Logger = exports.Logger = function () {
     this.level = level;
   };
 
+  Logger.prototype.isDebugEnabled = function isDebugEnabled() {
+    return this.level === logLevel.debug;
+  };
+
   return Logger;
 }();
 });
@@ -9085,7 +9324,7 @@ exports.Origin = exports.metadata = undefined;
 
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
-var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
 exports.decorators = decorators;
 exports.deprecated = deprecated;
@@ -9151,11 +9390,13 @@ var Origin = exports.Origin = function () {
       _aureliaPal.PLATFORM.eachModule(function (key, value) {
         if ((typeof value === 'undefined' ? 'undefined' : _typeof(value)) === 'object') {
           for (var name in value) {
-            var exp = value[name];
-            if (exp === fn) {
-              originStorage.set(fn, origin = new Origin(key, name));
-              return true;
-            }
+            try {
+              var exp = value[name];
+              if (exp === fn) {
+                originStorage.set(fn, origin = new Origin(key, name));
+                return true;
+              }
+            } catch (e) {}
           }
         }
 
@@ -9397,128 +9638,126 @@ if (typeof FEATURE_NO_IE === 'undefined') {
 
 if (typeof FEATURE_NO_IE === 'undefined') {
   if (!('classList' in document.createElement('_')) || document.createElementNS && !('classList' in document.createElementNS('http://www.w3.org/2000/svg', 'g'))) {
-    (function () {
-      var protoProp = 'prototype';
-      var strTrim = String.prototype.trim;
-      var arrIndexOf = Array.prototype.indexOf;
-      var emptyArray = [];
+    var protoProp = 'prototype';
+    var strTrim = String.prototype.trim;
+    var arrIndexOf = Array.prototype.indexOf;
+    var emptyArray = [];
 
-      var DOMEx = function DOMEx(type, message) {
-        this.name = type;
-        this.code = DOMException[type];
-        this.message = message;
+    var DOMEx = function DOMEx(type, message) {
+      this.name = type;
+      this.code = DOMException[type];
+      this.message = message;
+    };
+
+    var checkTokenAndGetIndex = function checkTokenAndGetIndex(classList, token) {
+      if (token === '') {
+        throw new DOMEx('SYNTAX_ERR', 'An invalid or illegal string was specified');
+      }
+
+      if (/\s/.test(token)) {
+        throw new DOMEx('INVALID_CHARACTER_ERR', 'String contains an invalid character');
+      }
+
+      return arrIndexOf.call(classList, token);
+    };
+
+    var ClassList = function ClassList(elem) {
+      var trimmedClasses = strTrim.call(elem.getAttribute('class') || '');
+      var classes = trimmedClasses ? trimmedClasses.split(/\s+/) : emptyArray;
+
+      for (var i = 0, ii = classes.length; i < ii; ++i) {
+        this.push(classes[i]);
+      }
+
+      this._updateClassName = function () {
+        elem.setAttribute('class', this.toString());
       };
+    };
 
-      var checkTokenAndGetIndex = function checkTokenAndGetIndex(classList, token) {
-        if (token === '') {
-          throw new DOMEx('SYNTAX_ERR', 'An invalid or illegal string was specified');
+    var classListProto = ClassList[protoProp] = [];
+
+    DOMEx[protoProp] = Error[protoProp];
+
+    classListProto.item = function (i) {
+      return this[i] || null;
+    };
+
+    classListProto.contains = function (token) {
+      token += '';
+      return checkTokenAndGetIndex(this, token) !== -1;
+    };
+
+    classListProto.add = function () {
+      var tokens = arguments;
+      var i = 0;
+      var ii = tokens.length;
+      var token = void 0;
+      var updated = false;
+
+      do {
+        token = tokens[i] + '';
+        if (checkTokenAndGetIndex(this, token) === -1) {
+          this.push(token);
+          updated = true;
         }
+      } while (++i < ii);
 
-        if (/\s/.test(token)) {
-          throw new DOMEx('INVALID_CHARACTER_ERR', 'String contains an invalid character');
-        }
+      if (updated) {
+        this._updateClassName();
+      }
+    };
 
-        return arrIndexOf.call(classList, token);
-      };
+    classListProto.remove = function () {
+      var tokens = arguments;
+      var i = 0;
+      var ii = tokens.length;
+      var token = void 0;
+      var updated = false;
+      var index = void 0;
 
-      var ClassList = function ClassList(elem) {
-        var trimmedClasses = strTrim.call(elem.getAttribute('class') || '');
-        var classes = trimmedClasses ? trimmedClasses.split(/\s+/) : emptyArray;
-
-        for (var i = 0, ii = classes.length; i < ii; ++i) {
-          this.push(classes[i]);
-        }
-
-        this._updateClassName = function () {
-          elem.setAttribute('class', this.toString());
-        };
-      };
-
-      var classListProto = ClassList[protoProp] = [];
-
-      DOMEx[protoProp] = Error[protoProp];
-
-      classListProto.item = function (i) {
-        return this[i] || null;
-      };
-
-      classListProto.contains = function (token) {
-        token += '';
-        return checkTokenAndGetIndex(this, token) !== -1;
-      };
-
-      classListProto.add = function () {
-        var tokens = arguments;
-        var i = 0;
-        var ii = tokens.length;
-        var token = void 0;
-        var updated = false;
-
-        do {
-          token = tokens[i] + '';
-          if (checkTokenAndGetIndex(this, token) === -1) {
-            this.push(token);
-            updated = true;
-          }
-        } while (++i < ii);
-
-        if (updated) {
-          this._updateClassName();
-        }
-      };
-
-      classListProto.remove = function () {
-        var tokens = arguments;
-        var i = 0;
-        var ii = tokens.length;
-        var token = void 0;
-        var updated = false;
-        var index = void 0;
-
-        do {
-          token = tokens[i] + '';
+      do {
+        token = tokens[i] + '';
+        index = checkTokenAndGetIndex(this, token);
+        while (index !== -1) {
+          this.splice(index, 1);
+          updated = true;
           index = checkTokenAndGetIndex(this, token);
-          while (index !== -1) {
-            this.splice(index, 1);
-            updated = true;
-            index = checkTokenAndGetIndex(this, token);
-          }
-        } while (++i < ii);
-
-        if (updated) {
-          this._updateClassName();
         }
-      };
+      } while (++i < ii);
 
-      classListProto.toggle = function (token, force) {
-        token += '';
+      if (updated) {
+        this._updateClassName();
+      }
+    };
 
-        var result = this.contains(token);
-        var method = result ? force !== true && 'remove' : force !== false && 'add';
+    classListProto.toggle = function (token, force) {
+      token += '';
 
-        if (method) {
-          this[method](token);
-        }
+      var result = this.contains(token);
+      var method = result ? force !== true && 'remove' : force !== false && 'add';
 
-        if (force === true || force === false) {
-          return force;
-        }
+      if (method) {
+        this[method](token);
+      }
 
-        return !result;
-      };
+      if (force === true || force === false) {
+        return force;
+      }
 
-      classListProto.toString = function () {
-        return this.join(' ');
-      };
+      return !result;
+    };
 
-      Object.defineProperty(Element.prototype, 'classList', {
-        get: function get() {
-          return new ClassList(this);
-        },
-        enumerable: true,
-        configurable: true
-      });
-    })();
+    classListProto.toString = function () {
+      return this.join(' ');
+    };
+
+    Object.defineProperty(Element.prototype, 'classList', {
+      get: function get() {
+        return new ClassList(this);
+      },
+      enumerable: true,
+      configurable: true
+    });
   } else {
     var testElement = document.createElement('_');
     testElement.classList.add('c1', 'c2');
@@ -9542,17 +9781,15 @@ if (typeof FEATURE_NO_IE === 'undefined') {
     testElement.classList.toggle('c3', false);
 
     if (testElement.classList.contains('c3')) {
-      (function () {
-        var _toggle = DOMTokenList.prototype.toggle;
+      var _toggle = DOMTokenList.prototype.toggle;
 
-        DOMTokenList.prototype.toggle = function (token, force) {
-          if (1 in arguments && !this.contains(token) === !force) {
-            return force;
-          }
+      DOMTokenList.prototype.toggle = function (token, force) {
+        if (1 in arguments && !this.contains(token) === !force) {
+          return force;
+        }
 
-          return _toggle.call(this, token);
-        };
-      })();
+        return _toggle.call(this, token);
+      };
     }
 
     testElement = null;
@@ -9560,127 +9797,121 @@ if (typeof FEATURE_NO_IE === 'undefined') {
 }
 
 if (typeof FEATURE_NO_IE === 'undefined') {
-  (function () {
-    var _filterEntries = function _filterEntries(key, value) {
-      var i = 0,
-          n = _entries.length,
-          result = [];
-      for (; i < n; i++) {
-        if (_entries[i][key] == value) {
-          result.push(_entries[i]);
-        }
+  var _filterEntries = function _filterEntries(key, value) {
+    var i = 0,
+        n = _entries.length,
+        result = [];
+    for (; i < n; i++) {
+      if (_entries[i][key] == value) {
+        result.push(_entries[i]);
       }
-      return result;
-    };
+    }
+    return result;
+  };
 
-    var _clearEntries = function _clearEntries(type, name) {
-      var i = _entries.length,
-          entry;
-      while (i--) {
-        entry = _entries[i];
-        if (entry.entryType == type && (name === void 0 || entry.name == name)) {
-          _entries.splice(i, 1);
-        }
+  var _clearEntries = function _clearEntries(type, name) {
+    var i = _entries.length,
+        entry;
+    while (i--) {
+      entry = _entries[i];
+      if (entry.entryType == type && (name === void 0 || entry.name == name)) {
+        _entries.splice(i, 1);
       }
+    }
+  };
+
+  // @license http://opensource.org/licenses/MIT
+  if ('performance' in window === false) {
+    window.performance = {};
+  }
+
+  if ('now' in window.performance === false) {
+    var nowOffset = Date.now();
+
+    if (performance.timing && performance.timing.navigationStart) {
+      nowOffset = performance.timing.navigationStart;
+    }
+
+    window.performance.now = function now() {
+      return Date.now() - nowOffset;
     };
+  }
 
-    // @license http://opensource.org/licenses/MIT
-    if ('performance' in window === false) {
-      window.performance = {};
-    }
+  var startOffset = Date.now ? Date.now() : +new Date();
+  var _entries = [];
+  var _marksIndex = {};
 
-    if ('now' in window.performance === false) {
-      (function () {
-        var nowOffset = Date.now();
+  ;
 
-        if (performance.timing && performance.timing.navigationStart) {
-          nowOffset = performance.timing.navigationStart;
-        }
-
-        window.performance.now = function now() {
-          return Date.now() - nowOffset;
-        };
-      })();
-    }
-
-    var startOffset = Date.now ? Date.now() : +new Date();
-    var _entries = [];
-    var _marksIndex = {};
-
-    ;
-
-    if (!window.performance.mark) {
-      window.performance.mark = window.performance.webkitMark || function (name) {
-        var mark = {
-          name: name,
-          entryType: "mark",
-          startTime: window.performance.now(),
-          duration: 0
-        };
-
-        _entries.push(mark);
-        _marksIndex[name] = mark;
+  if (!window.performance.mark) {
+    window.performance.mark = window.performance.webkitMark || function (name) {
+      var mark = {
+        name: name,
+        entryType: "mark",
+        startTime: window.performance.now(),
+        duration: 0
       };
-    }
 
-    if (!window.performance.measure) {
-      window.performance.measure = window.performance.webkitMeasure || function (name, startMark, endMark) {
-        startMark = _marksIndex[startMark].startTime;
-        endMark = _marksIndex[endMark].startTime;
+      _entries.push(mark);
+      _marksIndex[name] = mark;
+    };
+  }
 
-        _entries.push({
-          name: name,
-          entryType: "measure",
-          startTime: startMark,
-          duration: endMark - startMark
-        });
-      };
-    }
+  if (!window.performance.measure) {
+    window.performance.measure = window.performance.webkitMeasure || function (name, startMark, endMark) {
+      startMark = _marksIndex[startMark].startTime;
+      endMark = _marksIndex[endMark].startTime;
 
-    if (!window.performance.getEntriesByType) {
-      window.performance.getEntriesByType = window.performance.webkitGetEntriesByType || function (type) {
-        return _filterEntries("entryType", type);
-      };
-    }
+      _entries.push({
+        name: name,
+        entryType: "measure",
+        startTime: startMark,
+        duration: endMark - startMark
+      });
+    };
+  }
 
-    if (!window.performance.getEntriesByName) {
-      window.performance.getEntriesByName = window.performance.webkitGetEntriesByName || function (name) {
-        return _filterEntries("name", name);
-      };
-    }
+  if (!window.performance.getEntriesByType) {
+    window.performance.getEntriesByType = window.performance.webkitGetEntriesByType || function (type) {
+      return _filterEntries("entryType", type);
+    };
+  }
 
-    if (!window.performance.clearMarks) {
-      window.performance.clearMarks = window.performance.webkitClearMarks || function (name) {
-        _clearEntries("mark", name);
-      };
-    }
+  if (!window.performance.getEntriesByName) {
+    window.performance.getEntriesByName = window.performance.webkitGetEntriesByName || function (name) {
+      return _filterEntries("name", name);
+    };
+  }
 
-    if (!window.performance.clearMeasures) {
-      window.performance.clearMeasures = window.performance.webkitClearMeasures || function (name) {
-        _clearEntries("measure", name);
-      };
-    }
+  if (!window.performance.clearMarks) {
+    window.performance.clearMarks = window.performance.webkitClearMarks || function (name) {
+      _clearEntries("mark", name);
+    };
+  }
 
-    _PLATFORM.performance = window.performance;
-  })();
+  if (!window.performance.clearMeasures) {
+    window.performance.clearMeasures = window.performance.webkitClearMeasures || function (name) {
+      _clearEntries("measure", name);
+    };
+  }
+
+  _PLATFORM.performance = window.performance;
 }
 
 if (typeof FEATURE_NO_IE === 'undefined') {
-  (function () {
-    var con = window.console = window.console || {};
-    var nop = function nop() {};
+  var con = window.console = window.console || {};
+  var nop = function nop() {};
 
-    if (!con.memory) con.memory = {};
-    ('assert,clear,count,debug,dir,dirxml,error,exception,group,' + 'groupCollapsed,groupEnd,info,log,markTimeline,profile,profiles,profileEnd,' + 'show,table,time,timeEnd,timeline,timelineEnd,timeStamp,trace,warn').split(',').forEach(function (m) {
-      if (!con[m]) con[m] = nop;
-    });
+  if (!con.memory) con.memory = {};
+  ('assert,clear,count,debug,dir,dirxml,error,exception,group,' + 'groupCollapsed,groupEnd,info,log,markTimeline,profile,profiles,profileEnd,' + 'show,table,time,timeEnd,timeline,timelineEnd,timeStamp,trace,warn').split(',').forEach(function (m) {
+    if (!con[m]) con[m] = nop;
+  });
 
-    if (_typeof(con.log) === 'object') {
-      'log,info,warn,error,assert,dir,clear,profile,profileEnd'.split(',').forEach(function (method) {
-        console[method] = this.bind(console[method], console);
-      }, Function.prototype.call);
-    }
-  })();
+  if (_typeof(con.log) === 'object') {
+    'log,info,warn,error,assert,dir,clear,profile,profileEnd'.split(',').forEach(function (method) {
+      console[method] = this.bind(console[method], console);
+    }, Function.prototype.call);
+  }
 }
 
 if (typeof FEATURE_NO_IE === 'undefined') {
@@ -9722,62 +9953,60 @@ var _FEATURE = exports._FEATURE = {
 };
 
 if (typeof FEATURE_NO_IE === 'undefined') {
-  (function () {
-    var isSVGTemplate = function isSVGTemplate(el) {
-      return el.tagName === 'template' && el.namespaceURI === 'http://www.w3.org/2000/svg';
-    };
+  var isSVGTemplate = function isSVGTemplate(el) {
+    return el.tagName === 'template' && el.namespaceURI === 'http://www.w3.org/2000/svg';
+  };
 
-    var fixSVGTemplateElement = function fixSVGTemplateElement(el) {
-      var template = el.ownerDocument.createElement('template');
-      var attrs = el.attributes;
-      var length = attrs.length;
-      var attr = void 0;
+  var fixSVGTemplateElement = function fixSVGTemplateElement(el) {
+    var template = el.ownerDocument.createElement('template');
+    var attrs = el.attributes;
+    var length = attrs.length;
+    var attr = void 0;
 
-      el.parentNode.insertBefore(template, el);
+    el.parentNode.insertBefore(template, el);
 
-      while (length-- > 0) {
-        attr = attrs[length];
-        template.setAttribute(attr.name, attr.value);
-        el.removeAttribute(attr.name);
-      }
-
-      el.parentNode.removeChild(el);
-
-      return fixHTMLTemplateElement(template);
-    };
-
-    var fixHTMLTemplateElement = function fixHTMLTemplateElement(template) {
-      var content = template.content = document.createDocumentFragment();
-      var child = void 0;
-
-      while (child = template.firstChild) {
-        content.appendChild(child);
-      }
-
-      return template;
-    };
-
-    var fixHTMLTemplateElementRoot = function fixHTMLTemplateElementRoot(template) {
-      var content = fixHTMLTemplateElement(template).content;
-      var childTemplates = content.querySelectorAll('template');
-
-      for (var i = 0, ii = childTemplates.length; i < ii; ++i) {
-        var child = childTemplates[i];
-
-        if (isSVGTemplate(child)) {
-          fixSVGTemplateElement(child);
-        } else {
-          fixHTMLTemplateElement(child);
-        }
-      }
-
-      return template;
-    };
-
-    if (!_FEATURE.htmlTemplateElement) {
-      _FEATURE.ensureHTMLTemplateElement = fixHTMLTemplateElementRoot;
+    while (length-- > 0) {
+      attr = attrs[length];
+      template.setAttribute(attr.name, attr.value);
+      el.removeAttribute(attr.name);
     }
-  })();
+
+    el.parentNode.removeChild(el);
+
+    return fixHTMLTemplateElement(template);
+  };
+
+  var fixHTMLTemplateElement = function fixHTMLTemplateElement(template) {
+    var content = template.content = document.createDocumentFragment();
+    var child = void 0;
+
+    while (child = template.firstChild) {
+      content.appendChild(child);
+    }
+
+    return template;
+  };
+
+  var fixHTMLTemplateElementRoot = function fixHTMLTemplateElementRoot(template) {
+    var content = fixHTMLTemplateElement(template).content;
+    var childTemplates = content.querySelectorAll('template');
+
+    for (var i = 0, ii = childTemplates.length; i < ii; ++i) {
+      var child = childTemplates[i];
+
+      if (isSVGTemplate(child)) {
+        fixSVGTemplateElement(child);
+      } else {
+        fixHTMLTemplateElement(child);
+      }
+    }
+
+    return template;
+  };
+
+  if (!_FEATURE.htmlTemplateElement) {
+    _FEATURE.ensureHTMLTemplateElement = fixHTMLTemplateElementRoot;
+  }
 }
 
 var shadowPoly = window.ShadowDOMPolyfill || null;
@@ -9794,7 +10023,7 @@ var _DOM = exports._DOM = {
     document.removeEventListener(eventName, callback, capture);
   },
   adoptNode: function adoptNode(node) {
-    return document.adoptNode(node, true);
+    return document.adoptNode(node);
   },
   createAttribute: function createAttribute(name) {
     return document.createAttribute(name);
@@ -9829,6 +10058,9 @@ var _DOM = exports._DOM = {
   },
   getElementById: function getElementById(id) {
     return document.getElementById(id);
+  },
+  querySelector: function querySelector(query) {
+    return document.querySelector(query);
   },
   querySelectorAll: function querySelectorAll(query) {
     return document.querySelectorAll(query);
@@ -11261,7 +11493,7 @@ var DynamicSegment = exports.DynamicSegment = function () {
   };
 
   DynamicSegment.prototype.regex = function regex() {
-    return this.optional ? '([^/]+)?' : '([^/]+)';
+    return '([^/]+)';
   };
 
   DynamicSegment.prototype.generate = function generate(params, consumed) {
@@ -11332,12 +11564,12 @@ var RouteRecognizer = exports.RouteRecognizer = function () {
     }
 
     var currentState = this.rootState;
+    var skippableStates = [];
     var regex = '^';
     var types = { statics: 0, dynamics: 0, stars: 0 };
     var names = [];
     var routeName = route.handler.name;
     var isEmpty = true;
-    var isAllOptional = true;
     var segments = parse(route.path, names, types, route.caseSensitive);
 
     for (var i = 0, ii = segments.length; i < ii; i++) {
@@ -11346,23 +11578,28 @@ var RouteRecognizer = exports.RouteRecognizer = function () {
         continue;
       }
 
-      isEmpty = false;
-      isAllOptional = isAllOptional && segment.optional;
+      var _addSegment = addSegment(currentState, segment),
+          firstState = _addSegment[0],
+          nextState = _addSegment[1];
 
-      currentState = addSegment(currentState, segment);
-      regex += segment.optional ? '/?' : '/';
-      regex += segment.regex();
+      for (var j = 0, jj = skippableStates.length; j < jj; j++) {
+        skippableStates[j].nextStates.push(firstState);
+      }
+
+      if (segment.optional) {
+        skippableStates.push(nextState);
+        regex += '(?:/' + segment.regex() + ')?';
+      } else {
+        currentState = nextState;
+        regex += '/' + segment.regex();
+        skippableStates.length = 0;
+        isEmpty = false;
+      }
     }
 
-    if (isAllOptional) {
-      if (isEmpty) {
-        currentState = currentState.put({ validChars: '/' });
-        regex += '/';
-      } else {
-        var finalState = this.rootState.put({ validChars: '/' });
-        currentState.epsilon = [finalState];
-        currentState = finalState;
-      }
+    if (isEmpty) {
+      currentState = currentState.put({ validChars: '/' });
+      regex += '/?';
     }
 
     var handlers = [{ handler: route.handler, names: names }];
@@ -11375,6 +11612,13 @@ var RouteRecognizer = exports.RouteRecognizer = function () {
           handlers: handlers
         };
       }
+    }
+
+    for (var _i3 = 0; _i3 < skippableStates.length; _i3++) {
+      var state = skippableStates[_i3];
+      state.handlers = handlers;
+      state.regex = new RegExp(regex + '$', route.caseSensitive ? '' : 'i');
+      state.types = types;
     }
 
     currentState.handlers = handlers;
@@ -11478,9 +11722,9 @@ var RouteRecognizer = exports.RouteRecognizer = function () {
     }
 
     var solutions = [];
-    for (var _i3 = 0, _l = states.length; _i3 < _l; _i3++) {
-      if (states[_i3].handlers) {
-        solutions.push(states[_i3]);
+    for (var _i4 = 0, _l = states.length; _i4 < _l; _i4++) {
+      if (states[_i4].handlers) {
+        solutions.push(states[_i4]);
       }
     }
 
@@ -11587,25 +11831,6 @@ function recognizeChar(states, ch) {
     nextStates.push.apply(nextStates, state.match(ch));
   }
 
-  var skippableStates = nextStates.filter(function (s) {
-    return s.epsilon;
-  });
-
-  var _loop = function _loop() {
-    var newStates = [];
-    skippableStates.forEach(function (s) {
-      nextStates.push.apply(nextStates, s.epsilon);
-      newStates.push.apply(newStates, s.epsilon);
-    });
-    skippableStates = newStates.filter(function (s) {
-      return s.epsilon;
-    });
-  };
-
-  while (skippableStates.length > 0) {
-    _loop();
-  }
-
   return nextStates;
 }
 
@@ -11632,17 +11857,13 @@ function findHandler(state, path, queryParams) {
 }
 
 function addSegment(currentState, segment) {
-  var state = currentState.put({ validChars: '/' });
+  var firstState = currentState.put({ validChars: '/' });
+  var nextState = firstState;
   segment.eachChar(function (ch) {
-    state = state.put(ch);
+    nextState = nextState.put(ch);
   });
 
-  if (segment.optional) {
-    currentState.epsilon = currentState.epsilon || [];
-    currentState.epsilon.push(state);
-  }
-
-  return state;
+  return [firstState, nextState];
 }
 });
 return ___scope___.entry = "dist/commonjs/aurelia-route-recognizer.js";
@@ -11655,7 +11876,7 @@ ___scope___.file("dist/commonjs/aurelia-router.js", function(exports, require, m
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.AppRouter = exports.PipelineProvider = exports.LoadRouteStep = exports.RouteLoader = exports.ActivateNextStep = exports.DeactivatePreviousStep = exports.CanActivateNextStep = exports.CanDeactivatePreviousStep = exports.Router = exports.BuildNavigationPlanStep = exports.activationStrategy = exports.RouterConfiguration = exports.RedirectToRoute = exports.Redirect = exports.NavModel = exports.NavigationInstruction = exports.CommitChangesStep = exports.Pipeline = exports.pipelineStatus = undefined;
+exports.AppRouter = exports.PipelineProvider = exports.LoadRouteStep = exports.RouteLoader = exports.ActivateNextStep = exports.DeactivatePreviousStep = exports.CanActivateNextStep = exports.CanDeactivatePreviousStep = exports.Router = exports.BuildNavigationPlanStep = exports.activationStrategy = exports.RouterConfiguration = exports.Pipeline = exports.pipelineStatus = exports.RedirectToRoute = exports.Redirect = exports.NavModel = exports.NavigationInstruction = exports.CommitChangesStep = undefined;
 
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
@@ -11664,6 +11885,7 @@ var _createClass = function () { function defineProperties(target, props) { for 
 exports._normalizeAbsolutePath = _normalizeAbsolutePath;
 exports._createRootedPath = _createRootedPath;
 exports._resolveUrl = _resolveUrl;
+exports._ensureArrayWithSingleRoutePerConfig = _ensureArrayWithSingleRoutePerConfig;
 exports.isNavigationCommand = isNavigationCommand;
 exports._buildNavigationPlan = _buildNavigationPlan;
 
@@ -11733,79 +11955,24 @@ function _resolveUrl(fragment, baseUrl, hasPushState) {
   return _createRootedPath(fragment, baseUrl, hasPushState);
 }
 
-var isRootedPath = /^#?\//;
-var isAbsoluteUrl = /^([a-z][a-z0-9+\-.]*:)?\/\//i;
+function _ensureArrayWithSingleRoutePerConfig(config) {
+  var routeConfigs = [];
 
-var pipelineStatus = exports.pipelineStatus = {
-  completed: 'completed',
-  canceled: 'canceled',
-  rejected: 'rejected',
-  running: 'running'
-};
-
-var Pipeline = exports.Pipeline = function () {
-  function Pipeline() {
-    
-
-    this.steps = [];
+  if (Array.isArray(config.route)) {
+    for (var i = 0, ii = config.route.length; i < ii; ++i) {
+      var current = Object.assign({}, config);
+      current.route = config.route[i];
+      routeConfigs.push(current);
+    }
+  } else {
+    routeConfigs.push(Object.assign({}, config));
   }
 
-  Pipeline.prototype.addStep = function addStep(step) {
-    var run = void 0;
-
-    if (typeof step === 'function') {
-      run = step;
-    } else if (typeof step.getSteps === 'function') {
-      var steps = step.getSteps();
-      for (var i = 0, l = steps.length; i < l; i++) {
-        this.addStep(steps[i]);
-      }
-
-      return this;
-    } else {
-      run = step.run.bind(step);
-    }
-
-    this.steps.push(run);
-
-    return this;
-  };
-
-  Pipeline.prototype.run = function run(instruction) {
-    var index = -1;
-    var steps = this.steps;
-
-    function next() {
-      index++;
-
-      if (index < steps.length) {
-        var currentStep = steps[index];
-
-        try {
-          return currentStep(instruction, next);
-        } catch (e) {
-          return next.reject(e);
-        }
-      } else {
-        return next.complete();
-      }
-    }
-
-    next.complete = createCompletionHandler(next, pipelineStatus.completed);
-    next.cancel = createCompletionHandler(next, pipelineStatus.canceled);
-    next.reject = createCompletionHandler(next, pipelineStatus.rejected);
-
-    return next();
-  };
-
-  return Pipeline;
-}();
-
-function createCompletionHandler(next, status) {
-  return function (output) {
-    return Promise.resolve({ status: status, output: output, completed: status === pipelineStatus.completed });
-  };
+  return routeConfigs;
 }
+
+var isRootedPath = /^#?\//;
+var isAbsoluteUrl = /^([a-z][a-z0-9+\-.]*:)?\/\//i;
 
 var CommitChangesStep = exports.CommitChangesStep = function () {
   function CommitChangesStep() {
@@ -11852,8 +12019,8 @@ var NavigationInstruction = exports.NavigationInstruction = function () {
 
   NavigationInstruction.prototype.getAllInstructions = function getAllInstructions() {
     var instructions = [this];
-    for (var key in this.viewPortInstructions) {
-      var childInstruction = this.viewPortInstructions[key].childNavigationInstruction;
+    for (var _key in this.viewPortInstructions) {
+      var childInstruction = this.viewPortInstructions[_key].childNavigationInstruction;
       if (childInstruction) {
         instructions.push.apply(instructions, childInstruction.getAllInstructions());
       }
@@ -11940,7 +12107,6 @@ var NavigationInstruction = exports.NavigationInstruction = function () {
 
     this.config.navModel.isActive = true;
 
-    router._refreshBaseUrl();
     router.refreshNavigation();
 
     var loads = [];
@@ -11989,7 +12155,7 @@ var NavigationInstruction = exports.NavigationInstruction = function () {
   };
 
   NavigationInstruction.prototype._updateTitle = function _updateTitle() {
-    var title = this._buildTitle();
+    var title = this._buildTitle(this.router.titleSeparator);
     if (title) {
       this.router.history.setTitle(title);
     }
@@ -12113,6 +12279,77 @@ var RedirectToRoute = exports.RedirectToRoute = function () {
   return RedirectToRoute;
 }();
 
+var pipelineStatus = exports.pipelineStatus = {
+  completed: 'completed',
+  canceled: 'canceled',
+  rejected: 'rejected',
+  running: 'running'
+};
+
+var Pipeline = exports.Pipeline = function () {
+  function Pipeline() {
+    
+
+    this.steps = [];
+  }
+
+  Pipeline.prototype.addStep = function addStep(step) {
+    var run = void 0;
+
+    if (typeof step === 'function') {
+      run = step;
+    } else if (typeof step.getSteps === 'function') {
+      var steps = step.getSteps();
+      for (var i = 0, l = steps.length; i < l; i++) {
+        this.addStep(steps[i]);
+      }
+
+      return this;
+    } else {
+      run = step.run.bind(step);
+    }
+
+    this.steps.push(run);
+
+    return this;
+  };
+
+  Pipeline.prototype.run = function run(instruction) {
+    var index = -1;
+    var steps = this.steps;
+
+    function next() {
+      index++;
+
+      if (index < steps.length) {
+        var currentStep = steps[index];
+
+        try {
+          return currentStep(instruction, next);
+        } catch (e) {
+          return next.reject(e);
+        }
+      } else {
+        return next.complete();
+      }
+    }
+
+    next.complete = createCompletionHandler(next, pipelineStatus.completed);
+    next.cancel = createCompletionHandler(next, pipelineStatus.canceled);
+    next.reject = createCompletionHandler(next, pipelineStatus.rejected);
+
+    return next();
+  };
+
+  return Pipeline;
+}();
+
+function createCompletionHandler(next, status) {
+  return function (output) {
+    return Promise.resolve({ status: status, output: output, completed: status === pipelineStatus.completed });
+  };
+}
+
 var RouterConfiguration = exports.RouterConfiguration = function () {
   function RouterConfiguration() {
     
@@ -12123,6 +12360,9 @@ var RouterConfiguration = exports.RouterConfiguration = function () {
   }
 
   RouterConfiguration.prototype.addPipelineStep = function addPipelineStep(name, step) {
+    if (step === null || step === undefined) {
+      throw new Error('Pipeline step cannot be null or undefined.');
+    }
     this.pipelineSteps.push({ name: name, step: step });
     return this;
   };
@@ -12164,21 +12404,11 @@ var RouterConfiguration = exports.RouterConfiguration = function () {
 
   RouterConfiguration.prototype.mapRoute = function mapRoute(config) {
     this.instructions.push(function (router) {
-      var routeConfigs = [];
-
-      if (Array.isArray(config.route)) {
-        for (var i = 0, ii = config.route.length; i < ii; ++i) {
-          var _current = Object.assign({}, config);
-          _current.route = config.route[i];
-          routeConfigs.push(_current);
-        }
-      } else {
-        routeConfigs.push(Object.assign({}, config));
-      }
+      var routeConfigs = _ensureArrayWithSingleRoutePerConfig(config);
 
       var navModel = void 0;
-      for (var _i = 0, _ii = routeConfigs.length; _i < _ii; ++_i) {
-        var _routeConfig = routeConfigs[_i];
+      for (var i = 0, ii = routeConfigs.length; i < ii; ++i) {
+        var _routeConfig = routeConfigs[i];
         _routeConfig.settings = _routeConfig.settings || {};
         if (!navModel) {
           navModel = router.createNavModel(_routeConfig);
@@ -12206,6 +12436,10 @@ var RouterConfiguration = exports.RouterConfiguration = function () {
       router.title = this.title;
     }
 
+    if (this.titleSeparator) {
+      router.titleSeparator = this.titleSeparator;
+    }
+
     if (this.unknownRouteConfig) {
       router.handleUnknownRoutes(this.unknownRouteConfig);
     }
@@ -12218,7 +12452,7 @@ var RouterConfiguration = exports.RouterConfiguration = function () {
       router.useViewPortDefaults(this.viewPortDefaults);
     }
 
-    router.options = this.options;
+    Object.assign(router.options, this.options);
 
     var pipelineSteps = this.pipelineSteps;
     if (pipelineSteps.length) {
@@ -12227,12 +12461,12 @@ var RouterConfiguration = exports.RouterConfiguration = function () {
       }
 
       var pipelineProvider = router.pipelineProvider;
-      for (var _i2 = 0, _ii2 = pipelineSteps.length; _i2 < _ii2; ++_i2) {
-        var _pipelineSteps$_i = pipelineSteps[_i2],
+      for (var _i = 0, _ii = pipelineSteps.length; _i < _ii; ++_i) {
+        var _pipelineSteps$_i = pipelineSteps[_i],
             _name = _pipelineSteps$_i.name,
-            step = _pipelineSteps$_i.step;
+            _step = _pipelineSteps$_i.step;
 
-        pipelineProvider.addStep(_name, step);
+        pipelineProvider.addStep(_name, _step);
       }
     }
   };
@@ -12253,6 +12487,9 @@ var BuildNavigationPlanStep = exports.BuildNavigationPlanStep = function () {
 
   BuildNavigationPlanStep.prototype.run = function run(navigationInstruction, next) {
     return _buildNavigationPlan(navigationInstruction).then(function (plan) {
+      if (plan instanceof Redirect) {
+        return next.cancel(plan);
+      }
       navigationInstruction.plan = plan;
       return next();
     }).catch(next.cancel);
@@ -12265,12 +12502,29 @@ function _buildNavigationPlan(instruction, forceLifecycleMinimum) {
   var config = instruction.config;
 
   if ('redirect' in config) {
-    var redirectLocation = _resolveUrl(config.redirect, getInstructionBaseUrl(instruction));
-    if (instruction.queryString) {
-      redirectLocation += '?' + instruction.queryString;
-    }
+    var _router = instruction.router;
+    return _router._createNavigationInstruction(config.redirect).then(function (newInstruction) {
+      var params = {};
+      for (var _key2 in newInstruction.params) {
+        var val = newInstruction.params[_key2];
+        if (typeof val === 'string' && val[0] === ':') {
+          val = val.slice(1);
 
-    return Promise.reject(new Redirect(redirectLocation));
+          if (val in instruction.params) {
+            params[_key2] = instruction.params[val];
+          }
+        } else {
+          params[_key2] = newInstruction.params[_key2];
+        }
+      }
+      var redirectLocation = _router.generate(newInstruction.config.name, params, instruction.options);
+
+      if (instruction.queryString) {
+        redirectLocation += '?' + instruction.queryString;
+      }
+
+      return Promise.resolve(new Redirect(redirectLocation));
+    });
   }
 
   var prev = instruction.previousInstruction;
@@ -12315,6 +12569,9 @@ function _buildNavigationPlan(instruction, forceLifecycleMinimum) {
           viewPortPlan.childNavigationInstruction = childInstruction;
 
           return _buildNavigationPlan(childInstruction, viewPortPlan.strategy === activationStrategy.invokeLifecycle).then(function (childPlan) {
+            if (childPlan instanceof Redirect) {
+              return Promise.reject(childPlan);
+            }
             childInstruction.plan = childPlan;
           });
         });
@@ -12352,22 +12609,22 @@ function hasDifferentParameterValues(prev, next) {
   var nextParams = next.params;
   var nextWildCardName = next.config.hasChildRouter ? next.getWildCardName() : null;
 
-  for (var key in nextParams) {
-    if (key === nextWildCardName) {
+  for (var _key3 in nextParams) {
+    if (_key3 === nextWildCardName) {
       continue;
     }
 
-    if (prevParams[key] !== nextParams[key]) {
+    if (prevParams[_key3] !== nextParams[_key3]) {
       return true;
     }
   }
 
-  for (var _key in prevParams) {
-    if (_key === nextWildCardName) {
+  for (var _key4 in prevParams) {
+    if (_key4 === nextWildCardName) {
       continue;
     }
 
-    if (prevParams[_key] !== nextParams[_key]) {
+    if (prevParams[_key4] !== nextParams[_key4]) {
       return true;
     }
   }
@@ -12378,32 +12635,19 @@ function hasDifferentParameterValues(prev, next) {
 
   var prevQueryParams = prev.queryParams;
   var nextQueryParams = next.queryParams;
-  for (var _key2 in nextQueryParams) {
-    if (prevQueryParams[_key2] !== nextQueryParams[_key2]) {
+  for (var _key5 in nextQueryParams) {
+    if (prevQueryParams[_key5] !== nextQueryParams[_key5]) {
       return true;
     }
   }
 
-  for (var _key3 in prevQueryParams) {
-    if (prevQueryParams[_key3] !== nextQueryParams[_key3]) {
+  for (var _key6 in prevQueryParams) {
+    if (prevQueryParams[_key6] !== nextQueryParams[_key6]) {
       return true;
     }
   }
 
   return false;
-}
-
-function getInstructionBaseUrl(instruction) {
-  var instructionBaseUrlParts = [];
-  instruction = instruction.parentInstruction;
-
-  while (instruction) {
-    instructionBaseUrlParts.unshift(instruction.getBaseUrl());
-    instruction = instruction.parentInstruction;
-  }
-
-  instructionBaseUrlParts.unshift('/');
-  return instructionBaseUrlParts.join('');
 }
 
 var Router = exports.Router = function () {
@@ -12516,7 +12760,7 @@ var Router = exports.Router = function () {
 
     var hasRoute = this._recognizer.hasRoute(name);
     if ((!this.isConfigured || !hasRoute) && this.parent) {
-      return this.parent.generate(name, params);
+      return this.parent.generate(name, params, options);
     }
 
     if (!hasRoute) {
@@ -12540,6 +12784,12 @@ var Router = exports.Router = function () {
   };
 
   Router.prototype.addRoute = function addRoute(config, navModel) {
+    if (Array.isArray(config.route)) {
+      var routeConfigs = _ensureArrayWithSingleRoutePerConfig(config);
+      routeConfigs.forEach(this.addRoute.bind(this));
+      return;
+    }
+
     validateRouteConfig(config, this.routes);
 
     if (!('viewPorts' in config) && !config.navigationStrategy) {
@@ -12638,11 +12888,11 @@ var Router = exports.Router = function () {
     var nav = this.navigation;
 
     for (var i = 0, length = nav.length; i < length; i++) {
-      var _current2 = nav[i];
-      if (!_current2.config.href) {
-        _current2.href = _createRootedPath(_current2.relativeHref, this.baseUrl, this.history._hasPushState);
+      var _current = nav[i];
+      if (!_current.config.href) {
+        _current.href = _createRootedPath(_current.relativeHref, this.baseUrl, this.history._hasPushState);
       } else {
-        _current2.href = _normalizeAbsolutePath(_current2.config.href, this.history._hasPushState);
+        _current.href = _normalizeAbsolutePath(_current.config.href, this.history._hasPushState);
       }
     }
   };
@@ -12658,8 +12908,7 @@ var Router = exports.Router = function () {
 
   Router.prototype._refreshBaseUrl = function _refreshBaseUrl() {
     if (this.parent) {
-      var baseUrl = this.parent.currentInstruction.getBaseUrl();
-      this.baseUrl = this.parent.baseUrl + baseUrl;
+      this.baseUrl = generateBaseUrl(this.parent, this.parent.currentInstruction);
     }
   };
 
@@ -12693,6 +12942,8 @@ var Router = exports.Router = function () {
       }
     };
 
+    var result = void 0;
+
     if (results && results.length) {
       var first = results[0];
       var _instruction = new NavigationInstruction(Object.assign({}, instructionInit, {
@@ -12702,38 +12953,42 @@ var Router = exports.Router = function () {
       }));
 
       if (typeof first.handler === 'function') {
-        return evaluateNavigationStrategy(_instruction, first.handler, first);
+        result = evaluateNavigationStrategy(_instruction, first.handler, first);
       } else if (first.handler && typeof first.handler.navigationStrategy === 'function') {
-        return evaluateNavigationStrategy(_instruction, first.handler.navigationStrategy, first.handler);
+        result = evaluateNavigationStrategy(_instruction, first.handler.navigationStrategy, first.handler);
+      } else {
+        result = Promise.resolve(_instruction);
       }
-
-      return Promise.resolve(_instruction);
     } else if (this.catchAllHandler) {
       var _instruction2 = new NavigationInstruction(Object.assign({}, instructionInit, {
         params: { path: fragment },
         queryParams: results ? results.queryParams : {},
         config: null }));
 
-      return evaluateNavigationStrategy(_instruction2, this.catchAllHandler);
+      result = evaluateNavigationStrategy(_instruction2, this.catchAllHandler);
     } else if (this.parent) {
-      var _router = this._parentCatchAllHandler(this.parent);
+      var _router2 = this._parentCatchAllHandler(this.parent);
 
-      if (_router) {
-        var newParentInstruction = this._findParentInstructionFromRouter(_router, parentInstruction);
+      if (_router2) {
+        var newParentInstruction = this._findParentInstructionFromRouter(_router2, parentInstruction);
 
         var _instruction3 = new NavigationInstruction(Object.assign({}, instructionInit, {
           params: { path: fragment },
           queryParams: results ? results.queryParams : {},
-          router: _router,
+          router: _router2,
           parentInstruction: newParentInstruction,
           parentCatchHandler: true,
           config: null }));
 
-        return evaluateNavigationStrategy(_instruction3, _router.catchAllHandler);
+        result = evaluateNavigationStrategy(_instruction3, _router2.catchAllHandler);
       }
     }
 
-    return Promise.reject(new Error('Route not found: ' + url));
+    if (result && parentInstruction) {
+      this.baseUrl = generateBaseUrl(this.parent, parentInstruction);
+    }
+
+    return result || Promise.reject(new Error('Route not found: ' + url));
   };
 
   Router.prototype._findParentInstructionFromRouter = function _findParentInstructionFromRouter(router, instruction) {
@@ -12789,6 +13044,10 @@ var Router = exports.Router = function () {
 
   return Router;
 }();
+
+function generateBaseUrl(router, instruction) {
+  return '' + (router.baseUrl || '') + (instruction.getBaseUrl() || '');
+}
 
 function validateRouteConfig(config, routes) {
   if ((typeof config === 'undefined' ? 'undefined' : _typeof(config)) !== 'object') {
@@ -12960,12 +13219,12 @@ function processActivatable(navigationInstruction, callbackName, next, ignoreRes
 
     if (i < length) {
       try {
-        var _current3$viewModel;
+        var _current2$viewModel;
 
-        var _current3 = infos[i];
-        var _result2 = (_current3$viewModel = _current3.viewModel)[callbackName].apply(_current3$viewModel, _current3.lifecycleArgs);
+        var _current2 = infos[i];
+        var _result2 = (_current2$viewModel = _current2.viewModel)[callbackName].apply(_current2$viewModel, _current2.lifecycleArgs);
         return processPotential(_result2, function (val) {
-          return inspect(val, _current3.router);
+          return inspect(val, _current2.router);
         }, next.cancel);
       } catch (error) {
         return next.cancel(error);
@@ -13169,6 +13428,9 @@ function loadRoute(routeLoader, navigationInstruction, viewPortPlan) {
         viewPortPlan.childNavigationInstruction = childInstruction;
 
         return _buildNavigationPlan(childInstruction).then(function (childPlan) {
+          if (childPlan instanceof Redirect) {
+            return Promise.reject(childPlan);
+          }
           childInstruction.plan = childPlan;
           viewPortInstruction.childNavigationInstruction = childInstruction;
 
@@ -13484,8 +13746,9 @@ function processResult(instruction, result, instructionCount, router) {
   }
 
   var finalResult = null;
+  var navigationCommandResult = null;
   if (isNavigationCommand(result.output)) {
-    result.output.navigate(router);
+    navigationCommandResult = result.output.navigate(router);
   } else {
     finalResult = result;
 
@@ -13498,7 +13761,9 @@ function processResult(instruction, result, instructionCount, router) {
     }
   }
 
-  return router._dequeueInstruction(instructionCount + 1).then(function (innerResult) {
+  return Promise.resolve(navigationCommandResult).then(function (_) {
+    return router._dequeueInstruction(instructionCount + 1);
+  }).then(function (innerResult) {
     return finalResult || innerResult || result;
   });
 }
@@ -13561,24 +13826,25 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.TaskQueue = undefined;
 
-var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
 var _aureliaPal = require('aurelia-pal');
 
 
 
-var hasSetImmediate = typeof setImmediate === 'function';
 var stackSeparator = '\nEnqueued in TaskQueue by:\n';
 var microStackSeparator = '\nEnqueued in MicroTaskQueue by:\n';
 
 function makeRequestFlushFromMutationObserver(flush) {
-  var toggle = 1;
   var observer = _aureliaPal.DOM.createMutationObserver(flush);
-  var node = _aureliaPal.DOM.createTextNode('');
+  var val = 'a';
+  var node = _aureliaPal.DOM.createTextNode('a');
+  var values = Object.create(null);
+  values.a = 'b';
+  values.b = 'a';
   observer.observe(node, { characterData: true });
   return function requestFlush() {
-    toggle = -toggle;
-    node.data = toggle;
+    node.data = val = values[val];
   };
 }
 
@@ -13602,10 +13868,6 @@ function onError(error, task, longStacks) {
 
   if ('onError' in task) {
     task.onError(error);
-  } else if (hasSetImmediate) {
-    setImmediate(function () {
-      throw error;
-    });
   } else {
     setTimeout(function () {
       throw error;
@@ -14439,9 +14701,7 @@ ___scope___.file("dist/commonjs/aurelia-templating-resources.js", function(expor
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.viewsRequireLifecycle = exports.unwrapExpression = exports.updateOneTimeBinding = exports.isOneTime = exports.getItemsSourceExpression = exports.updateOverrideContext = exports.createFullOverrideContext = exports.NumberRepeatStrategy = exports.SetRepeatStrategy = exports.MapRepeatStrategy = exports.ArrayRepeatStrategy = exports.NullRepeatStrategy = exports.RepeatStrategyLocator = exports.AbstractRepeater = exports.UpdateTriggerBindingBehavior = exports.BindingSignaler = exports.SignalBindingBehavior = exports.SelfBindingBehavior = exports.DebounceBindingBehavior = exports.ThrottleBindingBehavior = exports.TwoWayBindingBehavior = exports.OneWayBindingBehavior = exports.OneTimeBindingBehavior = exports.AttrBindingBehavior = exports.configure = exports.Focus = exports.Replaceable = exports.SanitizeHTMLValueConverter = exports.HTMLSanitizer = exports.Hide = exports.Show = exports.Repeat = exports.With = exports.Else = exports.If = exports.Compose = undefined;
-
-var _aureliaPal = require('aurelia-pal');
+exports.viewsRequireLifecycle = exports.unwrapExpression = exports.updateOneTimeBinding = exports.isOneTime = exports.getItemsSourceExpression = exports.updateOverrideContext = exports.createFullOverrideContext = exports.NumberRepeatStrategy = exports.SetRepeatStrategy = exports.MapRepeatStrategy = exports.ArrayRepeatStrategy = exports.NullRepeatStrategy = exports.RepeatStrategyLocator = exports.AbstractRepeater = exports.UpdateTriggerBindingBehavior = exports.BindingSignaler = exports.SignalBindingBehavior = exports.SelfBindingBehavior = exports.DebounceBindingBehavior = exports.ThrottleBindingBehavior = exports.TwoWayBindingBehavior = exports.FromViewBindingBehavior = exports.ToViewBindingBehavior = exports.OneWayBindingBehavior = exports.OneTimeBindingBehavior = exports.AttrBindingBehavior = exports.configure = exports.Focus = exports.Replaceable = exports.SanitizeHTMLValueConverter = exports.HTMLSanitizer = exports.Hide = exports.Show = exports.Repeat = exports.With = exports.Else = exports.If = exports.Compose = undefined;
 
 var _compose = require('./compose');
 
@@ -14510,7 +14770,7 @@ var _aureliaHideStyle = require('./aurelia-hide-style');
 function configure(config) {
   (0, _aureliaHideStyle.injectAureliaHideStyleAtHead)();
 
-  config.globalResources(_aureliaPal.PLATFORM.moduleName('./compose'), _aureliaPal.PLATFORM.moduleName('./if'), _aureliaPal.PLATFORM.moduleName('./else'), _aureliaPal.PLATFORM.moduleName('./with'), _aureliaPal.PLATFORM.moduleName('./repeat'), _aureliaPal.PLATFORM.moduleName('./show'), _aureliaPal.PLATFORM.moduleName('./hide'), _aureliaPal.PLATFORM.moduleName('./replaceable'), _aureliaPal.PLATFORM.moduleName('./sanitize-html'), _aureliaPal.PLATFORM.moduleName('./focus'), _aureliaPal.PLATFORM.moduleName('./binding-mode-behaviors'), _aureliaPal.PLATFORM.moduleName('./self-binding-behavior'), _aureliaPal.PLATFORM.moduleName('./throttle-binding-behavior'), _aureliaPal.PLATFORM.moduleName('./debounce-binding-behavior'), _aureliaPal.PLATFORM.moduleName('./signal-binding-behavior'), _aureliaPal.PLATFORM.moduleName('./update-trigger-binding-behavior'), _aureliaPal.PLATFORM.moduleName('./attr-binding-behavior'));
+  config.globalResources(_compose.Compose, _if.If, _else.Else, _with.With, _repeat.Repeat, _show.Show, _hide.Hide, _replaceable.Replaceable, _focus.Focus, _sanitizeHtml.SanitizeHTMLValueConverter, _bindingModeBehaviors.OneTimeBindingBehavior, _bindingModeBehaviors.OneWayBindingBehavior, _bindingModeBehaviors.ToViewBindingBehavior, _bindingModeBehaviors.FromViewBindingBehavior, _bindingModeBehaviors.TwoWayBindingBehavior, _throttleBindingBehavior.ThrottleBindingBehavior, _debounceBindingBehavior.DebounceBindingBehavior, _selfBindingBehavior.SelfBindingBehavior, _signalBindingBehavior.SignalBindingBehavior, _updateTriggerBindingBehavior.UpdateTriggerBindingBehavior, _attrBindingBehavior.AttrBindingBehavior);
 
   (0, _htmlResourcePlugin.configure)(config);
 
@@ -14542,6 +14802,8 @@ exports.configure = configure;
 exports.AttrBindingBehavior = _attrBindingBehavior.AttrBindingBehavior;
 exports.OneTimeBindingBehavior = _bindingModeBehaviors.OneTimeBindingBehavior;
 exports.OneWayBindingBehavior = _bindingModeBehaviors.OneWayBindingBehavior;
+exports.ToViewBindingBehavior = _bindingModeBehaviors.ToViewBindingBehavior;
+exports.FromViewBindingBehavior = _bindingModeBehaviors.FromViewBindingBehavior;
 exports.TwoWayBindingBehavior = _bindingModeBehaviors.TwoWayBindingBehavior;
 exports.ThrottleBindingBehavior = _throttleBindingBehavior.ThrottleBindingBehavior;
 exports.DebounceBindingBehavior = _debounceBindingBehavior.DebounceBindingBehavior;
@@ -14573,21 +14835,15 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.Compose = undefined;
 
-var _dec, _dec2, _class, _desc, _value, _class2, _descriptor, _descriptor2, _descriptor3, _descriptor4;
+var _dec, _class, _desc, _value, _class2, _descriptor, _descriptor2, _descriptor3, _descriptor4;
 
 var _aureliaDependencyInjection = require('aurelia-dependency-injection');
-
-var _aureliaLogging = require('aurelia-logging');
-
-var LogManager = _interopRequireWildcard(_aureliaLogging);
 
 var _aureliaTaskQueue = require('aurelia-task-queue');
 
 var _aureliaTemplating = require('aurelia-templating');
 
 var _aureliaPal = require('aurelia-pal');
-
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
 function _initDefineProp(target, property, descriptor, context) {
   if (!descriptor) return;
@@ -14634,9 +14890,11 @@ function _initializerWarningHelper(descriptor, context) {
   throw new Error('Decorating class property failed. Please ensure that transform-class-properties is enabled.');
 }
 
-var logger = LogManager.getLogger('templating-resources');
+var Compose = exports.Compose = (_dec = (0, _aureliaTemplating.customElement)('compose'), _dec(_class = (0, _aureliaTemplating.noView)(_class = (_class2 = function () {
+  Compose.inject = function inject() {
+    return [_aureliaPal.DOM.Element, _aureliaDependencyInjection.Container, _aureliaTemplating.CompositionEngine, _aureliaTemplating.ViewSlot, _aureliaTemplating.ViewResources, _aureliaTaskQueue.TaskQueue];
+  };
 
-var Compose = exports.Compose = (_dec = (0, _aureliaTemplating.customElement)('compose'), _dec2 = (0, _aureliaDependencyInjection.inject)(_aureliaPal.DOM.Element, _aureliaDependencyInjection.Container, _aureliaTemplating.CompositionEngine, _aureliaTemplating.ViewSlot, _aureliaTemplating.ViewResources, _aureliaTaskQueue.TaskQueue), _dec(_class = (0, _aureliaTemplating.noView)(_class = _dec2(_class = (_class2 = function () {
   function Compose(element, container, compositionEngine, viewSlot, viewResources, taskQueue) {
     
 
@@ -14669,12 +14927,13 @@ var Compose = exports.Compose = (_dec = (0, _aureliaTemplating.customElement)('c
     this.changes.view = this.view;
     this.changes.viewModel = this.viewModel;
     this.changes.model = this.model;
-    processChanges(this);
+    if (!this.pendingTask) {
+      processChanges(this);
+    }
   };
 
   Compose.prototype.unbind = function unbind() {
     this.changes = Object.create(null);
-    this.pendingTask = null;
     this.bindingContext = null;
     this.overrideContext = null;
     var returnToCache = true;
@@ -14710,7 +14969,7 @@ var Compose = exports.Compose = (_dec = (0, _aureliaTemplating.customElement)('c
 }), _descriptor4 = _applyDecoratedDescriptor(_class2.prototype, 'swapOrder', [_aureliaTemplating.bindable], {
   enumerable: true,
   initializer: null
-})), _class2)) || _class) || _class) || _class);
+})), _class2)) || _class) || _class);
 
 
 function isEmpty(obj) {
@@ -14765,18 +15024,19 @@ function processChanges(composer) {
     });
   }
 
-  composer.pendingTask = composer.pendingTask.catch(function (e) {
-    logger.error(e);
-  }).then(function () {
-    if (!composer.pendingTask) {
-      return;
-    }
-
-    composer.pendingTask = null;
-    if (!isEmpty(composer.changes)) {
-      processChanges(composer);
-    }
+  composer.pendingTask = composer.pendingTask.then(function () {
+    completeCompositionTask(composer);
+  }, function (reason) {
+    completeCompositionTask(composer);
+    throw reason;
   });
+}
+
+function completeCompositionTask(composer) {
+  composer.pendingTask = null;
+  if (!isEmpty(composer.changes)) {
+    processChanges(composer);
+  }
 }
 
 function requestUpdate(composer) {
@@ -15276,6 +15536,8 @@ var Repeat = exports.Repeat = (_dec = (0, _aureliaTemplating.customAttribute)('r
   };
 
   Repeat.prototype.itemsChanged = function itemsChanged() {
+    var _this2 = this;
+
     this._unsubscribeCollection();
 
     if (!this.scope) {
@@ -15291,7 +15553,11 @@ var Repeat = exports.Repeat = (_dec = (0, _aureliaTemplating.customAttribute)('r
     if (!this.isOneTime && !this._observeInnerCollection()) {
       this._observeCollection();
     }
+    this.ignoreMutation = true;
     this.strategy.instanceChanged(this, items);
+    this.observerLocator.taskQueue.queueMicroTask(function () {
+      _this2.ignoreMutation = false;
+    });
   };
 
   Repeat.prototype._getInnerCollection = function _getInnerCollection() {
@@ -15306,11 +15572,14 @@ var Repeat = exports.Repeat = (_dec = (0, _aureliaTemplating.customAttribute)('r
     if (!this.collectionObserver) {
       return;
     }
+    if (this.ignoreMutation) {
+      return;
+    }
     this.strategy.instanceMutated(this, collection, changes);
   };
 
   Repeat.prototype.handleInnerCollectionMutated = function handleInnerCollectionMutated(collection, changes) {
-    var _this2 = this;
+    var _this3 = this;
 
     if (!this.collectionObserver) {
       return;
@@ -15322,7 +15591,7 @@ var Repeat = exports.Repeat = (_dec = (0, _aureliaTemplating.customAttribute)('r
     this.ignoreMutation = true;
     var newItems = this.sourceExpression.evaluate(this.scope, this.lookupFunctions);
     this.observerLocator.taskQueue.queueMicroTask(function () {
-      return _this2.ignoreMutation = false;
+      return _this3.ignoreMutation = false;
     });
 
     if (newItems === this.items) {
@@ -16321,7 +16590,7 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.Show = undefined;
 
-var _dec, _dec2, _class;
+var _dec, _class;
 
 var _aureliaDependencyInjection = require('aurelia-dependency-injection');
 
@@ -16333,7 +16602,11 @@ var _aureliaHideStyle = require('./aurelia-hide-style');
 
 
 
-var Show = exports.Show = (_dec = (0, _aureliaTemplating.customAttribute)('show'), _dec2 = (0, _aureliaDependencyInjection.inject)(_aureliaPal.DOM.Element, _aureliaTemplating.Animator, _aureliaDependencyInjection.Optional.of(_aureliaPal.DOM.boundary, true)), _dec(_class = _dec2(_class = function () {
+var Show = exports.Show = (_dec = (0, _aureliaTemplating.customAttribute)('show'), _dec(_class = function () {
+  Show.inject = function inject() {
+    return [_aureliaPal.DOM.Element, _aureliaTemplating.Animator, _aureliaDependencyInjection.Optional.of(_aureliaPal.DOM.boundary, true)];
+  };
+
   function Show(element, animator, domBoundary) {
     
 
@@ -16359,7 +16632,7 @@ var Show = exports.Show = (_dec = (0, _aureliaTemplating.customAttribute)('show'
   };
 
   return Show;
-}()) || _class) || _class);
+}()) || _class);
 });
 ___scope___.file("dist/commonjs/aurelia-hide-style.js", function(exports, require, module, __filename, __dirname){
 
@@ -16398,7 +16671,7 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.Hide = undefined;
 
-var _dec, _dec2, _class;
+var _dec, _class;
 
 var _aureliaDependencyInjection = require('aurelia-dependency-injection');
 
@@ -16410,7 +16683,11 @@ var _aureliaHideStyle = require('./aurelia-hide-style');
 
 
 
-var Hide = exports.Hide = (_dec = (0, _aureliaTemplating.customAttribute)('hide'), _dec2 = (0, _aureliaDependencyInjection.inject)(_aureliaPal.DOM.Element, _aureliaTemplating.Animator, _aureliaDependencyInjection.Optional.of(_aureliaPal.DOM.boundary, true)), _dec(_class = _dec2(_class = function () {
+var Hide = exports.Hide = (_dec = (0, _aureliaTemplating.customAttribute)('hide'), _dec(_class = function () {
+  Hide.inject = function inject() {
+    return [_aureliaPal.DOM.Element, _aureliaTemplating.Animator, _aureliaDependencyInjection.Optional.of(_aureliaPal.DOM.boundary, true)];
+  };
+
   function Hide(element, animator, domBoundary) {
     
 
@@ -16436,7 +16713,7 @@ var Hide = exports.Hide = (_dec = (0, _aureliaTemplating.customAttribute)('hide'
   };
 
   return Hide;
-}()) || _class) || _class);
+}()) || _class);
 });
 ___scope___.file("dist/commonjs/sanitize-html.js", function(exports, require, module, __filename, __dirname){
 
@@ -16550,13 +16827,11 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.Focus = undefined;
 
-var _dec, _dec2, _class;
+var _dec, _class;
 
 var _aureliaTemplating = require('aurelia-templating');
 
 var _aureliaBinding = require('aurelia-binding');
-
-var _aureliaDependencyInjection = require('aurelia-dependency-injection');
 
 var _aureliaTaskQueue = require('aurelia-task-queue');
 
@@ -16564,7 +16839,11 @@ var _aureliaPal = require('aurelia-pal');
 
 
 
-var Focus = exports.Focus = (_dec = (0, _aureliaTemplating.customAttribute)('focus', _aureliaBinding.bindingMode.twoWay), _dec2 = (0, _aureliaDependencyInjection.inject)(_aureliaPal.DOM.Element, _aureliaTaskQueue.TaskQueue), _dec(_class = _dec2(_class = function () {
+var Focus = exports.Focus = (_dec = (0, _aureliaTemplating.customAttribute)('focus', _aureliaBinding.bindingMode.twoWay), _dec(_class = function () {
+  Focus.inject = function inject() {
+    return [_aureliaPal.DOM.Element, _aureliaTaskQueue.TaskQueue];
+  };
+
   function Focus(element, taskQueue) {
     
 
@@ -16621,7 +16900,7 @@ var Focus = exports.Focus = (_dec = (0, _aureliaTemplating.customAttribute)('foc
   };
 
   return Focus;
-}()) || _class) || _class);
+}()) || _class);
 });
 ___scope___.file("dist/commonjs/css-resource.js", function(exports, require, module, __filename, __dirname){
 
@@ -16753,11 +17032,13 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.AttrBindingBehavior = undefined;
 
+var _dec, _class;
+
 var _aureliaBinding = require('aurelia-binding');
 
 
 
-var AttrBindingBehavior = exports.AttrBindingBehavior = function () {
+var AttrBindingBehavior = exports.AttrBindingBehavior = (_dec = (0, _aureliaBinding.bindingBehavior)('attr'), _dec(_class = function () {
   function AttrBindingBehavior() {
     
   }
@@ -16769,7 +17050,7 @@ var AttrBindingBehavior = exports.AttrBindingBehavior = function () {
   AttrBindingBehavior.prototype.unbind = function unbind(binding, source) {};
 
   return AttrBindingBehavior;
-}();
+}()) || _class);
 });
 ___scope___.file("dist/commonjs/binding-mode-behaviors.js", function(exports, require, module, __filename, __dirname){
 
@@ -16778,9 +17059,9 @@ ___scope___.file("dist/commonjs/binding-mode-behaviors.js", function(exports, re
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.TwoWayBindingBehavior = exports.OneWayBindingBehavior = exports.OneTimeBindingBehavior = undefined;
+exports.TwoWayBindingBehavior = exports.FromViewBindingBehavior = exports.ToViewBindingBehavior = exports.OneWayBindingBehavior = exports.OneTimeBindingBehavior = undefined;
 
-var _dec, _class, _dec2, _class2, _dec3, _class3;
+var _dec, _dec2, _class, _dec3, _dec4, _class2, _dec5, _dec6, _class3, _dec7, _dec8, _class4, _dec9, _dec10, _class5;
 
 var _aureliaBinding = require('aurelia-binding');
 
@@ -16799,21 +17080,31 @@ var modeBindingBehavior = {
   }
 };
 
-var OneTimeBindingBehavior = exports.OneTimeBindingBehavior = (_dec = (0, _aureliaMetadata.mixin)(modeBindingBehavior), _dec(_class = function OneTimeBindingBehavior() {
+var OneTimeBindingBehavior = exports.OneTimeBindingBehavior = (_dec = (0, _aureliaMetadata.mixin)(modeBindingBehavior), _dec2 = (0, _aureliaBinding.bindingBehavior)('oneTime'), _dec(_class = _dec2(_class = function OneTimeBindingBehavior() {
   
 
   this.mode = _aureliaBinding.bindingMode.oneTime;
-}) || _class);
-var OneWayBindingBehavior = exports.OneWayBindingBehavior = (_dec2 = (0, _aureliaMetadata.mixin)(modeBindingBehavior), _dec2(_class2 = function OneWayBindingBehavior() {
+}) || _class) || _class);
+var OneWayBindingBehavior = exports.OneWayBindingBehavior = (_dec3 = (0, _aureliaMetadata.mixin)(modeBindingBehavior), _dec4 = (0, _aureliaBinding.bindingBehavior)('oneWay'), _dec3(_class2 = _dec4(_class2 = function OneWayBindingBehavior() {
   
 
-  this.mode = _aureliaBinding.bindingMode.oneWay;
-}) || _class2);
-var TwoWayBindingBehavior = exports.TwoWayBindingBehavior = (_dec3 = (0, _aureliaMetadata.mixin)(modeBindingBehavior), _dec3(_class3 = function TwoWayBindingBehavior() {
+  this.mode = _aureliaBinding.bindingMode.toView;
+}) || _class2) || _class2);
+var ToViewBindingBehavior = exports.ToViewBindingBehavior = (_dec5 = (0, _aureliaMetadata.mixin)(modeBindingBehavior), _dec6 = (0, _aureliaBinding.bindingBehavior)('toView'), _dec5(_class3 = _dec6(_class3 = function ToViewBindingBehavior() {
+  
+
+  this.mode = _aureliaBinding.bindingMode.toView;
+}) || _class3) || _class3);
+var FromViewBindingBehavior = exports.FromViewBindingBehavior = (_dec7 = (0, _aureliaMetadata.mixin)(modeBindingBehavior), _dec8 = (0, _aureliaBinding.bindingBehavior)('fromView'), _dec7(_class4 = _dec8(_class4 = function FromViewBindingBehavior() {
+  
+
+  this.mode = _aureliaBinding.bindingMode.fromView;
+}) || _class4) || _class4);
+var TwoWayBindingBehavior = exports.TwoWayBindingBehavior = (_dec9 = (0, _aureliaMetadata.mixin)(modeBindingBehavior), _dec10 = (0, _aureliaBinding.bindingBehavior)('twoWay'), _dec9(_class5 = _dec10(_class5 = function TwoWayBindingBehavior() {
   
 
   this.mode = _aureliaBinding.bindingMode.twoWay;
-}) || _class3);
+}) || _class5) || _class5);
 });
 ___scope___.file("dist/commonjs/throttle-binding-behavior.js", function(exports, require, module, __filename, __dirname){
 
@@ -16823,6 +17114,8 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.ThrottleBindingBehavior = undefined;
+
+var _dec, _class;
 
 var _aureliaBinding = require('aurelia-binding');
 
@@ -16850,7 +17143,7 @@ function throttle(newValue) {
   }
 }
 
-var ThrottleBindingBehavior = exports.ThrottleBindingBehavior = function () {
+var ThrottleBindingBehavior = exports.ThrottleBindingBehavior = (_dec = (0, _aureliaBinding.bindingBehavior)('throttle'), _dec(_class = function () {
   function ThrottleBindingBehavior() {
     
   }
@@ -16886,7 +17179,7 @@ var ThrottleBindingBehavior = exports.ThrottleBindingBehavior = function () {
   };
 
   return ThrottleBindingBehavior;
-}();
+}()) || _class);
 });
 ___scope___.file("dist/commonjs/debounce-binding-behavior.js", function(exports, require, module, __filename, __dirname){
 
@@ -16896,6 +17189,8 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.DebounceBindingBehavior = undefined;
+
+var _dec, _class;
 
 var _aureliaBinding = require('aurelia-binding');
 
@@ -16927,13 +17222,13 @@ function debounceCall(context, newValue, oldValue) {
     state.oldValue = oldValue;
   }
   state.timeoutId = setTimeout(function () {
-    var ov = state.oldValue;
+    var _oldValue = state.oldValue;
     state.oldValue = unset;
-    _this2.debouncedMethod(context, newValue, ov);
+    _this2.debouncedMethod(context, newValue, _oldValue);
   }, state.delay);
 }
 
-var DebounceBindingBehavior = exports.DebounceBindingBehavior = function () {
+var DebounceBindingBehavior = exports.DebounceBindingBehavior = (_dec = (0, _aureliaBinding.bindingBehavior)('debounce'), _dec(_class = function () {
   function DebounceBindingBehavior() {
     
   }
@@ -16969,7 +17264,7 @@ var DebounceBindingBehavior = exports.DebounceBindingBehavior = function () {
   };
 
   return DebounceBindingBehavior;
-}();
+}()) || _class);
 });
 ___scope___.file("dist/commonjs/self-binding-behavior.js", function(exports, require, module, __filename, __dirname){
 
@@ -16978,6 +17273,11 @@ ___scope___.file("dist/commonjs/self-binding-behavior.js", function(exports, req
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.SelfBindingBehavior = undefined;
+
+var _dec, _class;
+
+var _aureliaBinding = require('aurelia-binding');
 
 
 
@@ -16991,7 +17291,7 @@ function handleSelfEvent(event) {
   this.selfEventCallSource(event);
 }
 
-var SelfBindingBehavior = exports.SelfBindingBehavior = function () {
+var SelfBindingBehavior = exports.SelfBindingBehavior = (_dec = (0, _aureliaBinding.bindingBehavior)('self'), _dec(_class = function () {
   function SelfBindingBehavior() {
     
   }
@@ -17008,7 +17308,7 @@ var SelfBindingBehavior = exports.SelfBindingBehavior = function () {
   };
 
   return SelfBindingBehavior;
-}();
+}()) || _class);
 });
 ___scope___.file("dist/commonjs/signal-binding-behavior.js", function(exports, require, module, __filename, __dirname){
 
@@ -17019,11 +17319,15 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.SignalBindingBehavior = undefined;
 
+var _dec, _class;
+
+var _aureliaBinding = require('aurelia-binding');
+
 var _bindingSignaler = require('./binding-signaler');
 
 
 
-var SignalBindingBehavior = exports.SignalBindingBehavior = function () {
+var SignalBindingBehavior = exports.SignalBindingBehavior = (_dec = (0, _aureliaBinding.bindingBehavior)('signal'), _dec(_class = function () {
   SignalBindingBehavior.inject = function inject() {
     return [_bindingSignaler.BindingSignaler];
   };
@@ -17075,7 +17379,7 @@ var SignalBindingBehavior = exports.SignalBindingBehavior = function () {
   };
 
   return SignalBindingBehavior;
-}();
+}()) || _class);
 });
 ___scope___.file("dist/commonjs/binding-signaler.js", function(exports, require, module, __filename, __dirname){
 
@@ -17120,6 +17424,8 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.UpdateTriggerBindingBehavior = undefined;
 
+var _dec, _class;
+
 var _aureliaBinding = require('aurelia-binding');
 
 
@@ -17127,7 +17433,7 @@ var _aureliaBinding = require('aurelia-binding');
 var eventNamesRequired = 'The updateTrigger binding behavior requires at least one event name argument: eg <input value.bind="firstName & updateTrigger:\'blur\'">';
 var notApplicableMessage = 'The updateTrigger binding behavior can only be applied to two-way/ from-view bindings on input/select elements.';
 
-var UpdateTriggerBindingBehavior = exports.UpdateTriggerBindingBehavior = function () {
+var UpdateTriggerBindingBehavior = exports.UpdateTriggerBindingBehavior = (_dec = (0, _aureliaBinding.bindingBehavior)('updateTrigger'), _dec(_class = function () {
   function UpdateTriggerBindingBehavior() {
     
   }
@@ -17163,7 +17469,7 @@ var UpdateTriggerBindingBehavior = exports.UpdateTriggerBindingBehavior = functi
   };
 
   return UpdateTriggerBindingBehavior;
-}();
+}()) || _class);
 });
 ___scope___.file("dist/commonjs/html-resource-plugin.js", function(exports, require, module, __filename, __dirname){
 
@@ -17257,8 +17563,6 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.configure = exports.RouteHref = exports.RouterView = exports.TemplatingRouteLoader = undefined;
 
-var _aureliaPal = require('aurelia-pal');
-
 var _aureliaRouter = require('aurelia-router');
 
 var _routeLoader = require('./route-loader');
@@ -17268,7 +17572,7 @@ var _routerView = require('./router-view');
 var _routeHref = require('./route-href');
 
 function configure(config) {
-  config.singleton(_aureliaRouter.RouteLoader, _routeLoader.TemplatingRouteLoader).singleton(_aureliaRouter.Router, _aureliaRouter.AppRouter).globalResources(_aureliaPal.PLATFORM.moduleName('./router-view'), _aureliaPal.PLATFORM.moduleName('./route-href'));
+  config.singleton(_aureliaRouter.RouteLoader, _routeLoader.TemplatingRouteLoader).singleton(_aureliaRouter.Router, _aureliaRouter.AppRouter).globalResources(_routerView.RouterView, _routeHref.RouteHref);
 
   config.container.registerAlias(_aureliaRouter.Router, _aureliaRouter.AppRouter);
 }
@@ -17333,8 +17637,6 @@ var TemplatingRouteLoader = exports.TemplatingRouteLoader = (_dec2 = (0, _aureli
     } else {
       viewModel = (0, _aureliaPath.relativeToFile)(config.moduleId, _aureliaMetadata.Origin.get(router.container.viewModel.constructor).moduleId);
     }
-
-    config = config || {};
 
     var instruction = {
       viewModel: viewModel,
@@ -17716,17 +18018,18 @@ ___scope___.file("dist/commonjs/aurelia-templating.js", function(exports, requir
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.TemplatingEngine = exports.ElementConfigResource = exports.CompositionEngine = exports.SwapStrategies = exports.HtmlBehaviorResource = exports.BindableProperty = exports.BehaviorPropertyObserver = exports.Controller = exports.ViewEngine = exports.ModuleAnalyzer = exports.ResourceDescription = exports.ResourceModule = exports.ViewCompiler = exports.ViewFactory = exports.BoundViewFactory = exports.ViewSlot = exports.View = exports.ViewResources = exports.ShadowDOM = exports.ShadowSlot = exports.PassThroughSlot = exports.SlotCustomAttribute = exports.BindingLanguage = exports.ViewLocator = exports.InlineViewStrategy = exports.TemplateRegistryViewStrategy = exports.NoViewStrategy = exports.ConventionalViewStrategy = exports.RelativeViewStrategy = exports.viewStrategy = exports.TargetInstruction = exports.BehaviorInstruction = exports.ViewCompileInstruction = exports.ResourceLoadContext = exports.ElementEvents = exports.ViewEngineHooksResource = exports.CompositionTransaction = exports.CompositionTransactionOwnershipToken = exports.CompositionTransactionNotifier = exports.Animator = exports.animationEvent = undefined;
+exports.TemplatingEngine = exports.ElementConfigResource = exports.CompositionEngine = exports.SwapStrategies = exports.HtmlBehaviorResource = exports.BindableProperty = exports.BehaviorPropertyObserver = exports.Controller = exports.ViewEngine = exports.ModuleAnalyzer = exports.ResourceDescription = exports.ResourceModule = exports.ViewCompiler = exports.ViewFactory = exports.BoundViewFactory = exports.ViewSlot = exports.View = exports.ViewResources = exports.ShadowDOM = exports.ShadowSlot = exports.PassThroughSlot = exports.SlotCustomAttribute = exports.BindingLanguage = exports.ViewLocator = exports.StaticViewStrategy = exports.InlineViewStrategy = exports.TemplateRegistryViewStrategy = exports.NoViewStrategy = exports.ConventionalViewStrategy = exports.RelativeViewStrategy = exports.viewStrategy = exports.TargetInstruction = exports.BehaviorInstruction = exports.ViewCompileInstruction = exports.ResourceLoadContext = exports.ElementEvents = exports.ViewEngineHooksResource = exports.CompositionTransaction = exports.CompositionTransactionOwnershipToken = exports.CompositionTransactionNotifier = exports.Animator = exports.animationEvent = undefined;
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
-var _class, _temp, _dec, _class2, _dec2, _class3, _dec3, _class4, _dec4, _class5, _dec5, _class6, _class7, _temp2, _dec6, _class8, _class9, _temp3, _class11, _dec7, _class13, _dec8, _class14, _class15, _temp4, _dec9, _class16, _dec10, _class17, _dec11, _class18;
+var _class, _temp, _dec, _class2, _dec2, _class3, _dec3, _class4, _dec4, _class5, _dec5, _class6, _dec6, _class7, _class8, _temp2, _class9, _temp3, _class11, _dec7, _class13, _dec8, _class14, _class15, _temp4, _dec9, _class16, _dec10, _class17, _dec11, _class18;
 
 exports._hyphenate = _hyphenate;
 exports._isAllWhitespace = _isAllWhitespace;
 exports.viewEngineHooks = viewEngineHooks;
+exports.validateBehaviorName = validateBehaviorName;
 exports.children = children;
 exports.child = child;
 exports.resource = resource;
@@ -17744,6 +18047,7 @@ exports.useViewStrategy = useViewStrategy;
 exports.useView = useView;
 exports.inlineView = inlineView;
 exports.noView = noView;
+exports.view = view;
 exports.elementConfig = elementConfig;
 exports.viewResources = viewResources;
 
@@ -17755,9 +18059,9 @@ var _aureliaMetadata = require('aurelia-metadata');
 
 var _aureliaPal = require('aurelia-pal');
 
-var _aureliaPath = require('aurelia-path');
-
 var _aureliaLoader = require('aurelia-loader');
+
+var _aureliaPath = require('aurelia-path');
 
 var _aureliaDependencyInjection = require('aurelia-dependency-injection');
 
@@ -18032,8 +18336,8 @@ var ElementEvents = exports.ElementEvents = function () {
   };
 
   ElementEvents.prototype.disposeAll = function disposeAll() {
-    for (var key in this.subscriptions) {
-      this.dispose(key);
+    for (var _key in this.subscriptions) {
+      this.dispose(_key);
     }
   };
 
@@ -18395,7 +18699,90 @@ var InlineViewStrategy = exports.InlineViewStrategy = (_dec5 = viewStrategy(), _
 
   return InlineViewStrategy;
 }()) || _class6);
-var ViewLocator = exports.ViewLocator = (_temp2 = _class7 = function () {
+var StaticViewStrategy = exports.StaticViewStrategy = (_dec6 = viewStrategy(), _dec6(_class7 = function () {
+  function StaticViewStrategy(config) {
+    
+
+    if (typeof config === 'string' || config instanceof HTMLTemplateElement) {
+      config = {
+        template: config
+      };
+    }
+    this.template = config.template;
+    this.dependencies = config.dependencies || [];
+    this.factoryIsReady = false;
+    this.onReady = null;
+  }
+
+  StaticViewStrategy.prototype.loadViewFactory = function loadViewFactory(viewEngine, compileInstruction, loadContext, target) {
+    var _this2 = this;
+
+    if (this.factoryIsReady) {
+      return Promise.resolve(this.factory);
+    }
+    var deps = this.dependencies;
+    deps = typeof deps === 'function' ? deps() : deps;
+    deps = deps ? deps : [];
+    deps = Array.isArray(deps) ? deps : [deps];
+
+    return Promise.all(deps).then(function (dependencies) {
+      var container = viewEngine.container;
+      var appResources = viewEngine.appResources;
+      var viewCompiler = viewEngine.viewCompiler;
+      var viewResources = new ViewResources(appResources);
+
+      var resource = void 0;
+      var elDeps = [];
+
+      if (target) {
+        viewResources.autoRegister(container, target);
+      }
+
+      for (var _iterator = dependencies, _isArray = Array.isArray(_iterator), _i = 0, _iterator = _isArray ? _iterator : _iterator[Symbol.iterator]();;) {
+        var _ref;
+
+        if (_isArray) {
+          if (_i >= _iterator.length) break;
+          _ref = _iterator[_i++];
+        } else {
+          _i = _iterator.next();
+          if (_i.done) break;
+          _ref = _i.value;
+        }
+
+        var dep = _ref;
+
+        if (typeof dep === 'function') {
+          resource = viewResources.autoRegister(container, dep);
+        } else if (dep && (typeof dep === 'undefined' ? 'undefined' : _typeof(dep)) === 'object') {
+          for (var _key2 in dep) {
+            var exported = dep[_key2];
+            if (typeof exported === 'function') {
+              resource = viewResources.autoRegister(container, exported);
+            }
+          }
+        } else {
+          throw new Error('dependency neither function nor object. Received: "' + (typeof dep === 'undefined' ? 'undefined' : _typeof(dep)) + '"');
+        }
+        if (resource.elementName !== null) {
+          elDeps.push(resource);
+        }
+      }
+
+      return Promise.all(elDeps.map(function (el) {
+        return el.load(container, el.target);
+      })).then(function () {
+        var factory = viewCompiler.compile(_this2.template, viewResources, compileInstruction);
+        _this2.factoryIsReady = true;
+        _this2.factory = factory;
+        return factory;
+      });
+    });
+  };
+
+  return StaticViewStrategy;
+}()) || _class7);
+var ViewLocator = exports.ViewLocator = (_temp2 = _class8 = function () {
   function ViewLocator() {
     
   }
@@ -18435,6 +18822,19 @@ var ViewLocator = exports.ViewLocator = (_temp2 = _class7 = function () {
       value = value.constructor;
     }
 
+    if ('$view' in value) {
+      var c = value.$view;
+      var _view = void 0;
+      c = typeof c === 'function' ? c.call(value) : c;
+      if (c === null) {
+        _view = new NoViewStrategy();
+      } else {
+        _view = c instanceof StaticViewStrategy ? c : new StaticViewStrategy(c);
+      }
+      _aureliaMetadata.metadata.define(ViewLocator.viewStrategyMetadataKey, _view, value);
+      return _view;
+    }
+
     var origin = _aureliaMetadata.Origin.get(value);
     var strategy = _aureliaMetadata.metadata.get(ViewLocator.viewStrategyMetadataKey, value);
 
@@ -18462,7 +18862,7 @@ var ViewLocator = exports.ViewLocator = (_temp2 = _class7 = function () {
   };
 
   return ViewLocator;
-}(), _class7.viewStrategyMetadataKey = 'aurelia:view-strategy', _temp2);
+}(), _class8.viewStrategyMetadataKey = 'aurelia:view-strategy', _temp2);
 
 
 function mi(name) {
@@ -18491,7 +18891,11 @@ var BindingLanguage = exports.BindingLanguage = function () {
 
 var noNodes = Object.freeze([]);
 
-var SlotCustomAttribute = exports.SlotCustomAttribute = (_dec6 = (0, _aureliaDependencyInjection.inject)(_aureliaPal.DOM.Element), _dec6(_class8 = function () {
+var SlotCustomAttribute = exports.SlotCustomAttribute = function () {
+  SlotCustomAttribute.inject = function inject() {
+    return [_aureliaPal.DOM.Element];
+  };
+
   function SlotCustomAttribute(element) {
     
 
@@ -18502,7 +18906,7 @@ var SlotCustomAttribute = exports.SlotCustomAttribute = (_dec6 = (0, _aureliaDep
   SlotCustomAttribute.prototype.valueChanged = function valueChanged(newValue, oldValue) {};
 
   return SlotCustomAttribute;
-}()) || _class8);
+}();
 
 var PassThroughSlot = exports.PassThroughSlot = function () {
   function PassThroughSlot(anchor, name, destinationName, fallbackFactory) {
@@ -18941,7 +19345,113 @@ function register(lookup, name, resource, type) {
   lookup[name] = resource;
 }
 
+function validateBehaviorName(name, type) {
+  if (/[A-Z]/.test(name)) {
+    var newName = _hyphenate(name);
+    LogManager.getLogger('templating').warn('\'' + name + '\' is not a valid ' + type + ' name and has been converted to \'' + newName + '\'. Upper-case letters are not allowed because the DOM is not case-sensitive.');
+    return newName;
+  }
+  return name;
+}
+
+var conventionMark = '__au_resource__';
+
 var ViewResources = exports.ViewResources = function () {
+  ViewResources.convention = function convention(target, existing) {
+    var resource = void 0;
+
+    if (existing && conventionMark in existing) {
+      return existing;
+    }
+    if ('$resource' in target) {
+      var config = target.$resource;
+
+      if (typeof config === 'string') {
+        resource = existing || new HtmlBehaviorResource();
+        resource[conventionMark] = true;
+        if (!resource.elementName) {
+          resource.elementName = validateBehaviorName(config, 'custom element');
+        }
+      } else {
+        if (typeof config === 'function') {
+          config = config.call(target);
+        }
+        if (typeof config === 'string') {
+          config = { name: config };
+        }
+
+        config = Object.assign({}, config);
+
+        var resourceType = config.type || 'element';
+
+        var _name = config.name;
+        switch (resourceType) {
+          case 'element':case 'attribute':
+            resource = existing || new HtmlBehaviorResource();
+            resource[conventionMark] = true;
+            if (resourceType === 'element') {
+              if (!resource.elementName) {
+                resource.elementName = _name ? validateBehaviorName(_name, 'custom element') : _hyphenate(target.name);
+              }
+            } else {
+              if (!resource.attributeName) {
+                resource.attributeName = _name ? validateBehaviorName(_name, 'custom attribute') : _hyphenate(target.name);
+              }
+            }
+            if ('templateController' in config) {
+              config.liftsContent = config.templateController;
+              delete config.templateController;
+            }
+            if ('defaultBindingMode' in config && resource.attributeDefaultBindingMode !== undefined) {
+              config.attributeDefaultBindingMode = config.defaultBindingMode;
+              delete config.defaultBindingMode;
+            }
+
+            delete config.name;
+
+            Object.assign(resource, config);
+            break;
+          case 'valueConverter':
+            resource = new _aureliaBinding.ValueConverterResource((0, _aureliaBinding.camelCase)(_name || target.name));
+            break;
+          case 'bindingBehavior':
+            resource = new _aureliaBinding.BindingBehaviorResource((0, _aureliaBinding.camelCase)(_name || target.name));
+            break;
+          case 'viewEngineHooks':
+            resource = new ViewEngineHooksResource();
+            break;
+        }
+      }
+
+      if (resource instanceof HtmlBehaviorResource) {
+        var _bindables = typeof config === 'string' ? undefined : config.bindables;
+        var currentProps = resource.properties;
+        if (Array.isArray(_bindables)) {
+          for (var i = 0, ii = _bindables.length; ii > i; ++i) {
+            var prop = _bindables[i];
+            if (!prop || typeof prop !== 'string' && !prop.name) {
+              throw new Error('Invalid bindable property at "' + i + '" for class "' + target.name + '". Expected either a string or an object with "name" property.');
+            }
+            var newProp = new BindableProperty(prop);
+
+            var existed = false;
+            for (var j = 0, jj = currentProps.length; jj > j; ++j) {
+              if (currentProps[j].name === newProp.name) {
+                existed = true;
+                break;
+              }
+            }
+            if (existed) {
+              continue;
+            }
+            newProp.registerWith(target, resource);
+          }
+        }
+      }
+    }
+    return resource;
+  };
+
   function ViewResources(parent, viewUrl) {
     
 
@@ -19079,6 +19589,32 @@ var ViewResources = exports.ViewResources = function () {
     return this.values[name] || (this.hasParent ? this.parent.getValue(name) : null);
   };
 
+  ViewResources.prototype.autoRegister = function autoRegister(container, impl) {
+    var resourceTypeMeta = _aureliaMetadata.metadata.getOwn(_aureliaMetadata.metadata.resource, impl);
+    if (resourceTypeMeta) {
+      if (resourceTypeMeta instanceof HtmlBehaviorResource) {
+        ViewResources.convention(impl, resourceTypeMeta);
+
+        if (resourceTypeMeta.attributeName === null && resourceTypeMeta.elementName === null) {
+          HtmlBehaviorResource.convention(impl.name, resourceTypeMeta);
+        }
+        if (resourceTypeMeta.attributeName === null && resourceTypeMeta.elementName === null) {
+          resourceTypeMeta.elementName = _hyphenate(impl.name);
+        }
+      }
+    } else {
+      resourceTypeMeta = ViewResources.convention(impl) || HtmlBehaviorResource.convention(impl.name) || _aureliaBinding.ValueConverterResource.convention(impl.name) || _aureliaBinding.BindingBehaviorResource.convention(impl.name) || ViewEngineHooksResource.convention(impl.name);
+      if (!resourceTypeMeta) {
+        resourceTypeMeta = new HtmlBehaviorResource();
+        resourceTypeMeta.elementName = _hyphenate(impl.name);
+      }
+      _aureliaMetadata.metadata.define(_aureliaMetadata.metadata.resource, resourceTypeMeta, impl);
+    }
+    resourceTypeMeta.initialize(container, impl);
+    resourceTypeMeta.register(this);
+    return resourceTypeMeta;
+  };
+
   return ViewResources;
 }();
 
@@ -19108,7 +19644,7 @@ var View = exports.View = function () {
     this._isUserControlled = false;
     this.contentView = null;
 
-    for (var key in slots) {
+    for (var _key3 in slots) {
       this.hasSlots = true;
       break;
     }
@@ -19469,7 +20005,7 @@ var ViewSlot = exports.ViewSlot = function () {
   };
 
   ViewSlot.prototype.removeMany = function removeMany(viewsToRemove, returnToCache, skipAnimation) {
-    var _this2 = this;
+    var _this3 = this;
 
     var children = this.children;
     var ii = viewsToRemove.length;
@@ -19482,7 +20018,7 @@ var ViewSlot = exports.ViewSlot = function () {
         return;
       }
 
-      var animation = _this2.animateView(child, 'leave');
+      var animation = _this3.animateView(child, 'leave');
       if (animation) {
         rmPromises.push(animation.then(function () {
           return child.removeNodes();
@@ -19493,7 +20029,7 @@ var ViewSlot = exports.ViewSlot = function () {
     });
 
     var removeAction = function removeAction() {
-      if (_this2.isAttached) {
+      if (_this3.isAttached) {
         for (i = 0; i < ii; ++i) {
           viewsToRemove[i].detached();
         }
@@ -19523,16 +20059,16 @@ var ViewSlot = exports.ViewSlot = function () {
   };
 
   ViewSlot.prototype.removeAt = function removeAt(index, returnToCache, skipAnimation) {
-    var _this3 = this;
+    var _this4 = this;
 
     var view = this.children[index];
 
     var removeAction = function removeAction() {
-      index = _this3.children.indexOf(view);
+      index = _this4.children.indexOf(view);
       view.removeNodes();
-      _this3.children.splice(index, 1);
+      _this4.children.splice(index, 1);
 
-      if (_this3.isAttached) {
+      if (_this4.isAttached) {
         view.detached();
       }
 
@@ -19556,7 +20092,7 @@ var ViewSlot = exports.ViewSlot = function () {
   };
 
   ViewSlot.prototype.removeAll = function removeAll(returnToCache, skipAnimation) {
-    var _this4 = this;
+    var _this5 = this;
 
     var children = this.children;
     var ii = children.length;
@@ -19569,7 +20105,7 @@ var ViewSlot = exports.ViewSlot = function () {
         return;
       }
 
-      var animation = _this4.animateView(child, 'leave');
+      var animation = _this5.animateView(child, 'leave');
       if (animation) {
         rmPromises.push(animation.then(function () {
           return child.removeNodes();
@@ -19580,7 +20116,7 @@ var ViewSlot = exports.ViewSlot = function () {
     });
 
     var removeAction = function removeAction() {
-      if (_this4.isAttached) {
+      if (_this5.isAttached) {
         for (i = 0; i < ii; ++i) {
           children[i].detached();
         }
@@ -19596,7 +20132,7 @@ var ViewSlot = exports.ViewSlot = function () {
         }
       }
 
-      _this4.children = [];
+      _this5.children = [];
     };
 
     if (rmPromises.length > 0) {
@@ -19643,7 +20179,7 @@ var ViewSlot = exports.ViewSlot = function () {
   };
 
   ViewSlot.prototype.projectTo = function projectTo(slots) {
-    var _this5 = this;
+    var _this6 = this;
 
     this.projectToSlots = slots;
     this.add = this._projectionAdd;
@@ -19654,7 +20190,7 @@ var ViewSlot = exports.ViewSlot = function () {
     this.removeMany = this._projectionRemoveMany;
     this.removeAll = this._projectionRemoveAll;
     this.children.forEach(function (view) {
-      return ShadowDOM.distributeView(view, slots, _this5);
+      return ShadowDOM.distributeView(view, slots, _this6);
     });
   };
 
@@ -19704,6 +20240,9 @@ var ViewSlot = exports.ViewSlot = function () {
     if (this.isAttached) {
       view.detached();
     }
+    if (returnToCache) {
+      view.returnToCache();
+    }
   };
 
   ViewSlot.prototype._projectionRemoveAt = function _projectionRemoveAt(index, returnToCache) {
@@ -19715,13 +20254,16 @@ var ViewSlot = exports.ViewSlot = function () {
     if (this.isAttached) {
       view.detached();
     }
+    if (returnToCache) {
+      view.returnToCache();
+    }
   };
 
   ViewSlot.prototype._projectionRemoveMany = function _projectionRemoveMany(viewsToRemove, returnToCache) {
-    var _this6 = this;
+    var _this7 = this;
 
     viewsToRemove.forEach(function (view) {
-      return _this6.remove(view, returnToCache);
+      return _this7.remove(view, returnToCache);
     });
   };
 
@@ -19729,10 +20271,15 @@ var ViewSlot = exports.ViewSlot = function () {
     ShadowDOM.undistributeAll(this.projectToSlots, this);
 
     var children = this.children;
+    var ii = children.length;
 
     if (this.isAttached) {
-      for (var i = 0, ii = children.length; i < ii; ++i) {
-        children[i].detached();
+      for (var i = 0; i < ii; ++i) {
+        if (returnToCache) {
+          children[i].returnToCache();
+        } else {
+          children[i].detached();
+        }
       }
     }
 
@@ -19940,8 +20487,8 @@ function styleStringToObject(style, target) {
 function styleObjectToString(obj) {
   var result = '';
 
-  for (var key in obj) {
-    result += key + ':' + obj[key] + ';';
+  for (var _key4 in obj) {
+    result += _key4 + ':' + obj[_key4] + ';';
   }
 
   return result;
@@ -19963,19 +20510,19 @@ function applySurrogateInstruction(container, element, instruction, controllers,
     container._resolvers.set(providers[i], providerResolverInstance);
   }
 
-  for (var key in values) {
-    currentAttributeValue = element.getAttribute(key);
+  for (var _key5 in values) {
+    currentAttributeValue = element.getAttribute(_key5);
 
     if (currentAttributeValue) {
-      if (key === 'class') {
-        element.setAttribute('class', currentAttributeValue + ' ' + values[key]);
-      } else if (key === 'style') {
-        var styleObject = styleStringToObject(values[key]);
+      if (_key5 === 'class') {
+        element.setAttribute('class', currentAttributeValue + ' ' + values[_key5]);
+      } else if (_key5 === 'style') {
+        var styleObject = styleStringToObject(values[_key5]);
         styleStringToObject(currentAttributeValue, styleObject);
         element.setAttribute('style', styleObjectToString(styleObject));
       }
     } else {
-      element.setAttribute(key, values[key]);
+      element.setAttribute(_key5, values[_key5]);
     }
   }
 
@@ -20324,10 +20871,10 @@ var ViewCompiler = exports.ViewCompiler = (_dec7 = (0, _aureliaDependencyInjecti
             }
 
             if (info.command && info.command !== 'options' && type.primaryProperty) {
-              var primaryProperty = type.primaryProperty;
-              attrName = info.attrName = primaryProperty.attribute;
+              var _primaryProperty = type.primaryProperty;
+              attrName = info.attrName = _primaryProperty.attribute;
 
-              info.defaultBindingMode = primaryProperty.defaultBindingMode;
+              info.defaultBindingMode = _primaryProperty.defaultBindingMode;
             }
           }
         }
@@ -20465,10 +21012,10 @@ var ViewCompiler = exports.ViewCompiler = (_dec7 = (0, _aureliaDependencyInjecti
             }
 
             if (info.command && info.command !== 'options' && type.primaryProperty) {
-              var primaryProperty = type.primaryProperty;
-              attrName = info.attrName = primaryProperty.attribute;
+              var _primaryProperty2 = type.primaryProperty;
+              attrName = info.attrName = _primaryProperty2.attribute;
 
-              info.defaultBindingMode = primaryProperty.defaultBindingMode;
+              info.defaultBindingMode = _primaryProperty2.defaultBindingMode;
             }
           }
         }
@@ -20671,8 +21218,8 @@ var ResourceModule = exports.ResourceModule = function () {
       }
     } else {
       loads = new Array(resources.length);
-      for (var _i = 0, _ii = resources.length; _i < _ii; ++_i) {
-        loads[_i] = resources[_i].load(container, loadContext);
+      for (var _i2 = 0, _ii = resources.length; _i2 < _ii; ++_i2) {
+        loads[_i2] = resources[_i2].load(container, loadContext);
       }
     }
 
@@ -20778,12 +21325,16 @@ var ModuleAnalyzer = exports.ModuleAnalyzer = function () {
       resourceTypeMeta = _aureliaMetadata.metadata.get(_aureliaMetadata.metadata.resource, exportedValue);
 
       if (resourceTypeMeta) {
-        if (resourceTypeMeta.attributeName === null && resourceTypeMeta.elementName === null) {
-          HtmlBehaviorResource.convention(key, resourceTypeMeta);
-        }
+        if (resourceTypeMeta instanceof HtmlBehaviorResource) {
+          ViewResources.convention(exportedValue, resourceTypeMeta);
 
-        if (resourceTypeMeta.attributeName === null && resourceTypeMeta.elementName === null) {
-          resourceTypeMeta.elementName = _hyphenate(key);
+          if (resourceTypeMeta.attributeName === null && resourceTypeMeta.elementName === null) {
+            HtmlBehaviorResource.convention(key, resourceTypeMeta);
+          }
+
+          if (resourceTypeMeta.attributeName === null && resourceTypeMeta.elementName === null) {
+            resourceTypeMeta.elementName = _hyphenate(key);
+          }
         }
 
         if (!mainResource && resourceTypeMeta instanceof HtmlBehaviorResource && resourceTypeMeta.elementName !== null) {
@@ -20796,7 +21347,14 @@ var ModuleAnalyzer = exports.ModuleAnalyzer = function () {
       } else if (exportedValue instanceof _aureliaLoader.TemplateRegistryEntry) {
         vs = new TemplateRegistryViewStrategy(moduleId, exportedValue);
       } else {
-        if (conventional = HtmlBehaviorResource.convention(key)) {
+        if (conventional = ViewResources.convention(exportedValue)) {
+          if (conventional.elementName !== null && !mainResource) {
+            mainResource = new ResourceDescription(key, exportedValue, conventional);
+          } else {
+            resources.push(new ResourceDescription(key, exportedValue, conventional));
+          }
+          _aureliaMetadata.metadata.define(_aureliaMetadata.metadata.resource, conventional, exportedValue);
+        } else if (conventional = HtmlBehaviorResource.convention(key)) {
           if (conventional.elementName !== null && !mainResource) {
             mainResource = new ResourceDescription(key, exportedValue, conventional);
           } else {
@@ -20841,12 +21399,12 @@ function ensureRegistryEntry(loader, urlOrRegistryEntry) {
 
 var ProxyViewFactory = function () {
   function ProxyViewFactory(promise) {
-    var _this7 = this;
+    var _this8 = this;
 
     
 
     promise.then(function (x) {
-      return _this7.viewFactory = x;
+      return _this8.viewFactory = x;
     });
   }
 
@@ -20906,7 +21464,7 @@ var ViewEngine = exports.ViewEngine = (_dec8 = (0, _aureliaDependencyInjection.i
   };
 
   ViewEngine.prototype.loadViewFactory = function loadViewFactory(urlOrRegistryEntry, compileInstruction, loadContext, target) {
-    var _this8 = this;
+    var _this9 = this;
 
     loadContext = loadContext || new ResourceLoadContext();
 
@@ -20928,14 +21486,14 @@ var ViewEngine = exports.ViewEngine = (_dec8 = (0, _aureliaDependencyInjection.i
 
       loadContext.addDependency(url);
 
-      registryEntry.onReady = _this8.loadTemplateResources(registryEntry, compileInstruction, loadContext, target).then(function (resources) {
+      registryEntry.onReady = _this9.loadTemplateResources(registryEntry, compileInstruction, loadContext, target).then(function (resources) {
         registryEntry.resources = resources;
 
         if (registryEntry.template === null) {
           return registryEntry.factory = null;
         }
 
-        var viewFactory = _this8.viewCompiler.compile(registryEntry.template, resources, compileInstruction);
+        var viewFactory = _this9.viewCompiler.compile(registryEntry.template, resources, compileInstruction);
         return registryEntry.factory = viewFactory;
       });
 
@@ -20984,30 +21542,30 @@ var ViewEngine = exports.ViewEngine = (_dec8 = (0, _aureliaDependencyInjection.i
   };
 
   ViewEngine.prototype.importViewModelResource = function importViewModelResource(moduleImport, moduleMember) {
-    var _this9 = this;
+    var _this10 = this;
 
     return this.loader.loadModule(moduleImport).then(function (viewModelModule) {
       var normalizedId = _aureliaMetadata.Origin.get(viewModelModule).moduleId;
-      var resourceModule = _this9.moduleAnalyzer.analyze(normalizedId, viewModelModule, moduleMember);
+      var resourceModule = _this10.moduleAnalyzer.analyze(normalizedId, viewModelModule, moduleMember);
 
       if (!resourceModule.mainResource) {
         throw new Error('No view model found in module "' + moduleImport + '".');
       }
 
-      resourceModule.initialize(_this9.container);
+      resourceModule.initialize(_this10.container);
 
       return resourceModule.mainResource;
     });
   };
 
   ViewEngine.prototype.importViewResources = function importViewResources(moduleIds, names, resources, compileInstruction, loadContext) {
-    var _this10 = this;
+    var _this11 = this;
 
     loadContext = loadContext || new ResourceLoadContext();
     compileInstruction = compileInstruction || ViewCompileInstruction.normal;
 
     moduleIds = moduleIds.map(function (x) {
-      return _this10._applyLoaderPlugin(x);
+      return _this11._applyLoaderPlugin(x);
     });
 
     return this.loader.loadAllModules(moduleIds).then(function (imports) {
@@ -21017,8 +21575,8 @@ var ViewEngine = exports.ViewEngine = (_dec8 = (0, _aureliaDependencyInjection.i
       var normalizedId = void 0;
       var current = void 0;
       var associatedModule = void 0;
-      var container = _this10.container;
-      var moduleAnalyzer = _this10.moduleAnalyzer;
+      var container = _this11.container;
+      var moduleAnalyzer = _this11.moduleAnalyzer;
       var allAnalysis = new Array(imports.length);
 
       for (i = 0, ii = imports.length; i < ii; ++i) {
@@ -21183,7 +21741,7 @@ var Controller = exports.Controller = function () {
   Controller.prototype.unbind = function unbind() {
     if (this.isBound) {
       var _boundProperties = this.boundProperties;
-      var _i2 = void 0;
+      var _i3 = void 0;
       var _ii2 = void 0;
 
       this.isBound = false;
@@ -21201,8 +21759,8 @@ var Controller = exports.Controller = function () {
         this.elementEvents.disposeAll();
       }
 
-      for (_i2 = 0, _ii2 = _boundProperties.length; _i2 < _ii2; ++_i2) {
-        _boundProperties[_i2].binding.unbind();
+      for (_i3 = 0, _ii2 = _boundProperties.length; _i3 < _ii2; ++_i3) {
+        _boundProperties[_i3].binding.unbind();
       }
     }
   };
@@ -21260,7 +21818,7 @@ var BehaviorPropertyObserver = exports.BehaviorPropertyObserver = (_dec9 = (0, _
   BehaviorPropertyObserver.prototype.setValue = function setValue(newValue) {
     var oldValue = this.currentValue;
 
-    if (oldValue !== newValue) {
+    if (!Object.is(newValue, oldValue)) {
       this.oldValue = oldValue;
       this.currentValue = newValue;
 
@@ -21281,7 +21839,7 @@ var BehaviorPropertyObserver = exports.BehaviorPropertyObserver = (_dec9 = (0, _
 
     this.notqueued = true;
 
-    if (newValue === oldValue) {
+    if (Object.is(newValue, oldValue)) {
       return;
     }
 
@@ -21333,8 +21891,11 @@ var BindableProperty = exports.BindableProperty = function () {
     }
 
     this.attribute = this.attribute || _hyphenate(this.name);
-    if (this.defaultBindingMode === null || this.defaultBindingMode === undefined) {
+    var defaultBindingMode = this.defaultBindingMode;
+    if (defaultBindingMode === null || defaultBindingMode === undefined) {
       this.defaultBindingMode = _aureliaBinding.bindingMode.oneWay;
+    } else if (typeof defaultBindingMode === 'string') {
+      this.defaultBindingMode = _aureliaBinding.bindingMode[defaultBindingMode] || _aureliaBinding.bindingMode.oneWay;
     }
     this.changeHandler = this.changeHandler || null;
     this.owner = null;
@@ -21447,8 +22008,8 @@ var BindableProperty = exports.BindableProperty = function () {
     var defaultValue = this.defaultValue;
 
     if (this.isDynamic) {
-      for (var key in attributes) {
-        this._createDynamicProperty(viewModel, observerLookup, behaviorHandlesBind, key, attributes[key], boundProperties);
+      for (var _key6 in attributes) {
+        this._createDynamicProperty(viewModel, observerLookup, behaviorHandlesBind, _key6, attributes[_key6], boundProperties);
       }
     } else if (!this.hasOptions) {
       observer = observerLookup[this.name];
@@ -21659,14 +22220,14 @@ var HtmlBehaviorResource = exports.HtmlBehaviorResource = function () {
   };
 
   HtmlBehaviorResource.prototype.register = function register(registry, name) {
-    var _this11 = this;
+    var _this12 = this;
 
     if (this.attributeName !== null) {
       registry.registerAttribute(name || this.attributeName, this, this.attributeName);
 
       if (Array.isArray(this.aliases)) {
         this.aliases.forEach(function (alias) {
-          registry.registerAttribute(alias, _this11, _this11.attributeName);
+          registry.registerAttribute(alias, _this12, _this12.attributeName);
         });
       }
     }
@@ -21677,7 +22238,7 @@ var HtmlBehaviorResource = exports.HtmlBehaviorResource = function () {
   };
 
   HtmlBehaviorResource.prototype.load = function load(container, target, loadContext, viewStrategy, transientView) {
-    var _this12 = this;
+    var _this13 = this;
 
     var options = void 0;
 
@@ -21690,8 +22251,8 @@ var HtmlBehaviorResource = exports.HtmlBehaviorResource = function () {
       }
 
       return viewStrategy.loadViewFactory(container.get(ViewEngine), options, loadContext, target).then(function (viewFactory) {
-        if (!transientView || !_this12.viewFactory) {
-          _this12.viewFactory = viewFactory;
+        if (!transientView || !_this13.viewFactory) {
+          _this13.viewFactory = viewFactory;
         }
 
         return viewFactory;
@@ -21704,13 +22265,13 @@ var HtmlBehaviorResource = exports.HtmlBehaviorResource = function () {
   HtmlBehaviorResource.prototype.compile = function compile(compiler, resources, node, instruction, parentNode) {
     if (this.liftsContent) {
       if (!instruction.viewFactory) {
-        var template = _aureliaPal.DOM.createElement('template');
+        var _template = _aureliaPal.DOM.createElement('template');
         var fragment = _aureliaPal.DOM.createDocumentFragment();
         var cacheSize = node.getAttribute('view-cache');
         var part = node.getAttribute('part');
 
         node.removeAttribute(instruction.originalAttrName);
-        _aureliaPal.DOM.replaceNode(template, node, parentNode);
+        _aureliaPal.DOM.replaceNode(_template, node, parentNode);
         fragment.appendChild(node);
         instruction.viewFactory = compiler.compile(fragment, resources);
 
@@ -21724,7 +22285,7 @@ var HtmlBehaviorResource = exports.HtmlBehaviorResource = function () {
           node.removeAttribute('view-cache');
         }
 
-        node = template;
+        node = _template;
       }
     } else if (this.elementName !== null) {
       var _partReplacements2 = {};
@@ -21819,8 +22380,8 @@ var HtmlBehaviorResource = exports.HtmlBehaviorResource = function () {
 
           if (instruction.anchorIsContainer) {
             if (childBindings !== null) {
-              for (var _i3 = 0, _ii3 = childBindings.length; _i3 < _ii3; ++_i3) {
-                controller.view.addBinding(childBindings[_i3].create(element, viewModel, controller));
+              for (var _i4 = 0, _ii3 = childBindings.length; _i4 < _ii3; ++_i4) {
+                controller.view.addBinding(childBindings[_i4].create(element, viewModel, controller));
               }
             }
 
@@ -21829,26 +22390,26 @@ var HtmlBehaviorResource = exports.HtmlBehaviorResource = function () {
             controller.view.insertNodesBefore(viewHost);
           }
         } else if (childBindings !== null) {
-          for (var _i4 = 0, _ii4 = childBindings.length; _i4 < _ii4; ++_i4) {
-            bindings.push(childBindings[_i4].create(element, viewModel, controller));
+          for (var _i5 = 0, _ii4 = childBindings.length; _i5 < _ii4; ++_i5) {
+            bindings.push(childBindings[_i5].create(element, viewModel, controller));
           }
         }
       } else if (controller.view) {
         controller.view.controller = controller;
 
         if (childBindings !== null) {
-          for (var _i5 = 0, _ii5 = childBindings.length; _i5 < _ii5; ++_i5) {
-            controller.view.addBinding(childBindings[_i5].create(instruction.host, viewModel, controller));
+          for (var _i6 = 0, _ii5 = childBindings.length; _i6 < _ii5; ++_i6) {
+            controller.view.addBinding(childBindings[_i6].create(instruction.host, viewModel, controller));
           }
         }
       } else if (childBindings !== null) {
-        for (var _i6 = 0, _ii6 = childBindings.length; _i6 < _ii6; ++_i6) {
-          bindings.push(childBindings[_i6].create(instruction.host, viewModel, controller));
+        for (var _i7 = 0, _ii6 = childBindings.length; _i7 < _ii6; ++_i7) {
+          bindings.push(childBindings[_i7].create(instruction.host, viewModel, controller));
         }
       }
     } else if (childBindings !== null) {
-      for (var _i7 = 0, _ii7 = childBindings.length; _i7 < _ii7; ++_i7) {
-        bindings.push(childBindings[_i7].create(element, viewModel, controller));
+      for (var _i8 = 0, _ii7 = childBindings.length; _i8 < _ii7; ++_i8) {
+        bindings.push(childBindings[_i8].create(element, viewModel, controller));
       }
     }
 
@@ -21886,7 +22447,7 @@ var HtmlBehaviorResource = exports.HtmlBehaviorResource = function () {
   };
 
   HtmlBehaviorResource.prototype._copyInheritedProperties = function _copyInheritedProperties(container, target) {
-    var _this13 = this;
+    var _this14 = this;
 
     var behavior = void 0;
     var derived = target;
@@ -21904,20 +22465,20 @@ var HtmlBehaviorResource = exports.HtmlBehaviorResource = function () {
     }
     behavior.initialize(container, target);
 
-    var _loop = function _loop(_i8, _ii8) {
-      var prop = behavior.properties[_i8];
+    var _loop = function _loop(_i9, _ii8) {
+      var prop = behavior.properties[_i9];
 
-      if (_this13.properties.some(function (p) {
+      if (_this14.properties.some(function (p) {
         return p.name === prop.name;
       })) {
         return 'continue';
       }
 
-      new BindableProperty(prop).registerWith(derived, _this13);
+      new BindableProperty(prop).registerWith(derived, _this14);
     };
 
-    for (var _i8 = 0, _ii8 = behavior.properties.length; _i8 < _ii8; ++_i8) {
-      var _ret = _loop(_i8, _ii8);
+    for (var _i9 = 0, _ii8 = behavior.properties.length; _i9 < _ii8; ++_i9) {
+      var _ret = _loop(_i9, _ii8);
 
       if (_ret === 'continue') continue;
     }
@@ -21991,17 +22552,17 @@ function onChildChange(mutations, observer) {
   var bindersLength = binders.length;
   var groupedMutations = new Map();
 
-  for (var _i9 = 0, _ii9 = mutations.length; _i9 < _ii9; ++_i9) {
-    var record = mutations[_i9];
+  for (var _i10 = 0, _ii9 = mutations.length; _i10 < _ii9; ++_i10) {
+    var record = mutations[_i10];
     var added = record.addedNodes;
     var removed = record.removedNodes;
 
     for (var j = 0, jj = removed.length; j < jj; ++j) {
-      var node = removed[j];
-      if (node.nodeType === 1) {
+      var _node = removed[j];
+      if (_node.nodeType === 1) {
         for (var k = 0; k < bindersLength; ++k) {
           var binder = binders[k];
-          if (binder.onRemove(node)) {
+          if (binder.onRemove(_node)) {
             trackMutation(groupedMutations, binder, record);
           }
         }
@@ -22009,11 +22570,11 @@ function onChildChange(mutations, observer) {
     }
 
     for (var _j = 0, _jj = added.length; _j < _jj; ++_j) {
-      var _node = added[_j];
-      if (_node.nodeType === 1) {
+      var _node2 = added[_j];
+      if (_node2.nodeType === 1) {
         for (var _k = 0; _k < bindersLength; ++_k) {
           var _binder = binders[_k];
-          if (_binder.onAdd(_node)) {
+          if (_binder.onAdd(_node2)) {
             trackMutation(groupedMutations, _binder, record);
           }
         }
@@ -22060,8 +22621,8 @@ var ChildObserverBinder = function () {
       if (assignedSlot && assignedSlot.projectFromAnchors) {
         var anchors = assignedSlot.projectFromAnchors;
 
-        for (var _i10 = 0, _ii10 = anchors.length; _i10 < _ii10; ++_i10) {
-          if (anchors[_i10].auOwnerView === contentView) {
+        for (var _i11 = 0, _ii10 = anchors.length; _i11 < _ii10; ++_i11) {
+          if (anchors[_i11].auOwnerView === contentView) {
             return true;
           }
         }
@@ -22102,7 +22663,7 @@ var ChildObserverBinder = function () {
         if (!items) {
           items = viewModel[this.property] = [];
         } else {
-          items.length = 0;
+          items.splice(0);
         }
 
         while (current) {
@@ -22197,6 +22758,7 @@ var ChildObserverBinder = function () {
     if (this.viewHost.__childObserver__) {
       this.viewHost.__childObserver__.disconnect();
       this.viewHost.__childObserver__ = null;
+      this.viewModel[this.property] = null;
     }
   };
 
@@ -22255,31 +22817,34 @@ var CompositionEngine = exports.CompositionEngine = (_dec10 = (0, _aureliaDepend
   };
 
   CompositionEngine.prototype._createControllerAndSwap = function _createControllerAndSwap(context) {
-    var _this14 = this;
+    var _this15 = this;
 
     return this.createController(context).then(function (controller) {
-      controller.automate(context.overrideContext, context.owningView);
-
       if (context.compositionTransactionOwnershipToken) {
         return context.compositionTransactionOwnershipToken.waitForCompositionComplete().then(function () {
-          return _this14._swap(context, controller.view);
+          controller.automate(context.overrideContext, context.owningView);
+
+          return _this15._swap(context, controller.view);
         }).then(function () {
           return controller;
         });
       }
 
-      return _this14._swap(context, controller.view).then(function () {
+      controller.automate(context.overrideContext, context.owningView);
+
+      return _this15._swap(context, controller.view).then(function () {
         return controller;
       });
     });
   };
 
   CompositionEngine.prototype.createController = function createController(context) {
-    var _this15 = this;
+    var _this16 = this;
 
     var childContainer = void 0;
     var viewModel = void 0;
     var viewModelResource = void 0;
+
     var m = void 0;
 
     return this.ensureViewModel(context).then(tryActivateViewModel).then(function () {
@@ -22288,7 +22853,7 @@ var CompositionEngine = exports.CompositionEngine = (_dec10 = (0, _aureliaDepend
       viewModelResource = context.viewModelResource;
       m = viewModelResource.metadata;
 
-      var viewStrategy = _this15.viewLocator.getViewStrategy(context.view || viewModel);
+      var viewStrategy = _this16.viewLocator.getViewStrategy(context.view || viewModel);
 
       if (context.viewResources) {
         viewStrategy.makeRelativeTo(context.viewResources.viewUrl);
@@ -22319,16 +22884,29 @@ var CompositionEngine = exports.CompositionEngine = (_dec10 = (0, _aureliaDepend
       });
     }
 
-    var m = _aureliaMetadata.metadata.getOrCreateOwn(_aureliaMetadata.metadata.resource, HtmlBehaviorResource, context.viewModel.constructor);
+    var ctor = context.viewModel.constructor;
+    var isClass = typeof context.viewModel === 'function';
+    if (isClass) {
+      ctor = context.viewModel;
+      childContainer.autoRegister(ctor);
+    }
+    var m = _aureliaMetadata.metadata.getOrCreateOwn(_aureliaMetadata.metadata.resource, HtmlBehaviorResource, ctor);
+
     m.elementName = m.elementName || 'dynamic-element';
-    m.initialize(context.container || childContainer, context.viewModel.constructor);
-    context.viewModelResource = { metadata: m, value: context.viewModel.constructor };
-    childContainer.viewModel = context.viewModel;
+
+    m.initialize(isClass ? childContainer : context.container || childContainer, ctor);
+
+    context.viewModelResource = { metadata: m, value: ctor };
+
+    if (context.host) {
+      childContainer.registerInstance(_aureliaPal.DOM.Element, context.host);
+    }
+    childContainer.viewModel = context.viewModel = isClass ? childContainer.get(ctor) : context.viewModel;
     return Promise.resolve(context);
   };
 
   CompositionEngine.prototype.compose = function compose(context) {
-    var _this16 = this;
+    var _this17 = this;
 
     context.childContainer = context.childContainer || context.container.createChild();
     context.view = this.viewLocator.getViewStrategy(context.view);
@@ -22355,13 +22933,13 @@ var CompositionEngine = exports.CompositionEngine = (_dec10 = (0, _aureliaDepend
 
         if (context.compositionTransactionOwnershipToken) {
           return context.compositionTransactionOwnershipToken.waitForCompositionComplete().then(function () {
-            return _this16._swap(context, result);
+            return _this17._swap(context, result);
           }).then(function () {
             return result;
           });
         }
 
-        return _this16._swap(context, result).then(function () {
+        return _this17._swap(context, result).then(function () {
           return result;
         });
       });
@@ -22399,18 +22977,14 @@ var ElementConfigResource = exports.ElementConfigResource = function () {
   return ElementConfigResource;
 }();
 
-function validateBehaviorName(name, type) {
-  if (/[A-Z]/.test(name)) {
-    var newName = _hyphenate(name);
-    LogManager.getLogger('templating').warn('\'' + name + '\' is not a valid ' + type + ' name and has been converted to \'' + newName + '\'. Upper-case letters are not allowed because the DOM is not case-sensitive.');
-    return newName;
-  }
-  return name;
-}
-
-function resource(instance) {
+function resource(instanceOrConfig) {
   return function (target) {
-    _aureliaMetadata.metadata.define(_aureliaMetadata.metadata.resource, instance, target);
+    var isConfig = typeof instanceOrConfig === 'string' || Object.getPrototypeOf(instanceOrConfig) === Object.prototype;
+    if (isConfig) {
+      target.$resource = instanceOrConfig;
+    } else {
+      _aureliaMetadata.metadata.define(_aureliaMetadata.metadata.resource, instanceOrConfig, target);
+    }
   };
 }
 
@@ -22571,6 +23145,12 @@ function noView(targetOrDependencies, dependencyBaseUrl) {
   return target ? deco(target) : deco;
 }
 
+function view(templateOrConfig) {
+  return function (target) {
+    target.$view = templateOrConfig;
+  };
+}
+
 function elementConfig(target) {
   var deco = function deco(t) {
     _aureliaMetadata.metadata.define(_aureliaMetadata.metadata.resource, new ElementConfigResource(), t);
@@ -22580,8 +23160,8 @@ function elementConfig(target) {
 }
 
 function viewResources() {
-  for (var _len = arguments.length, resources = Array(_len), _key = 0; _key < _len; _key++) {
-    resources[_key] = arguments[_key];
+  for (var _len = arguments.length, resources = Array(_len), _key7 = 0; _key7 < _len; _key7++) {
+    resources[_key7] = arguments[_key7];
   }
 
   return function (target) {
@@ -22714,7 +23294,7 @@ var Collection = (function () {
     return Collection;
 }());
 exports.Collection = Collection;
-
+//# sourceMappingURL=collection.js.map
 });
 ___scope___.file("dataSource.js", function(exports, require, module, __filename, __dirname){
 
@@ -22989,7 +23569,7 @@ var DataSource = (function () {
     return DataSource;
 }());
 exports.DataSource = DataSource;
-
+//# sourceMappingURL=dataSource.js.map
 });
 ___scope___.file("grid/attributes/v-changed.js", function(exports, require, module, __filename, __dirname){
 
@@ -23030,7 +23610,7 @@ var VGridAttributesOnChange = (function () {
     return VGridAttributesOnChange;
 }());
 exports.VGridAttributesOnChange = VGridAttributesOnChange;
-
+//# sourceMappingURL=v-changed.js.map
 });
 ___scope___.file("grid/attributes/v-data-handler.js", function(exports, require, module, __filename, __dirname){
 
@@ -23120,7 +23700,7 @@ var VGridAttributesDataHandler = (function () {
     return VGridAttributesDataHandler;
 }());
 exports.VGridAttributesDataHandler = VGridAttributesDataHandler;
-
+//# sourceMappingURL=v-data-handler.js.map
 });
 ___scope___.file("grid/attributes/v-drag-drop-col.js", function(exports, require, module, __filename, __dirname){
 
@@ -23510,7 +24090,7 @@ var VGridDragDropCol = (function () {
     return VGridDragDropCol;
 }());
 exports.VGridDragDropCol = VGridDragDropCol;
-
+//# sourceMappingURL=v-drag-drop-col.js.map
 });
 ___scope___.file("grid/attributes/v-filter-observer.js", function(exports, require, module, __filename, __dirname){
 
@@ -23605,7 +24185,7 @@ var VGridAttributesFilterObserver = (function () {
     return VGridAttributesFilterObserver;
 }());
 exports.VGridAttributesFilterObserver = VGridAttributesFilterObserver;
-
+//# sourceMappingURL=v-filter-observer.js.map
 });
 ___scope___.file("grid/attributes/v-filter.js", function(exports, require, module, __filename, __dirname){
 
@@ -23803,7 +24383,7 @@ var VGridAttributesFilter = (function () {
     return VGridAttributesFilter;
 }());
 exports.VGridAttributesFilter = VGridAttributesFilter;
-
+//# sourceMappingURL=v-filter.js.map
 });
 ___scope___.file("grid/attributes/v-image.js", function(exports, require, module, __filename, __dirname){
 
@@ -23843,7 +24423,7 @@ var VGridAttributesImageFix = (function () {
     return VGridAttributesImageFix;
 }());
 exports.VGridAttributesImageFix = VGridAttributesImageFix;
-
+//# sourceMappingURL=v-image.js.map
 });
 ___scope___.file("grid/attributes/v-menu.js", function(exports, require, module, __filename, __dirname){
 
@@ -24123,7 +24703,7 @@ var VGridAttributeMenu = (function () {
     return VGridAttributeMenu;
 }());
 exports.VGridAttributeMenu = VGridAttributeMenu;
-
+//# sourceMappingURL=v-menu.js.map
 });
 ___scope___.file("grid/attributes/v-resize-col.js", function(exports, require, module, __filename, __dirname){
 
@@ -24286,7 +24866,7 @@ var VGridAttributesResizeCol = (function () {
     return VGridAttributesResizeCol;
 }());
 exports.VGridAttributesResizeCol = VGridAttributesResizeCol;
-
+//# sourceMappingURL=v-resize-col.js.map
 });
 ___scope___.file("grid/attributes/v-selection.js", function(exports, require, module, __filename, __dirname){
 
@@ -24360,7 +24940,7 @@ var VGridAttributesSelection = (function () {
     return VGridAttributesSelection;
 }());
 exports.VGridAttributesSelection = VGridAttributesSelection;
-
+//# sourceMappingURL=v-selection.js.map
 });
 ___scope___.file("grid/attributes/v-sort.js", function(exports, require, module, __filename, __dirname){
 
@@ -24449,7 +25029,7 @@ var VGridAttributesSort = (function () {
     return VGridAttributesSort;
 }());
 exports.VGridAttributesSort = VGridAttributesSort;
-
+//# sourceMappingURL=v-sort.js.map
 });
 ___scope___.file("grid/columnBindingContext.js", function(exports, require, module, __filename, __dirname){
 
@@ -24495,7 +25075,7 @@ var ColumnBindingContext = (function () {
     return ColumnBindingContext;
 }());
 exports.ColumnBindingContext = ColumnBindingContext;
-
+//# sourceMappingURL=columnBindingContext.js.map
 });
 ___scope___.file("grid/columnMarkup.js", function(exports, require, module, __filename, __dirname){
 
@@ -24704,7 +25284,7 @@ var ColumnMarkup = (function () {
     return ColumnMarkup;
 }());
 exports.ColumnMarkup = ColumnMarkup;
-
+//# sourceMappingURL=columnMarkup.js.map
 });
 ___scope___.file("grid/columnMarkupHelper.js", function(exports, require, module, __filename, __dirname){
 
@@ -24884,7 +25464,7 @@ var ColumnMarkupHelper = (function () {
     return ColumnMarkupHelper;
 }());
 exports.ColumnMarkupHelper = ColumnMarkupHelper;
-
+//# sourceMappingURL=columnMarkupHelper.js.map
 });
 ___scope___.file("grid/contextMenu.js", function(exports, require, module, __filename, __dirname){
 
@@ -25075,7 +25655,7 @@ var ContextMenu = (function () {
     return ContextMenu;
 }());
 exports.ContextMenu = ContextMenu;
-
+//# sourceMappingURL=contextMenu.js.map
 });
 ___scope___.file("grid/controller.js", function(exports, require, module, __filename, __dirname){
 
@@ -25445,7 +26025,7 @@ var Controller = (function () {
     return Controller;
 }());
 exports.Controller = Controller;
-
+//# sourceMappingURL=controller.js.map
 });
 ___scope___.file("grid/footer.js", function(exports, require, module, __filename, __dirname){
 
@@ -25476,7 +26056,7 @@ var Footer = (function () {
     return Footer;
 }());
 exports.Footer = Footer;
-
+//# sourceMappingURL=footer.js.map
 });
 ___scope___.file("grid/groupingElements.js", function(exports, require, module, __filename, __dirname){
 
@@ -25571,7 +26151,7 @@ var GroupingElements = (function () {
     return GroupingElements;
 }());
 exports.GroupingElements = GroupingElements;
-
+//# sourceMappingURL=groupingElements.js.map
 });
 ___scope___.file("grid/htmlCache.js", function(exports, require, module, __filename, __dirname){
 
@@ -25648,7 +26228,7 @@ var HtmlCache = (function () {
     return HtmlCache;
 }());
 exports.HtmlCache = HtmlCache;
-
+//# sourceMappingURL=htmlCache.js.map
 });
 ___scope___.file("grid/htmlHeightWidth.js", function(exports, require, module, __filename, __dirname){
 
@@ -25915,7 +26495,7 @@ var HtmlHeightWidth = (function () {
     return HtmlHeightWidth;
 }());
 exports.HtmlHeightWidth = HtmlHeightWidth;
-
+//# sourceMappingURL=htmlHeightWidth.js.map
 });
 ___scope___.file("grid/loadingScreen.js", function(exports, require, module, __filename, __dirname){
 
@@ -25970,7 +26550,7 @@ var LoadingScreen = (function () {
     return LoadingScreen;
 }());
 exports.LoadingScreen = LoadingScreen;
-
+//# sourceMappingURL=loadingScreen.js.map
 });
 ___scope___.file("grid/mainMarkup.js", function(exports, require, module, __filename, __dirname){
 
@@ -26000,13 +26580,13 @@ var MainMarkup = (function () {
     return MainMarkup;
 }());
 exports.MainMarkup = MainMarkup;
-
+//# sourceMappingURL=mainMarkup.js.map
 });
 ___scope___.file("grid/mainMarkupHtmlString.js", function(exports, require, module, __filename, __dirname){
 
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.MainMarkupHtmlString = "\n        <avg-top-panel v-drag-drop-col class=\"avg-top-panel\" css=\"height:$au{avgPanel_Height}px\">\n\n        </avg-top-panel>\n\n        <avg-header class=\"avg-header\" css=\"height:$au{avgHeader_Height}px;top:$au{avgHeader_Top}px\">\n\n          <avg-header-left class=\"avg-header-left\" css=\"width:$au{avgHeaderLeft_Width}px\">\n           </avg-header-left>\n\n           <avg-header-main class=\"avg-header-main\" css=\"left:$au{avgHeaderMain_Left}px;right:$au{avgHeaderMain_Right}px\">\n             <avg-header-main-scroll css=\"width:$au{avgHeaderMainScroll_Width}px;height:$au{avgHeaderMainScroll_Height}px\">\n             </avg-header-main-scroll>\n           </avg-header-main>\n\n           <avg-header-right class=\"avg-header-right\" css=\"right:$au{avgHeaderRight_Right}px;width:$au{avgHeaderRight_Width}px\">\n           </avg-header-right>\n\n        </avg-header>\n\n        <avg-content class=\"avg-content\" css=\"top:$au{avgContent_Top}px;bottom:$au{avgContent_Bottom}px\">\n\n            <avg-content-left  class=\"avg-content-left\" css=\"width:$au{avgContentLeft_Width}px\">\n              <avg-content-left-scroll css=\"width:$au{avgContentLeftScroll_Width};height:$au{avgContentLeftScroll_Height}px\">\n              </avg-content-left-scroll>\n            </avg-content-left>\n\n            <avg-content-main  class=\"avg-content-main\" css=\"left:$au{avgContentMain_Left}px;right:$au{avgContentMain_Right}px\">\n              <avg-content-main-scroll css=\"min-width: 100%;width:$au{avgContentMainScroll_Width}px;height:$au{avgContentMainScroll_Height}px\">\n              </avg-content-main-scroll>\n            </avg-content-main>\n\n            <avg-content-right  class=\"avg-content-right\" css=\"right:$au{avgContentRight_Right}px;width:$au{avgContentRight_Width}px\">\n              <avg-content-right-scroll css=\"width:$au{avgContentRightScroll_Width};height:$au{avgContentRightScroll_Height}px\">\n              </avg-content-right-scroll>\n            </avg-content-right>\n\n        </avg-content>\n\n       <avg-footer class=\"avg-footer\" css=\"height:$au{avgFooter_Height}px\">\n       </avg-footer>\n\n       <avg-content-group css=\"left:0;right:0;top:$au{avgContentGroup_Top}px;bottom:$au{avgContentGroup_Bottom}px\">\n          <avg-content-group-scroll css=\"left:0;right:0;height:$au{avgContentGroup_Height}px\">\n          </avg-content-group-scroll>\n        </avg-content-group>\n\n        <avg-content-vhandle css=\"right:0;bottom:$au{avgContentVhandle_Bottom}px;right:$au{avgContentVhandle_Right}px;left:$au{avgContentVhandle_Left}px;top:$au{avgContentVhandle_Top}px\">\n          <avg-content-vhandle-scroll css=\"width:5px;height:$au{avgContentVhandleScroll_Height}px\">\n          </avg-content-vhandle-scroll>\n        </avg-content-vhandle>\n\n        <avg-content-hhandle css=\"bottom:$au{avgContentHhandle_Bottom}px;right:$au{avgContentHhandle_Right}px;left:$au{avgContentHhandle_Left}px;height:$au{avgContentHhandle_Height}px\">\n          <avg-content-hhandle-scroll css=\"height:7px;width:$au{avgContentHhandleScroll_Width}px\">\n          </avg-content-hhandle-scroll>\n        </avg-content-hhandle>\n\n        ".replace(/\$(au{)/g, '${');
-
+//# sourceMappingURL=mainMarkupHtmlString.js.map
 });
 ___scope___.file("grid/mainScrollEvents.js", function(exports, require, module, __filename, __dirname){
 
@@ -26221,7 +26801,7 @@ var MainScrollEvents = (function () {
     return MainScrollEvents;
 }());
 exports.MainScrollEvents = MainScrollEvents;
-
+//# sourceMappingURL=mainScrollEvents.js.map
 });
 ___scope___.file("grid/rowClickHandler.js", function(exports, require, module, __filename, __dirname){
 
@@ -26492,7 +27072,7 @@ var RowClickHandler = (function () {
     return RowClickHandler;
 }());
 exports.RowClickHandler = RowClickHandler;
-
+//# sourceMappingURL=rowClickHandler.js.map
 });
 ___scope___.file("grid/rowDataBinder.js", function(exports, require, module, __filename, __dirname){
 
@@ -26637,7 +27217,7 @@ var RowDataBinder = (function () {
     return RowDataBinder;
 }());
 exports.RowDataBinder = RowDataBinder;
-
+//# sourceMappingURL=rowDataBinder.js.map
 });
 ___scope___.file("grid/rowMarkup.js", function(exports, require, module, __filename, __dirname){
 
@@ -26680,7 +27260,7 @@ var RowMarkup = (function () {
     return RowMarkup;
 }());
 exports.RowMarkup = RowMarkup;
-
+//# sourceMappingURL=rowMarkup.js.map
 });
 ___scope___.file("grid/rowScrollEvents.js", function(exports, require, module, __filename, __dirname){
 
@@ -27028,7 +27608,7 @@ var RowScrollEvents = (function () {
     return RowScrollEvents;
 }());
 exports.RowScrollEvents = RowScrollEvents;
-
+//# sourceMappingURL=rowScrollEvents.js.map
 });
 ___scope___.file("grid/styles/cellsAndLabels.css", function(exports, require, module, __filename, __dirname){
 
@@ -27060,7 +27640,7 @@ module.exports = "/*here is the main tag css, keeping them here, so theming will
 });
 ___scope___.file("grid/styles/main-elements.css", function(exports, require, module, __filename, __dirname){
 
-module.exports = ".avg-default {\r\n  border: 1px solid rgb(230, 230, 230);\r\n  -webkit-touch-callout: none;\r\n  -webkit-user-select: none;\r\n  -moz-user-select: none;\r\n  -ms-user-select: none;\r\n  user-select: none;\r\n  overflow: hidden;\r\n}\r\n\r\n.avg-default .avg-top-panel {\r\n  border-bottom: 1px solid rgb(230, 230, 230);\r\n  background-color: rgb(240, 240, 240);\r\n}\r\n\r\n.avg-default .avg-header {}\r\n\r\n.avg-default .avg-footer {\r\n  border-top: 1px solid rgb(230, 230, 230);\r\n  background-color: rgb(240, 240, 240);\r\n}\r\n\r\n.avg-default .avg-content-right {\r\n  background-color: white;\r\n  border-top: 2px solid rgb(230, 230, 230);\r\n}\r\n\r\n.avg-default .avg-content-left {\r\n  background-color: white;\r\n  border-top: 2px solid rgb(230, 230, 230);\r\n}\r\n\r\n.avg-default .avg-header-main {\r\n  background-color: rgb(240, 240, 240);\r\n}\r\n\r\n.avg-default .avg-header-left {\r\n  background-color: rgb(240, 240, 240);\r\n}\r\n\r\n.avg-default .avg-header-right {\r\n  background-color: rgb(240, 240, 240);\r\n}\r\n\r\n.avg-default .avg-content-main {\r\n  background-color: white;\r\n  border-top: 2px solid rgb(230, 230, 230);\r\n}\r\n\r\n.avg-default .avg-row {\r\n  border-bottom: 1px solid rgb(230, 230, 230);\r\n  box-sizing: border-box;\r\n}\r\n\r\n.avg-default .avg-header-left .avg-col {\r\n  /*white-space: nowrap;*/\r\n  box-sizing: border-box;\r\n  text-overflow: ellipsis;\r\n  border-right: 1px solid rgb(230, 230, 230);\r\n  overflow: hidden;\r\n}\r\n\r\n.avg-default .avg-header-main .avg-col {\r\n  /*white-space: nowrap;*/\r\n  box-sizing: border-box;\r\n  text-overflow: ellipsis;\r\n  border-right: 1px solid rgb(230, 230, 230);\r\n  overflow: hidden;\r\n}\r\n\r\n.avg-default .avg-header-right .avg-col {\r\n  box-sizing: border-box;\r\n  border-left: 1px solid rgb(230, 230, 230);\r\n}\r\n\r\n.avg-default .avg-content-left .avg-col {\r\n  white-space: nowrap;\r\n  box-sizing: border-box;\r\n  text-overflow: ellipsis;\r\n  border-right: 1px solid rgb(230, 230, 230);\r\n  overflow: hidden;\r\n}\r\n\r\n.avg-default .avg-content-main .avg-col {\r\n  white-space: nowrap;\r\n  text-overflow: ellipsis;\r\n  border-right: 1px solid rgb(230, 230, 230);\r\n  overflow: hidden;\r\n  box-sizing: border-box;\r\n}\r\n\r\n.avg-default .avg-content-right .avg-col {\r\n  border-left: 1px solid rgb(230, 230, 230);\r\n}\r\n\r\n.avg-default .avg-col-group {\r\n  pointer-events: all;\r\n  box-sizing: border-box;\r\n  white-space: nowrap;\r\n  text-overflow: ellipsis;\r\n  background-color: rgb(250, 250, 250);\r\n  border-top: 1px solid rgb(230, 230, 230);\r\n  padding: 5px 10px;\r\n}\r\n\r\n.avg-default .avg-col-grouping {\r\n  white-space: nowrap;\r\n  box-sizing: border-box;\r\n  text-overflow: ellipsis;\r\n  background-color: rgb(250, 250, 250);\r\n  border-right: 1px solid rgb(230, 230, 230);\r\n  overflow: hidden;\r\n}\r\n\r\n.avg-default .avg-col-grouping-header {\r\n  white-space: nowrap;\r\n  text-overflow: ellipsis;\r\n  background-color: rgb(240, 240, 240);\r\n  border-right: 1px solid rgb(230, 230, 230);\r\n  overflow: hidden;\r\n}\r\n\r\n.avg-default .avg-selected-row {\r\n  box-shadow: none;\r\n  background-color: rgb(203, 195, 203);\r\n}\r\n"
+module.exports = "﻿.avg-default {\r\n  border: 1px solid rgb(230, 230, 230);\r\n  -webkit-touch-callout: none;\r\n  -webkit-user-select: none;\r\n  -moz-user-select: none;\r\n  -ms-user-select: none;\r\n  user-select: none;\r\n  overflow: hidden;\r\n}\r\n\r\n.avg-default .avg-top-panel {\r\n  border-bottom: 1px solid rgb(230, 230, 230);\r\n  background-color: rgb(240, 240, 240);\r\n}\r\n\r\n.avg-default .avg-header {}\r\n\r\n.avg-default .avg-footer {\r\n  border-top: 1px solid rgb(230, 230, 230);\r\n  background-color: rgb(240, 240, 240);\r\n}\r\n\r\n.avg-default .avg-content-right {\r\n  background-color: white;\r\n  border-top: 2px solid rgb(230, 230, 230);\r\n}\r\n\r\n.avg-default .avg-content-left {\r\n  background-color: white;\r\n  border-top: 2px solid rgb(230, 230, 230);\r\n}\r\n\r\n.avg-default .avg-header-main {\r\n  background-color: rgb(240, 240, 240);\r\n}\r\n\r\n.avg-default .avg-header-left {\r\n  background-color: rgb(240, 240, 240);\r\n}\r\n\r\n.avg-default .avg-header-right {\r\n  background-color: rgb(240, 240, 240);\r\n}\r\n\r\n.avg-default .avg-content-main {\r\n  background-color: white;\r\n  border-top: 2px solid rgb(230, 230, 230);\r\n}\r\n\r\n.avg-default .avg-row {\r\n  border-bottom: 1px solid rgb(230, 230, 230);\r\n  box-sizing: border-box;\r\n}\r\n\r\n.avg-default .avg-header-left .avg-col {\r\n  /*white-space: nowrap;*/\r\n  box-sizing: border-box;\r\n  text-overflow: ellipsis;\r\n  border-right: 1px solid rgb(230, 230, 230);\r\n  overflow: hidden;\r\n}\r\n\r\n.avg-default .avg-header-main .avg-col {\r\n  /*white-space: nowrap;*/\r\n  box-sizing: border-box;\r\n  text-overflow: ellipsis;\r\n  border-right: 1px solid rgb(230, 230, 230);\r\n  overflow: hidden;\r\n}\r\n\r\n.avg-default .avg-header-right .avg-col {\r\n  box-sizing: border-box;\r\n  border-left: 1px solid rgb(230, 230, 230);\r\n}\r\n\r\n.avg-default .avg-content-left .avg-col {\r\n  white-space: nowrap;\r\n  box-sizing: border-box;\r\n  text-overflow: ellipsis;\r\n  border-right: 1px solid rgb(230, 230, 230);\r\n  overflow: hidden;\r\n}\r\n\r\n.avg-default .avg-content-main .avg-col {\r\n  white-space: nowrap;\r\n  text-overflow: ellipsis;\r\n  border-right: 1px solid rgb(230, 230, 230);\r\n  overflow: hidden;\r\n  box-sizing: border-box;\r\n}\r\n\r\n.avg-default .avg-content-right .avg-col {\r\n  border-left: 1px solid rgb(230, 230, 230);\r\n}\r\n\r\n.avg-default .avg-col-group {\r\n  pointer-events: all;\r\n  box-sizing: border-box;\r\n  white-space: nowrap;\r\n  text-overflow: ellipsis;\r\n  background-color: rgb(250, 250, 250);\r\n  border-top: 1px solid rgb(230, 230, 230);\r\n  padding: 5px 10px;\r\n}\r\n\r\n.avg-default .avg-col-grouping {\r\n  white-space: nowrap;\r\n  box-sizing: border-box;\r\n  text-overflow: ellipsis;\r\n  background-color: rgb(250, 250, 250);\r\n  border-right: 1px solid rgb(230, 230, 230);\r\n  overflow: hidden;\r\n}\r\n\r\n.avg-default .avg-col-grouping-header {\r\n  white-space: nowrap;\r\n  text-overflow: ellipsis;\r\n  background-color: rgb(240, 240, 240);\r\n  border-right: 1px solid rgb(230, 230, 230);\r\n  overflow: hidden;\r\n}\r\n\r\n.avg-default .avg-selected-row {\r\n  box-shadow: none;\r\n  background-color: rgb(203, 195, 203);\r\n}\r\n"
 });
 ___scope___.file("grid/v-grid-col.js", function(exports, require, module, __filename, __dirname){
 
@@ -27237,7 +27817,7 @@ var VGridElementColConfig = (function () {
     return VGridElementColConfig;
 }());
 exports.VGridElementColConfig = VGridElementColConfig;
-
+//# sourceMappingURL=v-grid-col.js.map
 });
 ___scope___.file("grid/v-grid-contextmenu.js", function(exports, require, module, __filename, __dirname){
 
@@ -27334,7 +27914,7 @@ var VGridContextmenu = (function () {
     return VGridContextmenu;
 }());
 exports.VGridContextmenu = VGridContextmenu;
-
+//# sourceMappingURL=v-grid-contextmenu.js.map
 });
 ___scope___.file("grid/v-grid-footer.js", function(exports, require, module, __filename, __dirname){
 
@@ -27374,7 +27954,7 @@ var VGridFooter = (function () {
     return VGridFooter;
 }());
 exports.VGridFooter = VGridFooter;
-
+//# sourceMappingURL=v-grid-footer.js.map
 });
 ___scope___.file("grid/v-grid-group-element.js", function(exports, require, module, __filename, __dirname){
 
@@ -27414,7 +27994,7 @@ var VGridGroupElement = (function () {
     return VGridGroupElement;
 }());
 exports.VGridGroupElement = VGridGroupElement;
-
+//# sourceMappingURL=v-grid-group-element.js.map
 });
 ___scope___.file("grid/v-grid-group-row.js", function(exports, require, module, __filename, __dirname){
 
@@ -27454,7 +28034,7 @@ var VGridGroupRow = (function () {
     return VGridGroupRow;
 }());
 exports.VGridGroupRow = VGridGroupRow;
-
+//# sourceMappingURL=v-grid-group-row.js.map
 });
 ___scope___.file("grid/v-grid-loadingscreen.js", function(exports, require, module, __filename, __dirname){
 
@@ -27494,7 +28074,7 @@ var VGridLoadingScreen = (function () {
     return VGridLoadingScreen;
 }());
 exports.VGridLoadingScreen = VGridLoadingScreen;
-
+//# sourceMappingURL=v-grid-loadingscreen.js.map
 });
 ___scope___.file("grid/v-grid-row-repeat.js", function(exports, require, module, __filename, __dirname){
 
@@ -27549,7 +28129,7 @@ var VGridElementRowRepeat = (function () {
     return VGridElementRowRepeat;
 }());
 exports.VGridElementRowRepeat = VGridElementRowRepeat;
-
+//# sourceMappingURL=v-grid-row-repeat.js.map
 });
 ___scope___.file("grid/v-grid.html", function(exports, require, module, __filename, __dirname){
 
@@ -27775,7 +28355,7 @@ var VGrid = (function () {
     return VGrid;
 }());
 exports.VGrid = VGrid;
-
+//# sourceMappingURL=v-grid.js.map
 });
 ___scope___.file("grid/viewSlots.js", function(exports, require, module, __filename, __dirname){
 
@@ -27874,7 +28454,7 @@ var ViewSlots = (function () {
     return ViewSlots;
 }());
 exports.ViewSlots = ViewSlots;
-
+//# sourceMappingURL=viewSlots.js.map
 });
 ___scope___.file("gridConnector.js", function(exports, require, module, __filename, __dirname){
 
@@ -28096,7 +28676,7 @@ var GridConnector = (function () {
     return GridConnector;
 }());
 exports.GridConnector = GridConnector;
-
+//# sourceMappingURL=gridConnector.js.map
 });
 ___scope___.file("index.js", function(exports, require, module, __filename, __dirname){
 
@@ -28110,7 +28690,7 @@ function configure(config) {
     config.globalResources(prefix + '/attributes/v-filter', prefix + '/attributes/v-filter-observer', prefix + '/attributes/v-sort', prefix + '/attributes/v-image', prefix + '/attributes/v-drag-drop-col', prefix + '/attributes/v-changed', prefix + '/attributes/v-data-handler', prefix + '/attributes/v-resize-col', prefix + '/attributes/v-menu', prefix + '/attributes/v-selection', prefix + '/v-grid-row-repeat', prefix + '/v-grid-group-row', prefix + '/v-grid-group-element', prefix + '/v-grid-loadingscreen', prefix + '/v-grid-contextmenu', prefix + '/v-grid-footer', prefix + '/v-grid-col', prefix + '/v-grid');
 }
 exports.configure = configure;
-
+//# sourceMappingURL=index.js.map
 });
 ___scope___.file("interfaces.js", function(exports, require, module, __filename, __dirname){
 
@@ -28165,7 +28745,7 @@ var arrayGrouping_1 = require("./utils/arrayGrouping");
 exports.ArrayGrouping = arrayGrouping_1.ArrayGrouping;
 var footer_1 = require("./grid/footer");
 exports.Footer = footer_1.Footer;
-
+//# sourceMappingURL=interfaces.js.map
 });
 ___scope___.file("selection.js", function(exports, require, module, __filename, __dirname){
 
@@ -28298,7 +28878,7 @@ var Selection = (function () {
     return Selection;
 }());
 exports.Selection = Selection;
-
+//# sourceMappingURL=selection.js.map
 });
 ___scope___.file("utils/arrayFilter.js", function(exports, require, module, __filename, __dirname){
 
@@ -28494,7 +29074,7 @@ var ArrayFilter = (function () {
     return ArrayFilter;
 }());
 exports.ArrayFilter = ArrayFilter;
-
+//# sourceMappingURL=arrayFilter.js.map
 });
 ___scope___.file("utils/arrayGrouping.js", function(exports, require, module, __filename, __dirname){
 
@@ -28720,7 +29300,7 @@ var ArrayGrouping = (function () {
     return ArrayGrouping;
 }());
 exports.ArrayGrouping = ArrayGrouping;
-
+//# sourceMappingURL=arrayGrouping.js.map
 });
 ___scope___.file("utils/arraySort.js", function(exports, require, module, __filename, __dirname){
 
@@ -28885,7 +29465,7 @@ var ArraySort = (function () {
     return ArraySort;
 }());
 exports.ArraySort = ArraySort;
-
+//# sourceMappingURL=arraySort.js.map
 });
 ___scope___.file("utils/arrayUtils.js", function(exports, require, module, __filename, __dirname){
 
@@ -29006,7 +29586,7 @@ var ArrayUtils = (function () {
     return ArrayUtils;
 }());
 exports.ArrayUtils = ArrayUtils;
-
+//# sourceMappingURL=arrayUtils.js.map
 });
 ___scope___.file("index.js", function(exports, require, module, __filename, __dirname){
 
@@ -29020,7 +29600,7 @@ function configure(config) {
     config.globalResources(prefix + '/attributes/v-filter', prefix + '/attributes/v-filter-observer', prefix + '/attributes/v-sort', prefix + '/attributes/v-image', prefix + '/attributes/v-drag-drop-col', prefix + '/attributes/v-changed', prefix + '/attributes/v-data-handler', prefix + '/attributes/v-resize-col', prefix + '/attributes/v-menu', prefix + '/attributes/v-selection', prefix + '/v-grid-row-repeat', prefix + '/v-grid-group-row', prefix + '/v-grid-group-element', prefix + '/v-grid-loadingscreen', prefix + '/v-grid-contextmenu', prefix + '/v-grid-footer', prefix + '/v-grid-col', prefix + '/v-grid');
 }
 exports.configure = configure;
-
+//# sourceMappingURL=index.js.map
 });
 ___scope___.file("interfaces.js", function(exports, require, module, __filename, __dirname){
 
@@ -29075,7 +29655,7 @@ var arrayGrouping_1 = require("./utils/arrayGrouping");
 exports.ArrayGrouping = arrayGrouping_1.ArrayGrouping;
 var footer_1 = require("./grid/footer");
 exports.Footer = footer_1.Footer;
-
+//# sourceMappingURL=interfaces.js.map
 });
 ___scope___.file("grid/htmlCache.js", function(exports, require, module, __filename, __dirname){
 
@@ -29152,7 +29732,7 @@ var HtmlCache = (function () {
     return HtmlCache;
 }());
 exports.HtmlCache = HtmlCache;
-
+//# sourceMappingURL=htmlCache.js.map
 });
 ___scope___.file("grid/controller.js", function(exports, require, module, __filename, __dirname){
 
@@ -29522,7 +30102,7 @@ var Controller = (function () {
     return Controller;
 }());
 exports.Controller = Controller;
-
+//# sourceMappingURL=controller.js.map
 });
 ___scope___.file("grid/mainMarkup.js", function(exports, require, module, __filename, __dirname){
 
@@ -29552,13 +30132,13 @@ var MainMarkup = (function () {
     return MainMarkup;
 }());
 exports.MainMarkup = MainMarkup;
-
+//# sourceMappingURL=mainMarkup.js.map
 });
 ___scope___.file("grid/mainMarkupHtmlString.js", function(exports, require, module, __filename, __dirname){
 
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.MainMarkupHtmlString = "\n        <avg-top-panel v-drag-drop-col class=\"avg-top-panel\" css=\"height:$au{avgPanel_Height}px\">\n\n        </avg-top-panel>\n\n        <avg-header class=\"avg-header\" css=\"height:$au{avgHeader_Height}px;top:$au{avgHeader_Top}px\">\n\n          <avg-header-left class=\"avg-header-left\" css=\"width:$au{avgHeaderLeft_Width}px\">\n           </avg-header-left>\n\n           <avg-header-main class=\"avg-header-main\" css=\"left:$au{avgHeaderMain_Left}px;right:$au{avgHeaderMain_Right}px\">\n             <avg-header-main-scroll css=\"width:$au{avgHeaderMainScroll_Width}px;height:$au{avgHeaderMainScroll_Height}px\">\n             </avg-header-main-scroll>\n           </avg-header-main>\n\n           <avg-header-right class=\"avg-header-right\" css=\"right:$au{avgHeaderRight_Right}px;width:$au{avgHeaderRight_Width}px\">\n           </avg-header-right>\n\n        </avg-header>\n\n        <avg-content class=\"avg-content\" css=\"top:$au{avgContent_Top}px;bottom:$au{avgContent_Bottom}px\">\n\n            <avg-content-left  class=\"avg-content-left\" css=\"width:$au{avgContentLeft_Width}px\">\n              <avg-content-left-scroll css=\"width:$au{avgContentLeftScroll_Width};height:$au{avgContentLeftScroll_Height}px\">\n              </avg-content-left-scroll>\n            </avg-content-left>\n\n            <avg-content-main  class=\"avg-content-main\" css=\"left:$au{avgContentMain_Left}px;right:$au{avgContentMain_Right}px\">\n              <avg-content-main-scroll css=\"min-width: 100%;width:$au{avgContentMainScroll_Width}px;height:$au{avgContentMainScroll_Height}px\">\n              </avg-content-main-scroll>\n            </avg-content-main>\n\n            <avg-content-right  class=\"avg-content-right\" css=\"right:$au{avgContentRight_Right}px;width:$au{avgContentRight_Width}px\">\n              <avg-content-right-scroll css=\"width:$au{avgContentRightScroll_Width};height:$au{avgContentRightScroll_Height}px\">\n              </avg-content-right-scroll>\n            </avg-content-right>\n\n        </avg-content>\n\n       <avg-footer class=\"avg-footer\" css=\"height:$au{avgFooter_Height}px\">\n       </avg-footer>\n\n       <avg-content-group css=\"left:0;right:0;top:$au{avgContentGroup_Top}px;bottom:$au{avgContentGroup_Bottom}px\">\n          <avg-content-group-scroll css=\"left:0;right:0;height:$au{avgContentGroup_Height}px\">\n          </avg-content-group-scroll>\n        </avg-content-group>\n\n        <avg-content-vhandle css=\"right:0;bottom:$au{avgContentVhandle_Bottom}px;right:$au{avgContentVhandle_Right}px;left:$au{avgContentVhandle_Left}px;top:$au{avgContentVhandle_Top}px\">\n          <avg-content-vhandle-scroll css=\"width:5px;height:$au{avgContentVhandleScroll_Height}px\">\n          </avg-content-vhandle-scroll>\n        </avg-content-vhandle>\n\n        <avg-content-hhandle css=\"bottom:$au{avgContentHhandle_Bottom}px;right:$au{avgContentHhandle_Right}px;left:$au{avgContentHhandle_Left}px;height:$au{avgContentHhandle_Height}px\">\n          <avg-content-hhandle-scroll css=\"height:7px;width:$au{avgContentHhandleScroll_Width}px\">\n          </avg-content-hhandle-scroll>\n        </avg-content-hhandle>\n\n        ".replace(/\$(au{)/g, '${');
-
+//# sourceMappingURL=mainMarkupHtmlString.js.map
 });
 ___scope___.file("grid/mainScrollEvents.js", function(exports, require, module, __filename, __dirname){
 
@@ -29773,7 +30353,7 @@ var MainScrollEvents = (function () {
     return MainScrollEvents;
 }());
 exports.MainScrollEvents = MainScrollEvents;
-
+//# sourceMappingURL=mainScrollEvents.js.map
 });
 ___scope___.file("grid/rowMarkup.js", function(exports, require, module, __filename, __dirname){
 
@@ -29816,7 +30396,7 @@ var RowMarkup = (function () {
     return RowMarkup;
 }());
 exports.RowMarkup = RowMarkup;
-
+//# sourceMappingURL=rowMarkup.js.map
 });
 ___scope___.file("grid/rowScrollEvents.js", function(exports, require, module, __filename, __dirname){
 
@@ -30164,7 +30744,7 @@ var RowScrollEvents = (function () {
     return RowScrollEvents;
 }());
 exports.RowScrollEvents = RowScrollEvents;
-
+//# sourceMappingURL=rowScrollEvents.js.map
 });
 ___scope___.file("grid/columnMarkup.js", function(exports, require, module, __filename, __dirname){
 
@@ -30373,7 +30953,7 @@ var ColumnMarkup = (function () {
     return ColumnMarkup;
 }());
 exports.ColumnMarkup = ColumnMarkup;
-
+//# sourceMappingURL=columnMarkup.js.map
 });
 ___scope___.file("grid/columnMarkupHelper.js", function(exports, require, module, __filename, __dirname){
 
@@ -30553,7 +31133,7 @@ var ColumnMarkupHelper = (function () {
     return ColumnMarkupHelper;
 }());
 exports.ColumnMarkupHelper = ColumnMarkupHelper;
-
+//# sourceMappingURL=columnMarkupHelper.js.map
 });
 ___scope___.file("grid/htmlHeightWidth.js", function(exports, require, module, __filename, __dirname){
 
@@ -30820,7 +31400,7 @@ var HtmlHeightWidth = (function () {
     return HtmlHeightWidth;
 }());
 exports.HtmlHeightWidth = HtmlHeightWidth;
-
+//# sourceMappingURL=htmlHeightWidth.js.map
 });
 ___scope___.file("grid/viewSlots.js", function(exports, require, module, __filename, __dirname){
 
@@ -30919,7 +31499,7 @@ var ViewSlots = (function () {
     return ViewSlots;
 }());
 exports.ViewSlots = ViewSlots;
-
+//# sourceMappingURL=viewSlots.js.map
 });
 ___scope___.file("grid/columnBindingContext.js", function(exports, require, module, __filename, __dirname){
 
@@ -30965,7 +31545,7 @@ var ColumnBindingContext = (function () {
     return ColumnBindingContext;
 }());
 exports.ColumnBindingContext = ColumnBindingContext;
-
+//# sourceMappingURL=columnBindingContext.js.map
 });
 ___scope___.file("grid/rowDataBinder.js", function(exports, require, module, __filename, __dirname){
 
@@ -31110,7 +31690,7 @@ var RowDataBinder = (function () {
     return RowDataBinder;
 }());
 exports.RowDataBinder = RowDataBinder;
-
+//# sourceMappingURL=rowDataBinder.js.map
 });
 ___scope___.file("grid/rowClickHandler.js", function(exports, require, module, __filename, __dirname){
 
@@ -31381,7 +31961,7 @@ var RowClickHandler = (function () {
     return RowClickHandler;
 }());
 exports.RowClickHandler = RowClickHandler;
-
+//# sourceMappingURL=rowClickHandler.js.map
 });
 ___scope___.file("grid/groupingElements.js", function(exports, require, module, __filename, __dirname){
 
@@ -31476,7 +32056,7 @@ var GroupingElements = (function () {
     return GroupingElements;
 }());
 exports.GroupingElements = GroupingElements;
-
+//# sourceMappingURL=groupingElements.js.map
 });
 ___scope___.file("grid/loadingScreen.js", function(exports, require, module, __filename, __dirname){
 
@@ -31531,7 +32111,7 @@ var LoadingScreen = (function () {
     return LoadingScreen;
 }());
 exports.LoadingScreen = LoadingScreen;
-
+//# sourceMappingURL=loadingScreen.js.map
 });
 ___scope___.file("grid/contextMenu.js", function(exports, require, module, __filename, __dirname){
 
@@ -31722,7 +32302,7 @@ var ContextMenu = (function () {
     return ContextMenu;
 }());
 exports.ContextMenu = ContextMenu;
-
+//# sourceMappingURL=contextMenu.js.map
 });
 ___scope___.file("grid/v-grid.js", function(exports, require, module, __filename, __dirname){
 
@@ -31944,7 +32524,7 @@ var VGrid = (function () {
     return VGrid;
 }());
 exports.VGrid = VGrid;
-
+//# sourceMappingURL=v-grid.js.map
 });
 ___scope___.file("grid/footer.js", function(exports, require, module, __filename, __dirname){
 
@@ -31975,7 +32555,7 @@ var Footer = (function () {
     return Footer;
 }());
 exports.Footer = Footer;
-
+//# sourceMappingURL=footer.js.map
 });
 ___scope___.file("gridConnector.js", function(exports, require, module, __filename, __dirname){
 
@@ -32197,7 +32777,7 @@ var GridConnector = (function () {
     return GridConnector;
 }());
 exports.GridConnector = GridConnector;
-
+//# sourceMappingURL=gridConnector.js.map
 });
 ___scope___.file("dataSource.js", function(exports, require, module, __filename, __dirname){
 
@@ -32472,7 +33052,7 @@ var DataSource = (function () {
     return DataSource;
 }());
 exports.DataSource = DataSource;
-
+//# sourceMappingURL=dataSource.js.map
 });
 ___scope___.file("selection.js", function(exports, require, module, __filename, __dirname){
 
@@ -32605,7 +33185,7 @@ var Selection = (function () {
     return Selection;
 }());
 exports.Selection = Selection;
-
+//# sourceMappingURL=selection.js.map
 });
 ___scope___.file("collection.js", function(exports, require, module, __filename, __dirname){
 
@@ -32683,7 +33263,7 @@ var Collection = (function () {
     return Collection;
 }());
 exports.Collection = Collection;
-
+//# sourceMappingURL=collection.js.map
 });
 ___scope___.file("utils/arrayUtils.js", function(exports, require, module, __filename, __dirname){
 
@@ -32804,7 +33384,7 @@ var ArrayUtils = (function () {
     return ArrayUtils;
 }());
 exports.ArrayUtils = ArrayUtils;
-
+//# sourceMappingURL=arrayUtils.js.map
 });
 ___scope___.file("utils/arrayFilter.js", function(exports, require, module, __filename, __dirname){
 
@@ -33000,7 +33580,7 @@ var ArrayFilter = (function () {
     return ArrayFilter;
 }());
 exports.ArrayFilter = ArrayFilter;
-
+//# sourceMappingURL=arrayFilter.js.map
 });
 ___scope___.file("utils/arraySort.js", function(exports, require, module, __filename, __dirname){
 
@@ -33165,7 +33745,7 @@ var ArraySort = (function () {
     return ArraySort;
 }());
 exports.ArraySort = ArraySort;
-
+//# sourceMappingURL=arraySort.js.map
 });
 ___scope___.file("utils/arrayGrouping.js", function(exports, require, module, __filename, __dirname){
 
@@ -33391,7 +33971,7 @@ var ArrayGrouping = (function () {
     return ArrayGrouping;
 }());
 exports.ArrayGrouping = ArrayGrouping;
-
+//# sourceMappingURL=arrayGrouping.js.map
 });
 return ___scope___.entry = "index.js";
 });
@@ -33708,139 +34288,144 @@ ___scope___.file("index.js", function(exports, require, module, __filename, __di
 // From https://github.com/defunctzombie/node-process/blob/master/browser.js
 // shim for using process in browser
 if (FuseBox.isServer) {
-    if (typeof __process_env__ !== "undefined") {
-        Object.assign(global.process.env, __process_env__);
-    }
-    module.exports = global.process;
+	if (typeof __process_env__ !== "undefined") {
+		Object.assign(global.process.env, __process_env__);
+	}
+	module.exports = global.process;
 } else {
-    // Object assign polyfill
-    if (typeof Object.assign != "function") {
-        Object.assign = function(target, varArgs) { // .length of function is 2
-            "use strict";
-            if (target == null) { // TypeError if undefined or null
-                throw new TypeError("Cannot convert undefined or null to object");
-            }
+	// Object assign polyfill
+	if (typeof Object.assign != "function") {
+		Object.assign = function(target, varArgs) {
+			// .length of function is 2
+			"use strict";
+			if (target == null) {
+				// TypeError if undefined or null
+				throw new TypeError("Cannot convert undefined or null to object");
+			}
 
-            var to = Object(target);
+			var to = Object(target);
 
-            for (var index = 1; index < arguments.length; index++) {
-                var nextSource = arguments[index];
+			for (var index = 1; index < arguments.length; index++) {
+				var nextSource = arguments[index];
 
-                if (nextSource != null) { // Skip over if undefined or null
-                    for (var nextKey in nextSource) {
-                        // Avoid bugs when hasOwnProperty is shadowed
-                        if (Object.prototype.hasOwnProperty.call(nextSource, nextKey)) {
-                            to[nextKey] = nextSource[nextKey];
-                        }
-                    }
-                }
-            }
-            return to;
-        };
-    }
+				if (nextSource != null) {
+					// Skip over if undefined or null
+					for (var nextKey in nextSource) {
+						// Avoid bugs when hasOwnProperty is shadowed
+						if (Object.prototype.hasOwnProperty.call(nextSource, nextKey)) {
+							to[nextKey] = nextSource[nextKey];
+						}
+					}
+				}
+			}
+			return to;
+		};
+	}
 
+	var productionEnv = false; //require('@system-env').production;
 
+	var process = (module.exports = {});
+	var queue = [];
+	var draining = false;
+	var currentQueue;
+	var queueIndex = -1;
 
-    var productionEnv = false; //require('@system-env').production;
+	function cleanUpNextTick() {
+		draining = false;
+		if (currentQueue.length) {
+			queue = currentQueue.concat(queue);
+		} else {
+			queueIndex = -1;
+		}
+		if (queue.length) {
+			drainQueue();
+		}
+	}
 
-    var process = module.exports = {};
-    var queue = [];
-    var draining = false;
-    var currentQueue;
-    var queueIndex = -1;
+	function drainQueue() {
+		if (draining) {
+			return;
+		}
+		var timeout = setTimeout(cleanUpNextTick);
+		draining = true;
 
-    function cleanUpNextTick() {
-        draining = false;
-        if (currentQueue.length) {
-            queue = currentQueue.concat(queue);
-        } else {
-            queueIndex = -1;
-        }
-        if (queue.length) {
-            drainQueue();
-        }
-    }
+		var len = queue.length;
+		while (len) {
+			currentQueue = queue;
+			queue = [];
+			while (++queueIndex < len) {
+				if (currentQueue) {
+					currentQueue[queueIndex].run();
+				}
+			}
+			queueIndex = -1;
+			len = queue.length;
+		}
+		currentQueue = null;
+		draining = false;
+		clearTimeout(timeout);
+	}
 
-    function drainQueue() {
-        if (draining) {
-            return;
-        }
-        var timeout = setTimeout(cleanUpNextTick);
-        draining = true;
+	process.nextTick = function(fun) {
+		var args = new Array(arguments.length - 1);
+		if (arguments.length > 1) {
+			for (var i = 1; i < arguments.length; i++) {
+				args[i - 1] = arguments[i];
+			}
+		}
+		queue.push(new Item(fun, args));
+		if (queue.length === 1 && !draining) {
+			setTimeout(drainQueue, 0);
+		}
+	};
 
-        var len = queue.length;
-        while (len) {
-            currentQueue = queue;
-            queue = [];
-            while (++queueIndex < len) {
-                if (currentQueue) {
-                    currentQueue[queueIndex].run();
-                }
-            }
-            queueIndex = -1;
-            len = queue.length;
-        }
-        currentQueue = null;
-        draining = false;
-        clearTimeout(timeout);
-    }
+	// v8 likes predictible objects
+	function Item(fun, array) {
+		this.fun = fun;
+		this.array = array;
+	}
+	Item.prototype.run = function() {
+		this.fun.apply(null, this.array);
+	};
+	process.title = "browser";
+	process.browser = true;
+	process.env = {
+		NODE_ENV: productionEnv ? "production" : "development"
+	};
+	if (typeof __process_env__ !== "undefined") {
+		Object.assign(process.env, __process_env__);
+	}
+	process.argv = [];
+	process.version = ""; // empty string to avoid regexp issues
+	process.versions = {};
 
-    process.nextTick = function(fun) {
-        var args = new Array(arguments.length - 1);
-        if (arguments.length > 1) {
-            for (var i = 1; i < arguments.length; i++) {
-                args[i - 1] = arguments[i];
-            }
-        }
-        queue.push(new Item(fun, args));
-        if (queue.length === 1 && !draining) {
-            setTimeout(drainQueue, 0);
-        }
-    };
+	function noop() {}
 
-    // v8 likes predictible objects
-    function Item(fun, array) {
-        this.fun = fun;
-        this.array = array;
-    }
-    Item.prototype.run = function() {
-        this.fun.apply(null, this.array);
-    };
-    process.title = "browser";
-    process.browser = true;
-    process.env = {
-        NODE_ENV: productionEnv ? "production" : "development",
-    };
-    if (typeof __process_env__ !== "undefined") {
-        Object.assign(process.env, __process_env__);
-    }
-    process.argv = [];
-    process.version = ""; // empty string to avoid regexp issues
-    process.versions = {};
+	process.on = noop;
+	process.addListener = noop;
+	process.once = noop;
+	process.off = noop;
+	process.removeListener = noop;
+	process.removeAllListeners = noop;
+	process.emit = noop;
 
-    function noop() {}
+	process.binding = function(name) {
+		throw new Error("process.binding is not supported");
+	};
 
-    process.on = noop;
-    process.addListener = noop;
-    process.once = noop;
-    process.off = noop;
-    process.removeListener = noop;
-    process.removeAllListeners = noop;
-    process.emit = noop;
-
-    process.binding = function(name) {
-        throw new Error("process.binding is not supported");
-    };
-
-    process.cwd = function() { return "/"; };
-    process.chdir = function(dir) {
-        throw new Error("process.chdir is not supported");
-    };
-    process.umask = function() { return 0; };
-
+	process.cwd = function() {
+		return "/";
+	};
+	process.chdir = function(dir) {
+		throw new Error("process.chdir is not supported");
+	};
+	process.umask = function() {
+		return 0;
+	};
 }
+
 });
 return ___scope___.entry = "index.js";
 });
 })
-(function(e){function r(e){var r=e.charCodeAt(0),n=e.charCodeAt(1);if((m||58!==n)&&(r>=97&&r<=122||64===r)){if(64===r){var t=e.split("/"),i=t.splice(2,t.length).join("/");return[t[0]+"/"+t[1],i||void 0]}var o=e.indexOf("/");if(o===-1)return[e];var a=e.substring(0,o),u=e.substring(o+1);return[a,u]}}function n(e){return e.substring(0,e.lastIndexOf("/"))||"./"}function t(){for(var e=[],r=0;r<arguments.length;r++)e[r]=arguments[r];for(var n=[],t=0,i=arguments.length;t<i;t++)n=n.concat(arguments[t].split("/"));for(var o=[],t=0,i=n.length;t<i;t++){var a=n[t];a&&"."!==a&&(".."===a?o.pop():o.push(a))}return""===n[0]&&o.unshift(""),o.join("/")||(o.length?"/":".")}function i(e){var r=e.match(/\.(\w{1,})$/);return r&&r[1]?e:e+".js"}function o(e){if(m){var r,n=document,t=n.getElementsByTagName("head")[0];/\.css$/.test(e)?(r=n.createElement("link"),r.rel="stylesheet",r.type="text/css",r.href=e):(r=n.createElement("script"),r.type="text/javascript",r.src=e,r.async=!0),t.insertBefore(r,t.firstChild)}}function a(e,r){for(var n in e)e.hasOwnProperty(n)&&r(n,e[n])}function u(e){return{server:require(e)}}function f(e,n){var o=n.path||"./",a=n.pkg||"default",f=r(e);if(f&&(o="./",a=f[0],n.v&&n.v[a]&&(a=a+"@"+n.v[a]),e=f[1]),e)if(126===e.charCodeAt(0))e=e.slice(2,e.length),o="./";else if(!m&&(47===e.charCodeAt(0)||58===e.charCodeAt(1)))return u(e);var s=x[a];if(!s){if(m&&"electron"!==y.target)throw"Package not found "+a;return u(a+(e?"/"+e:""))}e=e?e:"./"+s.s.entry;var l,d=t(o,e),c=i(d),p=s.f[c];return!p&&c.indexOf("*")>-1&&(l=c),p||l||(c=t(d,"/","index.js"),p=s.f[c],p||"."!==d||(c=s.s&&s.s.entry||"index.js",p=s.f[c]),p||(c=d+".js",p=s.f[c]),p||(p=s.f[d+".jsx"]),p||(c=d+"/index.jsx",p=s.f[c])),{file:p,wildcard:l,pkgName:a,versions:s.v,filePath:d,validPath:c}}function s(e,r,n){if(void 0===n&&(n={}),!m)return r(/\.(js|json)$/.test(e)?g.require(e):"");if(n&&n.ajaxed===e)return console.error(e,"does not provide a module");var i=new XMLHttpRequest;i.onreadystatechange=function(){if(4==i.readyState)if(200==i.status){var n=i.getResponseHeader("Content-Type"),o=i.responseText;/json/.test(n)?o="module.exports = "+o:/javascript/.test(n)||(o="module.exports = "+JSON.stringify(o));var a=t("./",e);y.dynamic(a,o),r(y.import(e,{ajaxed:e}))}else console.error(e,"not found on request"),r(void 0)},i.open("GET",e,!0),i.send()}function l(e,r){var n=_[e];if(n)for(var t in n){var i=n[t].apply(null,r);if(i===!1)return!1}}function d(e){return null!==e&&["function","object","array"].indexOf(typeof e)>-1&&void 0===e.default?Object.isFrozen(e)?e.default=e:Object.defineProperty(e,"default",{value:e,writable:!0,enumerable:!1}):void 0}function c(e,r){if(void 0===r&&(r={}),58===e.charCodeAt(4)||58===e.charCodeAt(5))return o(e);var t=f(e,r);if(t.server)return t.server;var i=t.file;if(t.wildcard){var a=new RegExp(t.wildcard.replace(/\*/g,"@").replace(/[.?*+^$[\]\\(){}|-]/g,"\\$&").replace(/@@/g,".*").replace(/@/g,"[a-z0-9$_-]+"),"i"),u=x[t.pkgName];if(u){var p={};for(var v in u.f)a.test(v)&&(p[v]=c(t.pkgName+"/"+v));return p}}if(!i){var h="function"==typeof r,_=l("async",[e,r]);if(_===!1)return;return s(e,function(e){return h?r(e):null},r)}var w=t.pkgName;if(i.locals&&i.locals.module)return i.locals.module.exports;var b=i.locals={},j=n(t.validPath);b.exports={},b.module={exports:b.exports},b.require=function(e,r){var n=c(e,{pkg:w,path:j,v:t.versions});return y.sdep&&d(n),n},m||!g.require.main?b.require.main={filename:"./",paths:[]}:b.require.main=g.require.main;var k=[b.module.exports,b.require,b.module,t.validPath,j,w];return l("before-import",k),i.fn.apply(k[0],k),l("after-import",k),b.module.exports}if(e.FuseBox)return e.FuseBox;var p="undefined"!=typeof ServiceWorkerGlobalScope,v="undefined"!=typeof WorkerGlobalScope,m="undefined"!=typeof window&&"undefined"!=typeof window.navigator||v||p,g=m?v||p?{}:window:global;m&&(g.global=v||p?{}:window),e=m&&"undefined"==typeof __fbx__dnm__?e:module.exports;var h=m?v||p?{}:window.__fsbx__=window.__fsbx__||{}:g.$fsbx=g.$fsbx||{};m||(g.require=require);var x=h.p=h.p||{},_=h.e=h.e||{},y=function(){function r(){}return r.global=function(e,r){return void 0===r?g[e]:void(g[e]=r)},r.import=function(e,r){return c(e,r)},r.on=function(e,r){_[e]=_[e]||[],_[e].push(r)},r.exists=function(e){try{var r=f(e,{});return void 0!==r.file}catch(e){return!1}},r.remove=function(e){var r=f(e,{}),n=x[r.pkgName];n&&n.f[r.validPath]&&delete n.f[r.validPath]},r.main=function(e){return this.mainFile=e,r.import(e,{})},r.expose=function(r){var n=function(n){var t=r[n].alias,i=c(r[n].pkg);"*"===t?a(i,function(r,n){return e[r]=n}):"object"==typeof t?a(t,function(r,n){return e[n]=i[r]}):e[t]=i};for(var t in r)n(t)},r.dynamic=function(r,n,t){this.pkg(t&&t.pkg||"default",{},function(t){t.file(r,function(r,t,i,o,a){var u=new Function("__fbx__dnm__","exports","require","module","__filename","__dirname","__root__",n);u(!0,r,t,i,o,a,e)})})},r.flush=function(e){var r=x.default;for(var n in r.f)e&&!e(n)||delete r.f[n].locals},r.pkg=function(e,r,n){if(x[e])return n(x[e].s);var t=x[e]={};return t.f={},t.v=r,t.s={file:function(e,r){return t.f[e]={fn:r}}},n(t.s)},r.addPlugin=function(e){this.plugins.push(e)},r.packages=x,r.isBrowser=m,r.isServer=!m,r.plugins=[],r}();return m||(g.FuseBox=y),e.FuseBox=y}(this))
+(function(e){function r(e){var r=e.charCodeAt(0),n=e.charCodeAt(1);if((m||58!==n)&&(r>=97&&r<=122||64===r)){if(64===r){var t=e.split("/"),i=t.splice(2,t.length).join("/");return[t[0]+"/"+t[1],i||void 0]}var o=e.indexOf("/");if(o===-1)return[e];var a=e.substring(0,o),f=e.substring(o+1);return[a,f]}}function n(e){return e.substring(0,e.lastIndexOf("/"))||"./"}function t(){for(var e=[],r=0;r<arguments.length;r++)e[r]=arguments[r];for(var n=[],t=0,i=arguments.length;t<i;t++)n=n.concat(arguments[t].split("/"));for(var o=[],t=0,i=n.length;t<i;t++){var a=n[t];a&&"."!==a&&(".."===a?o.pop():o.push(a))}return""===n[0]&&o.unshift(""),o.join("/")||(o.length?"/":".")}function i(e){var r=e.match(/\.(\w{1,})$/);return r&&r[1]?e:e+".js"}function o(e){if(m){var r,n=document,t=n.getElementsByTagName("head")[0];/\.css$/.test(e)?(r=n.createElement("link"),r.rel="stylesheet",r.type="text/css",r.href=e):(r=n.createElement("script"),r.type="text/javascript",r.src=e,r.async=!0),t.insertBefore(r,t.firstChild)}}function a(e,r){for(var n in e)e.hasOwnProperty(n)&&r(n,e[n])}function f(e){return{server:require(e)}}function u(e,n){var o=n.path||"./",a=n.pkg||"default",u=r(e);if(u&&(o="./",a=u[0],n.v&&n.v[a]&&(a=a+"@"+n.v[a]),e=u[1]),e)if(126===e.charCodeAt(0))e=e.slice(2,e.length),o="./";else if(!m&&(47===e.charCodeAt(0)||58===e.charCodeAt(1)))return f(e);var s=x[a];if(!s){if(m&&"electron"!==_.target)throw"Package not found "+a;return f(a+(e?"/"+e:""))}e=e?e:"./"+s.s.entry;var l,d=t(o,e),c=i(d),p=s.f[c];return!p&&c.indexOf("*")>-1&&(l=c),p||l||(c=t(d,"/","index.js"),p=s.f[c],p||"."!==d||(c=s.s&&s.s.entry||"index.js",p=s.f[c]),p||(c=d+".js",p=s.f[c]),p||(p=s.f[d+".jsx"]),p||(c=d+"/index.jsx",p=s.f[c])),{file:p,wildcard:l,pkgName:a,versions:s.v,filePath:d,validPath:c}}function s(e,r,n){if(void 0===n&&(n={}),!m)return r(/\.(js|json)$/.test(e)?h.require(e):"");if(n&&n.ajaxed===e)return console.error(e,"does not provide a module");var i=new XMLHttpRequest;i.onreadystatechange=function(){if(4==i.readyState)if(200==i.status){var n=i.getResponseHeader("Content-Type"),o=i.responseText;/json/.test(n)?o="module.exports = "+o:/javascript/.test(n)||(o="module.exports = "+JSON.stringify(o));var a=t("./",e);_.dynamic(a,o),r(_.import(e,{ajaxed:e}))}else console.error(e,"not found on request"),r(void 0)},i.open("GET",e,!0),i.send()}function l(e,r){var n=y[e];if(n)for(var t in n){var i=n[t].apply(null,r);if(i===!1)return!1}}function d(e){if(null!==e&&["function","object","array"].indexOf(typeof e)!==-1&&!e.hasOwnProperty("default"))return Object.isFrozen(e)?void(e.default=e):void Object.defineProperty(e,"default",{value:e,writable:!0,enumerable:!1})}function c(e,r){if(void 0===r&&(r={}),58===e.charCodeAt(4)||58===e.charCodeAt(5))return o(e);var t=u(e,r);if(t.server)return t.server;var i=t.file;if(t.wildcard){var a=new RegExp(t.wildcard.replace(/\*/g,"@").replace(/[.?*+^$[\]\\(){}|-]/g,"\\$&").replace(/@@/g,".*").replace(/@/g,"[a-z0-9$_-]+"),"i"),f=x[t.pkgName];if(f){var p={};for(var v in f.f)a.test(v)&&(p[v]=c(t.pkgName+"/"+v));return p}}if(!i){var g="function"==typeof r,y=l("async",[e,r]);if(y===!1)return;return s(e,function(e){return g?r(e):null},r)}var w=t.pkgName;if(i.locals&&i.locals.module)return i.locals.module.exports;var b=i.locals={},j=n(t.validPath);b.exports={},b.module={exports:b.exports},b.require=function(e,r){var n=c(e,{pkg:w,path:j,v:t.versions});return _.sdep&&d(n),n},m||!h.require.main?b.require.main={filename:"./",paths:[]}:b.require.main=h.require.main;var k=[b.module.exports,b.require,b.module,t.validPath,j,w];return l("before-import",k),i.fn.apply(k[0],k),l("after-import",k),b.module.exports}if(e.FuseBox)return e.FuseBox;var p="undefined"!=typeof ServiceWorkerGlobalScope,v="undefined"!=typeof WorkerGlobalScope,m="undefined"!=typeof window&&"undefined"!=typeof window.navigator||v||p,h=m?v||p?{}:window:global;m&&(h.global=v||p?{}:window),e=m&&"undefined"==typeof __fbx__dnm__?e:module.exports;var g=m?v||p?{}:window.__fsbx__=window.__fsbx__||{}:h.$fsbx=h.$fsbx||{};m||(h.require=require);var x=g.p=g.p||{},y=g.e=g.e||{},_=function(){function r(){}return r.global=function(e,r){return void 0===r?h[e]:void(h[e]=r)},r.import=function(e,r){return c(e,r)},r.on=function(e,r){y[e]=y[e]||[],y[e].push(r)},r.exists=function(e){try{var r=u(e,{});return void 0!==r.file}catch(e){return!1}},r.remove=function(e){var r=u(e,{}),n=x[r.pkgName];n&&n.f[r.validPath]&&delete n.f[r.validPath]},r.main=function(e){return this.mainFile=e,r.import(e,{})},r.expose=function(r){var n=function(n){var t=r[n].alias,i=c(r[n].pkg);"*"===t?a(i,function(r,n){return e[r]=n}):"object"==typeof t?a(t,function(r,n){return e[n]=i[r]}):e[t]=i};for(var t in r)n(t)},r.dynamic=function(r,n,t){this.pkg(t&&t.pkg||"default",{},function(t){t.file(r,function(r,t,i,o,a){var f=new Function("__fbx__dnm__","exports","require","module","__filename","__dirname","__root__",n);f(!0,r,t,i,o,a,e)})})},r.flush=function(e){var r=x.default;for(var n in r.f)e&&!e(n)||delete r.f[n].locals},r.pkg=function(e,r,n){if(x[e])return n(x[e].s);var t=x[e]={};return t.f={},t.v=r,t.s={file:function(e,r){return t.f[e]={fn:r}}},n(t.s)},r.addPlugin=function(e){this.plugins.push(e)},r.packages=x,r.isBrowser=m,r.isServer=!m,r.plugins=[],r}();return m||(h.FuseBox=_),e.FuseBox=_}(this))
